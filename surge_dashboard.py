@@ -7,136 +7,102 @@ from pyproj import Transformer
 from streamlit_js_eval import get_geolocation
 import time
 
-# --- 1. 介面明亮化與 CSS 強制設定 ---
-st.set_page_config(page_title="雙北全域戰情室", page_icon="💎", layout="wide")
+# --- 1. 介面與 Chrome 防黑設定 ---
+st.set_page_config(page_title="雙北戰報：行政區精準版", page_icon="🚕", layout="wide")
 
 st.markdown("""
     <style>
-        /* 強制亮色模式，防止 Chrome 自動反轉 */
         :root { color-scheme: light !important; }
         html, body, [data-testid="stAppViewContainer"] { background-color: white !important; color: black !important; }
-        
-        /* 側邊欄樣式 (刷淡灰色) */
-        [data-testid="stSidebar"] { background-color: #f8f9fa !important; }
-        
-        /* 數據卡片 (Metric) 樣式：比照截圖但改為亮色 */
-        [data-testid="stMetric"] {
-            background-color: #ffffff !important;
-            border: 1px solid #dee2e6 !important;
-            border-left: 5px solid #d32f2f !important; /* 保留截圖的紅色側條感 */
-            border-radius: 8px;
-            padding: 15px !important;
-        }
-        
-        /* 按鈕樣式 */
-        div.stButton > button:first-child {
-            background-color: #FFD700 !important; color: black !important;
-            font-weight: bold; border-radius: 8px; width: 100%;
-        }
+        .stMetric { background-color: #f8f9fa !important; border: 1px solid #eee !important; border-radius: 12px; }
+        .leaflet-container { filter: none !important; background: white !important; }
     </style>
 """, unsafe_allow_html=True)
 
-# --- 2. 核心轉換與地址函式 ---
+# --- 2. 核心功能：地址與數據 ---
 transformer = Transformer.from_crs("epsg:3826", "epsg:4326")
 
-def get_address(lat, lon):
-    """將座標轉換為中文地址"""
+def get_addr_pro(lat, lon):
     try:
+        headers = {'User-Agent': f'UberRadar_Ayan_{int(time.time())}'}
         url = f"https://nominatim.openstreetmap.org/reverse?format=json&lat={lat}&lon={lon}&addressdetails=1&accept-language=zh-TW"
-        headers = {'User-Agent': f'UberDiamondRadar_{int(time.time())}'}
         res = requests.get(url, headers=headers, timeout=5).json()
         addr = res.get('address', {})
         dist = addr.get('suburb') or addr.get('city_district') or addr.get('town') or ""
         road = addr.get('road') or ""
         return f"{dist} {road}".strip() if (dist or road) else "定位中心"
-    except:
-        return f"{lat}, {lon}"
+    except: return f"{lat}, {lon}"
 
 @st.cache_data(ttl=60)
 def fetch_data():
     all_data = []
-    log = {"台北": 0, "新北": 0}
-    headers = {'User-Agent': 'Mozilla/5.0'}
-    # 台北市
+    # 台北市抓取
     try:
         t_d = requests.get("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_alldesc.json", timeout=10).json()['data']['park']
         t_a = requests.get("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_allavailable.json", timeout=10).json()['data']['park']
         t_df = pd.merge(pd.DataFrame(t_d), pd.DataFrame(t_a), on='id')
         for _, r in t_df.iterrows():
             lat, lon = transformer.transform(float(r['tw97x']), float(r['tw97y']))
-            occ = max(0, min(100, ((float(r['totalcar']) - float(r['availablecar'])) / float(r['totalcar']) * 100)))
-            all_data.append({'name': r['name'], 'lat': lat, 'lon': lon, 'occ': round(occ, 1), 'city': '台北'})
-        log["台北"] = len(t_df)
+            total, avail = float(r['totalcar']), float(r['availablecar'])
+            occ = max(0, min(100, ((total - avail) / total * 100))) if total > 0 else 0
+            color = '#d32f2f' if occ >= 95 else ('#f57c00' if occ >= 80 else '#388e3c')
+            # 關鍵修改：抓取 r['area'] 作為行政區
+            all_data.append({'場站名稱': r['name'], 'lat': lat, 'lon': lon, '佔用%': round(occ, 1), 'color': color, '行政區': r['area']})
     except: pass
-    # 新北市 (修復連線)
+    
+    # 新北市抓取
     try:
-        n_res = requests.get("https://data.ntpc.gov.tw/api/datasets/E09B3532-60D6-4547-BE9A-60C1F7AA0B0A/json", headers=headers, timeout=12).json()
+        n_res = requests.get("https://data.ntpc.gov.tw/api/datasets/E09B3532-60D6-4547-BE9A-60C1F7AA0B0A/json", timeout=12).json()
         for r in n_res:
             lat, lon = float(r.get('LAT') or 0), float(r.get('LON') or 0)
             if lat > 20:
-                t, a = float(r.get('TOTAL') or 1), float(r.get('AVAILABLE') or 0)
-                occ = max(0, min(100, ((t - a) / t * 100)))
-                all_data.append({'name': r.get('NAME'), 'lat': lat, 'lon': lon, 'occ': round(occ, 1), 'city': '新北'})
-                log["新北"] += 1
+                t, a = float(r.get('TOTAL') or 0), float(r.get('AVAILABLE') or 0)
+                occ = max(0, min(100, ((t - a) / t * 100))) if t > 0 else 0
+                color = '#d32f2f' if occ >= 95 else ('#f57c00' if occ >= 80 else '#388e3c')
+                # 關鍵修改：抓取 r.get('AREA') 作為行政區
+                all_data.append({'場站名稱': r.get('NAME'), 'lat': lat, 'lon': lon, '佔用%': round(occ, 1), 'color': color, '行政區': r.get('AREA')})
     except: pass
-    return pd.DataFrame(all_data), log
+    
+    return pd.DataFrame(all_data)
 
-# --- 3. 側邊欄連動控制 (比照截圖) ---
-with st.sidebar:
-    st.header("⚙️ 戰術開關")
-    show_rain = st.toggle("顯示即時雨雲 (疊加)", value=True)
-    zoom_val = st.slider("地圖初始縮放", 10, 18, 14)
-    if st.button("🔄 重新載入雙北數據"):
-        st.cache_data.clear()
-        st.rerun()
-
-# --- 4. GPS 與地址處理 ---
+# --- 3. 狀態處理 ---
 if 'pos' not in st.session_state: st.session_state['pos'] = (24.9669, 121.5451)
-if 'addr_str' not in st.session_state: st.session_state['addr_str'] = "定位中..."
+if 'addr' not in st.session_state: st.session_state['addr'] = "定位中..."
 
 curr = get_geolocation()
 if curr and 'coords' in curr:
     new_lat, new_lon = round(curr['coords']['latitude'], 4), round(curr['coords']['longitude'], 4)
-    if abs(new_lat - st.session_state['pos'][0]) > 0.0005 or st.session_state['addr_str'] == "定位中...":
+    if abs(new_lat - st.session_state['pos'][0]) > 0.0005 or st.session_state['addr'] == "定位中...":
         st.session_state['pos'] = (new_lat, new_lon)
-        st.session_state['addr_str'] = get_address(new_lat, new_lon)
+        st.session_state['addr'] = get_addr_pro(new_lat, new_lon)
 
-u_lat, u_lon = st.session_state['pos']
+# --- 4. 畫面渲染 ---
+st.title("🛡️ 雙北戰報 (行政區精準化)")
+df = fetch_data()
 
-# --- 5. 畫面渲染 ---
-st.header("🛡️ 雙北全域戰情室 (鑽石駕駛明亮版)")
-
-df, stats = fetch_data()
-
-# 儀表板 (比照截圖四格)
 m1, m2, m3, m4 = st.columns(4)
-m1.metric("台北連線", f"{stats['台北']} 處", "正常")
-m2.metric("新北連線", f"{stats['新北']} 處", "已修正" if stats['新北'] > 0 else "連線中")
-m3.metric("Surge 高潛力點", f"{len(df[df['occ'] >= 85]) if not df.empty else 0} 處", "建議出車")
-m4.metric("目前地址", st.session_state['addr_str']) # 這裡從座標改為地址
+m1.metric("台北站點", f"{len(df[df['行政區'].isin(['信義區','大安區','松山區','中正區','萬華區','中山區','大同區','南港區','內湖區','士林區','北投區','文山區'])]) if not df.empty else 0} 處")
+m2.metric("新北站點", f"{len(df) - len(df[df['行政區'].isin(['信義區','大安區','松山區','中正區','萬華區','中山區','大同區','南港區','內湖區','士林區','北投區','文山區'])]) if not df.empty else 0} 處")
+m3.metric("Surge 預警", f"{len(df[df['佔用%'] >= 90]) if not df.empty else 0} 處")
+m4.metric("目前地址", st.session_state['addr'])
 
 st.divider()
 
-col_map, col_list = st.columns([2.5, 1.2])
+col_map, col_list = st.columns([3, 1.3])
 
 with col_map:
-    # 強制使用明亮地圖
-    m = folium.Map(location=[u_lat, u_lon], zoom_start=zoom_val, tiles="openstreetmap")
+    m = folium.Map(location=st.session_state['pos'], zoom_start=14, 
+                   tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", attr="Google")
     
-    if show_rain:
-        rain_url = f"https://www.cwa.gov.tw/Data/radar/CV1_3600_EL.png?v={int(time.time()/300)}"
-        folium.raster_layers.ImageOverlay(image=rain_url, bounds=[[21.7, 118.0], [25.5, 122.5]], opacity=0.3).add_to(m)
-
     if not df.empty:
         for _, row in df.iterrows():
-            color = '#ff0000' if row['occ'] >= 90 else ('#ffa500' if row['occ'] >= 70 else '#008000')
-            folium.CircleMarker(location=[row['lat'], row['lon']], radius=7, color=color, fill=True, fill_opacity=0.6).add_to(m)
-    
-    folium.Marker([u_lat, u_lon], icon=folium.Icon(color='blue', icon='car', prefix='fa')).add_to(m)
-    st_folium(m, width="100%", height=550, key="diamond_bright_map")
+            folium.CircleMarker(location=[row['lat'], row['lon']], radius=7, color=row['color'], fill=True, fill_opacity=0.6).add_to(m)
+    folium.Marker(st.session_state['pos'], icon=folium.Icon(color='blue', icon='car', prefix='fa')).add_to(m)
+    st_folium(m, width="100%", height=600, key="district_radar_v12")
 
 with col_list:
-    st.subheader("🔥 滿位警戒 (Surge 預警)")
+    st.subheader("🔥 滿位警戒 (行政區版)")
     if not df.empty:
-        high_df = df[df['occ'] >= 80].sort_values('occ', ascending=False).head(15)
-        st.dataframe(high_df[['name', 'occ', 'city']], hide_index=True)
+        # 只顯示佔用率高的，且顯示行政區
+        high_df = df[df['佔用%'] >= 85].sort_values('佔用%', ascending=False).head(20)
+        st.dataframe(high_df[['場站名稱', '佔用%', '行政區']], hide_index=True)
