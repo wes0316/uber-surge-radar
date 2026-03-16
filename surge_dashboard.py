@@ -6,6 +6,10 @@ from streamlit_folium import st_folium
 from pyproj import Transformer
 from streamlit_js_eval import get_geolocation
 import time
+import urllib3
+
+# --- 隱藏 SSL 憑證警告 (針對政府 API) ---
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # --- 1. 視覺系統 (維持 Uber Black 質感) ---
 st.set_page_config(page_title="Uber 運輸需求預測", page_icon="🚕", layout="wide")
@@ -25,7 +29,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 2. 核心參數與資料抓取 (免認證 Open Data 版) ---
+# --- 2. 核心參數與資料抓取 (免認證 Open Data + 略過 SSL 版) ---
 transformer = Transformer.from_crs("epsg:3826", "epsg:4326")
 
 def get_address_pro(lat, lon):
@@ -52,28 +56,24 @@ def fetch_complete_data():
             all_data.append({'場站名稱': r['name'], 'lat': lat, 'lon': lon, '佔用%': round(max(0, min(100, occ)), 1), '行政區': r['area'], '縣市': '台北'})
     except: pass
 
-    # --- Part B: 新北市 (新北市資料開放平臺) ---
+    # --- Part B: 新北市 (略過 SSL 驗證) ---
     try:
-        # 新北市路外公共停車場資訊 (靜態，UUID: B146...)，設定 size=2000 確保抓取全部站點
         s_url = "https://data.ntpc.gov.tw/api/datasets/B1464EF0-9C7C-4A6F-ABF7-6BDF32847E68/json?page=0&size=2000"
-        # 新北市公有路外停車場即時賸餘車位數 (動態，UUID: E09B...)
         d_url = "https://data.ntpc.gov.tw/api/datasets/E09B35A5-A738-48CC-B0F5-570B67AD9C78/json?page=0&size=2000"
         
-        s_res = requests.get(s_url, timeout=15).json()
-        d_res = requests.get(d_url, timeout=15).json()
+        # 關鍵修正：加入 verify=False 略過政府網站的 SSL 憑證檢查
+        s_res = requests.get(s_url, timeout=15, verify=False).json()
+        d_res = requests.get(d_url, timeout=15, verify=False).json()
         
-        # 建立動態資料字典，以 ID 為 Key，AVAILABLE 為 Value
         dyn_map = {str(item.get('ID', '')).strip(): float(item.get('AVAILABLE', 0)) for item in d_res if 'ID' in item}
         
         for s in s_res:
             pid = str(s.get('ID', '')).strip()
-            # 如果該停車場有在動態資料庫中
             if pid in dyn_map:
                 tw97x, tw97y = s.get('TW97X'), s.get('TW97Y')
                 total = float(s.get('TOTALCAR', 0) or 0)
                 avail = dyn_map[pid]
                 
-                # 排除無座標，或 API 回傳 -9 (表示設備斷線/無連線) 的站點
                 if tw97x and tw97y and total > 0 and avail >= 0:
                     try:
                         lat, lon = transformer.transform(float(tw97x), float(tw97y))
@@ -138,7 +138,7 @@ with col_map:
                 tooltip=f"{row['場站名稱']}: {row['佔用%']}%"
             ).add_to(m)
     folium.Marker(st.session_state['gps_pos'], icon=folium.Icon(color='blue', icon='car', prefix='fa')).add_to(m)
-    st_folium(m, width="100%", height=600, key="uber_radar_opendata")
+    st_folium(m, width="100%", height=600, key="uber_radar_opendata_ssl_fixed")
 
 with col_list:
     st.markdown("### 🔥 紅區排行")
