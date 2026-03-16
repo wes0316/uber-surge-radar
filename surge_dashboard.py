@@ -7,6 +7,7 @@ from pyproj import Transformer
 from streamlit_js_eval import get_geolocation
 import time
 import urllib3
+import copy
 import base64
 
 # --- 隱藏 SSL 憑證警告 (針對政府 API) ---
@@ -38,7 +39,15 @@ st.markdown("""
         .dot-red { color: #FF0000 !important; font-size: 20px; font-weight: bold; }
         .dot-orange { color: #FFAA00 !important; font-size: 20px; font-weight: bold; }
         .dot-green { color: #28A745 !important; font-size: 20px; font-weight: bold; }
+        .dot-gray { color: #666666 !important; font-size: 20px; font-weight: bold; }
         .legend-text { color: #DCDCDC !important; font-size: 16px; margin-left: 5px; }
+
+        /* 戰術開關 (Toggle) 標籤強制不換行 */
+        div[data-testid="stWidgetLabel"] p { 
+            color: #DCDCDC !important; 
+            white-space: nowrap !important; /* 修正文字被擠壓換行的問題 */
+        }
+        .st-at { background-color: #276EF1 !important; } 
 
         /* 數據卡片 (Metric) */
         div[data-testid="stMetric"] {
@@ -77,9 +86,18 @@ def get_address_pro(lat, lon):
         return f"{dist} {road}".strip() if (dist or road) else f"{lat}, {lon}"
     except: return f"{lat}, {lon}"
 
+@st.cache_data(ttl=86400)
+def fetch_geojson():
+    url = "https://raw.githubusercontent.com/ronnywang/twgeojson/master/twtown2010.3.json"
+    headers = {'User-Agent': 'Mozilla/5.0'}
+    try:
+        res = requests.get(url, headers=headers, timeout=10)
+        return res.json()
+    except:
+        return None
+
 @st.cache_data(ttl=300)
 def get_radar_base64():
-    """ 透過後端抓取雨圖並轉 Base64，突破氣象署防盜鏈與瀏覽器 CORS 限制 """
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         'Referer': 'https://www.cwa.gov.tw/'
@@ -218,7 +236,7 @@ with col_map:
                 opacity=0.45, name="雷達回波圖"
             ).add_to(m)
 
-    # B. TOP 3 戰區：半徑 2 公里光罩 
+    # B. TOP 3 戰區：半徑 8 公里光罩
     if show_heatmap and not df.empty and not red_counts.empty:
         # 計算各行政區的地理中心點 (將該區所有停車場的經緯度平均)
         district_centers = df.groupby('行政區')[['lat', 'lon']].mean().to_dict('index')
@@ -241,10 +259,10 @@ with col_map:
                 else:
                     color, opac = '#FFAA00', 0.1  # TOP 3：橘黃光罩
                 
-                # 畫出 2 公里半徑的圓 (folium.Circle 的 radius 單位為公尺)
+                # 畫出 8 公里半徑的圓 (folium.Circle 的 radius 單位為公尺)
                 folium.Circle(
                     location=[center_lat, center_lon],
-                    radius=2000, 
+                    radius=8000, 
                     color=color,
                     weight=2,
                     fill=True,
