@@ -7,40 +7,33 @@ from pyproj import Transformer
 from streamlit_js_eval import get_geolocation
 import time
 
-# --- 1. Uber 旗艦科技視覺系統 (CSS 強制顯色版) ---
-st.set_page_config(page_title="Uber 運輸需求預測", page_icon="🚕", layout="wide")
+# --- 1. Uber 旗艦科技視覺系統 (CSS 完整版) ---
+st.set_page_config(page_title="Uber 雙北需求戰報", page_icon="🚕", layout="wide")
 
 st.markdown("""
     <style>
-        /* 全域底色：深炭灰 */
         html, body, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {
             background-color: #1A1A1A !important;
             color: #DCDCDC !important; 
             font-family: 'Inter', -apple-system, sans-serif !important;
         }
-
-        /* 側邊欄：Uber Black 質感 */
         [data-testid="stSidebar"] {
             background-color: #111111 !important;
             border-right: 1px solid #333333 !important;
         }
-        
-        /* 修正文字顏色，但不使用 !important 蓋掉所有內容 */
         [data-testid="stSidebar"] h3, [data-testid="stSidebar"] p {
             color: #B0B0B0; 
         }
 
-        /* --- 核心修正：定義圖例專用顏色類別 --- */
+        /* 圖例專用彩色 Class */
         .dot-red { color: #FF0000 !important; font-size: 20px; font-weight: bold; }
         .dot-orange { color: #FFAA00 !important; font-size: 20px; font-weight: bold; }
         .dot-green { color: #28A745 !important; font-size: 20px; font-weight: bold; }
         .legend-text { color: #DCDCDC !important; font-size: 16px; margin-left: 5px; }
 
-        /* 戰術開關 (Toggle) 特效 */
         div[data-testid="stWidgetLabel"] p { color: #DCDCDC !important; }
         .st-at { background-color: #276EF1 !important; } 
 
-        /* 數據卡片 (Metric) */
         div[data-testid="stMetric"] {
             background-color: #242424 !important;
             border: 1px solid #333333 !important;
@@ -52,20 +45,17 @@ st.markdown("""
         [data-testid="stMetricValue"] { color: #E0E0E0 !important; font-weight: 700 !important; }
         [data-testid="stMetricLabel"] { color: #909090 !important; font-size: 14px !important; }
 
-        /* 地圖邊框 */
         .leaflet-container { 
             border: 2px solid #000000 !important;
             border-radius: 8px !important;
             filter: none !important; 
             background-color: white !important;
         }
-        
-        /* 分隔線 */
         hr { border-top: 1px solid #333333 !important; }
     </style>
 """, unsafe_allow_html=True)
 
-# --- 2. 核心數據邏輯 (與前版一致) ---
+# --- 2. 核心數據邏輯：新北修復版 ---
 transformer = Transformer.from_crs("epsg:3826", "epsg:4326")
 
 def get_address_pro(lat, lon):
@@ -82,7 +72,9 @@ def get_address_pro(lat, lon):
 @st.cache_data(ttl=60)
 def fetch_complete_data():
     all_data = []
-    headers = {'User-Agent': 'Mozilla/5.0'}
+    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)'}
+    
+    # --- 台北市抓取 ---
     try:
         t_d = requests.get("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_alldesc.json", timeout=10).json()['data']['park']
         t_a = requests.get("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_allavailable.json", timeout=10).json()['data']['park']
@@ -93,30 +85,44 @@ def fetch_complete_data():
             occ = max(0, min(100, ((total - avail) / total * 100))) if total > 0 else 0
             all_data.append({'場站名稱': r['name'], 'lat': lat, 'lon': lon, '佔用%': round(occ, 1), '行政區': r['area'], '縣市': '台北'})
     except: pass
+
+    # --- 新北市抓取 (修復版) ---
     try:
-        n_res = requests.get("https://data.ntpc.gov.tw/api/datasets/E09B3532-60D6-4547-BE9A-60C1F7AA0B0A/json", headers=headers, timeout=15).json()
-        for r in n_res:
-            lat, lon = float(r.get('LAT') or 0), float(r.get('LON') or 0)
-            if lat > 20:
-                total, avail = float(r.get('TOTAL') or 1), float(r.get('AVAILABLE') or 0)
-                occ = max(0, min(100, ((total - avail) / total * 100)))
-                all_data.append({'場站名稱': r.get('NAME'), 'lat': lat, 'lon': lon, '佔用%': round(occ, 1), '行政區': r.get('AREA'), '縣市': '新北'})
+        n_url = "https://data.ntpc.gov.tw/api/datasets/E09B3532-60D6-4547-BE9A-60C1F7AA0B0A/json"
+        n_res = requests.get(n_url, headers=headers, timeout=15).json()
+        if isinstance(n_res, list):
+            for r in n_res:
+                try:
+                    # 關鍵：同時支援大小寫 key 並強制轉 float
+                    lat = float(r.get('LAT') or r.get('lat') or 0)
+                    lon = float(r.get('LON') or r.get('lon') or 0)
+                    if lat > 20:
+                        total = float(r.get('TOTAL') or r.get('total') or 1)
+                        avail = float(r.get('AVAILABLE') or r.get('available') or 0)
+                        occ = max(0, min(100, ((total - avail) / total * 100)))
+                        all_data.append({
+                            '場站名稱': r.get('NAME') or r.get('name'), 
+                            'lat': lat, 'lon': lon, '佔用%': round(occ, 1), 
+                            '行政區': r.get('AREA') or r.get('area'), 
+                            '縣市': '新北'
+                        })
+                except: continue
     except: pass
+    
     return pd.DataFrame(all_data)
 
-# --- 3. 側邊欄：Logo 與最終修正彩色圖例 ---
+# --- 3. 側邊欄 ---
 with st.sidebar:
-    st.image("logo.png", width=240)
-    st.markdown("### 🛠️ 需求變因控制")
+    st.image("logo.png", width=120)
+    st.markdown("### 🛠️ 戰術控制")
     show_rain = st.toggle("疊加雷達雨圖", value=True)
     show_heatmap = st.toggle("紅區行政區著色", value=True)
     zoom_val = st.slider("地圖縮放級別", 10, 18, 14)
-    if st.button("🔄 同步API數據"):
+    if st.button("🔄 同步數據"):
         st.cache_data.clear()
         st.rerun()
     st.divider()
     
-    # 這裡使用剛才在 CSS 裡定義的 Class
     st.markdown("### 📍 雷達圖例說明")
     st.markdown(f"""
         <div style="margin-bottom: 10px;">
@@ -131,7 +137,7 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
 # --- 4. 畫面渲染 ---
-st.title("🛡️ Uber運輸需求預測")
+st.title("🛡️ Uber 雙北需求戰報")
 df = fetch_complete_data()
 
 red_zones = df[df['佔用%'] >= 90] if not df.empty else pd.DataFrame()
@@ -151,7 +157,7 @@ if curr and 'coords' in curr:
 m1, m2, m3, m4 = st.columns(4)
 m1.metric("台北站點", f"{len(df[df['縣市']=='台北']) if not df.empty else 0} 處")
 m2.metric("新北站點", f"{len(df[df['縣市']=='新北']) if not df.empty else 0} 處")
-m3.metric("雙北需求紅區", f"{len(red_zones)} 處")
+m3.metric("全域需求紅區", f"{len(red_zones)} 處")
 m4.metric("目前位置", st.session_state['addr_label'])
 
 st.divider()
@@ -172,8 +178,8 @@ with col_map:
             folium.CircleMarker(location=[row['lat'], row['lon']], radius=7, color=c, fill=True, fill_opacity=0.7, weight=1).add_to(m)
     
     folium.Marker(st.session_state['gps_pos'], icon=folium.Icon(color='blue', icon='car', prefix='fa')).add_to(m)
-    st_folium(m, width="100%", height=600, key="uber_radar_final_fix")
+    st_folium(m, width="100%", height=600, key="uber_radar_data_fix")
 
 with col_list:
-    st.markdown("### 📈 紅區排行 TOP 10")
+    st.markdown("### 📈 紅區排行榜")
     st.dataframe(red_counts.head(10), hide_index=True, use_container_width=True)
