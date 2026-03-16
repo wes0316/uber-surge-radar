@@ -108,7 +108,7 @@ def fetch_complete_data():
 # --- 3. 側邊欄：左上角 Logo 置入 ---
 with st.sidebar:
     # 採用亮白色 Uber Logo，確保在深色背景下清晰
-    st.image("https://github.com/wes0316/uber-surge-radar/commit/7d8244ea6703a956e7931f54a3330bad0a35791a", width=120)
+    st.image("logo.png", width=120)
     st.markdown("### 🛠️ 戰術控制")
     show_rain = st.toggle("疊加雷達雨圖", value=True)
     show_heatmap = st.toggle("紅區行政區著色", value=True)
