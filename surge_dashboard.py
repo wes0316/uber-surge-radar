@@ -28,7 +28,7 @@ st.markdown("""
             color: #B0B0B0 !important;
         }
 
-        /* 戰術開關 (Toggle) 特效：開啟時顯示 Uber Blue */
+        /* 戰術開關 (Toggle) 特效 */
         div[data-testid="stWidgetLabel"] p { color: #DCDCDC !important; }
         .st-at { background-color: #276EF1 !important; } 
 
@@ -44,14 +44,7 @@ st.markdown("""
         [data-testid="stMetricValue"] { color: #E0E0E0 !important; font-weight: 700 !important; }
         [data-testid="stMetricLabel"] { color: #909090 !important; font-size: 14px !important; }
 
-        /* 資料表格暗色化 */
-        [data-testid="stDataFrame"] {
-            background-color: #242424 !important;
-            border: 1px solid #333333 !important;
-        }
-
-        /* 標題與地圖邊框 */
-        h1, h2, h3 { color: #E0E0E0 !important; font-weight: 700 !important; }
+        /* 地圖邊框 */
         .leaflet-container { 
             border: 2px solid #000000 !important;
             border-radius: 8px !important;
@@ -103,7 +96,7 @@ def fetch_complete_data():
     except: pass
     return pd.DataFrame(all_data)
 
-# --- 3. 側邊欄：Logo 與更新後的圖例 ---
+# --- 3. 側邊欄：Logo 與彩色圖例 ---
 with st.sidebar:
     st.image("logo.png", width=120)
     st.markdown("### 🛠️ 戰術控制")
@@ -115,11 +108,11 @@ with st.sidebar:
         st.rerun()
     st.divider()
     
-    # 這是你剛才要求更新的部分
+    # 圖例顏色強化：將圓點標註為地圖實際顏色
     st.markdown("### 📍 雷達圖例說明")
-    st.markdown('<p style="color:#FF4B4B; font-size:14px;">● 需求紅區 (佔用 >= 90%)</p>', unsafe_allow_html=True)
-    st.markdown('<p style="color:#FFAA00; font-size:14px;">● 高潛力區 (佔用 75-89%)</p>', unsafe_allow_html=True)
-    st.markdown('<p style="color:#28A745; font-size:14px;">● 正常區域 (佔用 < 75%)</p>', unsafe_allow_html=True)
+    st.markdown('<p style="font-size:14px;"><span style="color:#FF0000;">●</span> 需求紅區 (佔用 >= 90%)</p>', unsafe_allow_html=True)
+    st.markdown('<p style="font-size:14px;"><span style="color:#FFAA00;">●</span> 高潛力區 (佔用 75-89%)</p>', unsafe_allow_html=True)
+    st.markdown('<p style="font-size:14px;"><span style="color:#28A745;">●</span> 正常區域 (佔用 < 75%)</p>', unsafe_allow_html=True)
 
 # --- 4. 畫面渲染 ---
 st.title("🛡️ Uber 雙北需求戰報")
