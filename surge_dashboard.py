@@ -30,6 +30,7 @@ st.markdown("""
         .dot-red { color: #FF0000 !important; font-size: 20px; font-weight: bold; }
         .dot-orange { color: #FFAA00 !important; font-size: 20px; font-weight: bold; }
         .dot-green { color: #28A745 !important; font-size: 20px; font-weight: bold; }
+        .dot-gray { color: #666666 !important; font-size: 20px; font-weight: bold; }
         .legend-text { color: #DCDCDC !important; font-size: 16px; margin-left: 5px; }
         div[data-testid="stWidgetLabel"] p { color: #DCDCDC !important; }
         .st-at { background-color: #276EF1 !important; } 
@@ -67,7 +68,7 @@ def get_address_pro(lat, lon):
         return f"{dist} {road}".strip() if (dist or road) else f"{lat}, {lon}"
     except: return f"{lat}, {lon}"
 
-@st.cache_data(ttl=86400) # 邊界圖資不常變更，快取一整天
+@st.cache_data(ttl=86400) # 邊界圖資快取一整天
 def fetch_geojson():
     url = "https://raw.githubusercontent.com/ronnywang/twgeojson/master/twtown2010.3.json"
     try:
@@ -93,7 +94,7 @@ def fetch_complete_data():
             all_data.append({'場站名稱': r['name'], 'lat': lat, 'lon': lon, '佔用%': round(occ, 1), '行政區': r['area'], '縣市': '台北'})
     except: pass
     
-    # --- 新北市資料 (Open Data + 略過 SSL + 精準欄位解析) ---
+    # --- 新北市資料 (精準欄位解析) ---
     try:
         s_url = "https://data.ntpc.gov.tw/api/datasets/B1464EF0-9C7C-4A6F-ABF7-6BDF32847E68/json?page=0&size=2000"
         d_url = "https://data.ntpc.gov.tw/api/datasets/E09B35A5-A738-48CC-B0F5-570B67AD9C78/json?page=0&size=2000"
@@ -104,7 +105,6 @@ def fetch_complete_data():
         dyn_map = {}
         for item in d_res:
             if 'ID' in item:
-                # 相容 AVAILABLECAR 與 AVAILABLE 欄位
                 avail_val = item.get('AVAILABLECAR') if item.get('AVAILABLECAR') is not None else item.get('AVAILABLE', 0)
                 dyn_map[str(item['ID']).strip()] = float(avail_val)
         
@@ -112,11 +112,8 @@ def fetch_complete_data():
             pid = str(s.get('ID', '')).strip()
             if pid in dyn_map:
                 tw97x, tw97y = s.get('TW97X'), s.get('TW97Y')
-                
-                # 相容 TOTALCAR 與 TOTAL 欄位
                 total_val = s.get('TOTALCAR') if s.get('TOTALCAR') is not None else s.get('TOTAL', 0)
                 total = float(total_val or 0) 
-                
                 avail = dyn_map[pid]
                 
                 if tw97x and tw97y and total > 0 and avail >= 0:
@@ -124,7 +121,6 @@ def fetch_complete_data():
                         lat, lon = transformer.transform(float(tw97x), float(tw97y))
                         occ = (total - avail) / total * 100
                         occ = max(0, min(100, occ))
-                        
                         all_data.append({
                             '場站名稱': s.get('NAME', '未知站點'),
                             'lat': lat, 'lon': lon,
@@ -133,14 +129,13 @@ def fetch_complete_data():
                             '縣市': '新北'
                         })
                     except: pass
-    except Exception as e:
-        st.sidebar.error(f"新北 API 異常: {e}")
+    except: pass
         
     return pd.DataFrame(all_data)
 
 # --- 3. 側邊欄：Logo 與控制項 ---
 with st.sidebar:
-    st.image("logo.png", width=240) # 請確保目錄下有 logo.png 檔案
+    st.image("logo.png", width=240)
     st.markdown("### 🛠️ 需求變因控制")
     show_rain = st.toggle("疊加雷達雨圖", value=True)
     show_heatmap = st.toggle("紅區行政區著色", value=True)
@@ -152,15 +147,10 @@ with st.sidebar:
     
     st.markdown("### 📍 雷達圖例說明")
     st.markdown(f"""
-        <div style="margin-bottom: 10px;">
-            <span class="dot-red">●</span><span class="legend-text">需求紅區 (佔用 >= 90%)</span>
-        </div>
-        <div style="margin-bottom: 10px;">
-            <span class="dot-orange">●</span><span class="legend-text">高潛力區 (佔用 75-89%)</span>
-        </div>
-        <div style="margin-bottom: 10px;">
-            <span class="dot-green">●</span><span class="legend-text">正常區域 (佔用 < 75%)</span>
-        </div>
+        <div style="margin-bottom: 5px;"><span class="dot-red">●</span><span class="legend-text">需求紅區 (佔用 >= 90%)</span></div>
+        <div style="margin-bottom: 5px;"><span class="dot-orange">●</span><span class="legend-text">高潛力區 (佔用 75-89%)</span></div>
+        <div style="margin-bottom: 5px;"><span class="dot-green">●</span><span class="legend-text">正常區域 (佔用 < 75%)</span></div>
+        <div style="margin-bottom: 5px;"><span class="dot-gray">●</span><span class="legend-text">行政區底圖 (無資料/未觸發)</span></div>
     """, unsafe_allow_html=True)
 
 # --- 4. 畫面與數據處理 ---
@@ -196,10 +186,9 @@ with col_map:
     m = folium.Map(location=st.session_state['gps_pos'], zoom_start=zoom_val, 
                    tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", attr="Google Maps")
     
-    # A. 疊加雷達雨圖
+    # A. 疊加雷達雨圖 (防呆網址)
     if show_rain:
-        # 使用氣象署最新穩定的合成雷達圖網址
-        rain_url = f"https://www.cwa.gov.tw/Data/radar/CV1_3600.png?v={int(time.time()/300)}"
+        rain_url = f"https://cwa.gov.tw/Data/radar/CV1_3600.png?v={int(time.time()/300)}"
         folium.raster_layers.ImageOverlay(
             image=rain_url, 
             bounds=[[21.8, 118.0], [25.4, 122.2]], 
@@ -207,14 +196,14 @@ with col_map:
             name="雷達回波圖"
         ).add_to(m)
 
-    # B. 動態行政區著色
+    # B. 動態行政區著色 (全雙北繪製防呆版)
     if show_heatmap:
         geo_data = fetch_geojson()
-        if geo_data and not df.empty:
+        if geo_data: # 只要圖資載入成功就畫，不依賴 df 是否為空
             geo_data_copy = copy.deepcopy(geo_data)
             
-            # 將 DataFrame 內的行政區名稱統一為「台」，避免字元不合
-            if '行政區' in df.columns:
+            # 準備數據字典
+            if not df.empty and '行政區' in df.columns:
                 df['行政區_純化'] = df['行政區'].astype(str).str.replace('臺', '台').str.strip()
                 red_dict = df[df['佔用%'] >= 90]['行政區_純化'].value_counts().to_dict()
                 valid_districts = set(df['行政區_純化'].unique())
@@ -225,25 +214,26 @@ with col_map:
             filtered_features = []
             for feature in geo_data_copy.get('features', []):
                 props = feature.get('properties', {})
-                
-                # 取得 GeoJSON 內的名稱並統一化
                 t_name = str(props.get('TOWNNAME') or props.get('name') or '').replace('臺', '台').strip()
                 c_name = str(props.get('COUNTYNAME') or '').replace('臺', '台').strip()
                 
-                # 新北市舊名與行政區正名處理
+                # 新北市正名處理
                 if c_name in ['台北縣', '新北市'] and t_name.endswith(('市', '鎮', '鄉')):
                     t_name = t_name[:-1] + '區'
+                if c_name == '台北縣': c_name = '新北市'
                 
-                # 確保是雙北的行政區，且有該區的停車資料
-                if c_name in ['台北市', '新北市', '台北縣'] and t_name in valid_districts:
+                # 只要是雙北，就一律畫出來！
+                if c_name in ['台北市', '新北市']:
                     count = red_dict.get(t_name, 0)
                     
                     if count >= 5: 
                         color, opac = '#FF0000', 0.45 # 高密集紅區
                     elif count > 0: 
                         color, opac = '#FFAA00', 0.25 # 潛力區
-                    else: 
-                        color, opac = '#28A745', 0.05 # 正常/冷清區
+                    elif t_name in valid_districts: 
+                        color, opac = '#28A745', 0.05 # 正常區 (有停車場但無紅區)
+                    else:
+                        color, opac = '#666666', 0.1 # 灰色 (完全沒有停車場數據的區域)
                         
                     feature['properties']['DisplayName'] = f"{t_name} (紅區: {count})"
                     feature['properties']['style'] = {
@@ -274,9 +264,9 @@ with col_map:
     # D. 繪製目前位置車子圖示
     folium.Marker(st.session_state['gps_pos'], icon=folium.Icon(color='blue', icon='car', prefix='fa')).add_to(m)
     
-    # 使用動態 key 強制 Streamlit 重新渲染地圖層
-    dynamic_map_key = f"uber_map_{show_rain}_{show_heatmap}_{zoom_val}"
-    st_folium(m, width="100%", height=600, key=dynamic_map_key)
+    # 【超級關鍵】強迫渲染機制：把當下的開關狀態與時間直接寫進 Key 裡
+    dynamic_map_key = f"uber_map_{show_rain}_{show_heatmap}_{zoom_val}_{int(time.time()/10)}"
+    st_folium(m, width="100%", height=600, key=dynamic_map_key, returned_objects=[])
 
 with col_list:
     st.markdown("### 📈 紅區排行 TOP 10")
