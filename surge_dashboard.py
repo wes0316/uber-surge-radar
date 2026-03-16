@@ -67,7 +67,7 @@ def get_address_pro(lat, lon):
         return f"{dist} {road}".strip() if (dist or road) else f"{lat}, {lon}"
     except: return f"{lat}, {lon}"
 
-@st.cache_data(ttl=86400) # 邊界圖資快取一整天
+@st.cache_data(ttl=86400) # 邊界圖資不常變更，快取一整天
 def fetch_geojson():
     url = "https://raw.githubusercontent.com/ronnywang/twgeojson/master/twtown2010.3.json"
     try:
@@ -101,10 +101,10 @@ def fetch_complete_data():
         s_res = requests.get(s_url, timeout=15, verify=False).json()
         d_res = requests.get(d_url, timeout=15, verify=False).json()
         
-        # 建立動態字典 (相容 AVAILABLECAR 與 AVAILABLE)
         dyn_map = {}
         for item in d_res:
             if 'ID' in item:
+                # 相容 AVAILABLECAR 與 AVAILABLE 欄位
                 avail_val = item.get('AVAILABLECAR') if item.get('AVAILABLECAR') is not None else item.get('AVAILABLE', 0)
                 dyn_map[str(item['ID']).strip()] = float(avail_val)
         
@@ -113,7 +113,7 @@ def fetch_complete_data():
             if pid in dyn_map:
                 tw97x, tw97y = s.get('TW97X'), s.get('TW97Y')
                 
-                # 相容 TOTALCAR 與 TOTAL
+                # 相容 TOTALCAR 與 TOTAL 欄位
                 total_val = s.get('TOTALCAR') if s.get('TOTALCAR') is not None else s.get('TOTAL', 0)
                 total = float(total_val or 0) 
                 
@@ -140,7 +140,7 @@ def fetch_complete_data():
 
 # --- 3. 側邊欄：Logo 與控制項 ---
 with st.sidebar:
-    st.image("logo.png", width=240) # 請確保目錄下有 logo.png
+    st.image("logo.png", width=240) # 請確保目錄下有 logo.png 檔案
     st.markdown("### 🛠️ 需求變因控制")
     show_rain = st.toggle("疊加雷達雨圖", value=True)
     show_heatmap = st.toggle("紅區行政區著色", value=True)
@@ -198,37 +198,54 @@ with col_map:
     
     # A. 疊加雷達雨圖
     if show_rain:
-        rain_url = f"https://www.cwa.gov.tw/Data/radar/CV1_3600_EL.png?v={int(time.time()/300)}"
-        folium.raster_layers.ImageOverlay(image=rain_url, bounds=[[21.7, 118.0], [25.5, 122.5]], opacity=0.35).add_to(m)
+        # 使用氣象署最新穩定的合成雷達圖網址
+        rain_url = f"https://www.cwa.gov.tw/Data/radar/CV1_3600.png?v={int(time.time()/300)}"
+        folium.raster_layers.ImageOverlay(
+            image=rain_url, 
+            bounds=[[21.8, 118.0], [25.4, 122.2]], 
+            opacity=0.45,
+            name="雷達回波圖"
+        ).add_to(m)
 
-    # B. 動態行政區著色 (GeoJSON 深拷貝修復)
+    # B. 動態行政區著色
     if show_heatmap:
         geo_data = fetch_geojson()
         if geo_data and not df.empty:
             geo_data_copy = copy.deepcopy(geo_data)
-            red_dict = red_counts.set_index('行政區')['紅區數'].to_dict()
-            valid_districts = df['行政區'].unique()
+            
+            # 將 DataFrame 內的行政區名稱統一為「台」，避免字元不合
+            if '行政區' in df.columns:
+                df['行政區_純化'] = df['行政區'].astype(str).str.replace('臺', '台').str.strip()
+                red_dict = df[df['佔用%'] >= 90]['行政區_純化'].value_counts().to_dict()
+                valid_districts = set(df['行政區_純化'].unique())
+            else:
+                red_dict = {}
+                valid_districts = set()
             
             filtered_features = []
             for feature in geo_data_copy.get('features', []):
                 props = feature.get('properties', {})
-                t_name = props.get('TOWNNAME') or props.get('name') or props.get('T_Name') or ''
+                
+                # 取得 GeoJSON 內的名稱並統一化
+                t_name = str(props.get('TOWNNAME') or props.get('name') or '').replace('臺', '台').strip()
+                c_name = str(props.get('COUNTYNAME') or '').replace('臺', '台').strip()
                 
                 # 新北市舊名與行政區正名處理
-                if props.get('COUNTYNAME') in ['臺北縣', '新北市'] and t_name.endswith(('市', '鎮', '鄉')):
+                if c_name in ['台北縣', '新北市'] and t_name.endswith(('市', '鎮', '鄉')):
                     t_name = t_name[:-1] + '區'
                 
-                # 僅篩選有數據的行政區
-                if t_name in valid_districts:
+                # 確保是雙北的行政區，且有該區的停車資料
+                if c_name in ['台北市', '新北市', '台北縣'] and t_name in valid_districts:
                     count = red_dict.get(t_name, 0)
+                    
                     if count >= 5: 
-                        color, opac = '#FF0000', 0.4 # 高密集紅區
+                        color, opac = '#FF0000', 0.45 # 高密集紅區
                     elif count > 0: 
                         color, opac = '#FFAA00', 0.25 # 潛力區
                     else: 
                         color, opac = '#28A745', 0.05 # 正常/冷清區
                         
-                    feature['properties']['DisplayName'] = t_name
+                    feature['properties']['DisplayName'] = f"{t_name} (紅區: {count})"
                     feature['properties']['style'] = {
                         'fillColor': color, 'color': color, 'weight': 1.5, 'fillOpacity': opac
                     }
@@ -241,7 +258,7 @@ with col_map:
                     geo_data_copy,
                     name="行政區熱點著色",
                     style_function=lambda x: x['properties']['style'],
-                    tooltip=folium.GeoJsonTooltip(fields=['DisplayName'], aliases=['行政區:'])
+                    tooltip=folium.GeoJsonTooltip(fields=['DisplayName'], aliases=['區域狀態:'])
                 ).add_to(m)
 
     # C. 繪製停車場站點圓餅
@@ -250,13 +267,16 @@ with col_map:
             c = '#FF0000' if row['佔用%'] >= 90 else ('#FFA500' if row['佔用%'] >= 75 else '#28A745')
             folium.CircleMarker(
                 location=[row['lat'], row['lon']], 
-                radius=7, color=c, fill=True, fill_opacity=0.7, weight=1,
+                radius=6, color=c, fill=True, fill_opacity=0.7, weight=1,
                 tooltip=f"{row['場站名稱']}: {row['佔用%']}%"
             ).add_to(m)
     
     # D. 繪製目前位置車子圖示
     folium.Marker(st.session_state['gps_pos'], icon=folium.Icon(color='blue', icon='car', prefix='fa')).add_to(m)
-    st_folium(m, width="100%", height=600, key="uber_radar_master_final")
+    
+    # 使用動態 key 強制 Streamlit 重新渲染地圖層
+    dynamic_map_key = f"uber_map_{show_rain}_{show_heatmap}_{zoom_val}"
+    st_folium(m, width="100%", height=600, key=dynamic_map_key)
 
 with col_list:
     st.markdown("### 📈 紅區排行 TOP 10")
