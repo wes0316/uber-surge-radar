@@ -9,7 +9,7 @@ import time
 import urllib3
 import base64
 
-# --- 隱藏 SSL 憑證警告 (針對政府 API) ---
+# --- 隱藏 SSL 憑證警告 ---
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # --- 1. Uber 旗艦科技視覺系統 ---
@@ -17,46 +17,30 @@ st.set_page_config(page_title="Uber 運輸需求預測", page_icon="🚕", layou
 
 st.markdown("""
     <style>
-        /* 全域底色：深炭灰 */
         html, body, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {
             background-color: #1A1A1A !important;
             color: #DCDCDC !important; 
             font-family: 'Inter', -apple-system, sans-serif !important;
         }
-
-        /* 側邊欄：Uber Black 質感 */
         [data-testid="stSidebar"] {
             background-color: #111111 !important;
             border-right: 1px solid #333333 !important;
         }
-        
         [data-testid="stSidebar"] h3, [data-testid="stSidebar"] p {
             color: #B0B0B0; 
         }
-
-        /* 圖例顏色類別 */
         .dot-red { color: #FF0000 !important; font-size: 20px; font-weight: bold; }
         .dot-orange { color: #FFAA00 !important; font-size: 20px; font-weight: bold; }
         .dot-green { color: #28A745 !important; font-size: 20px; font-weight: bold; }
         .legend-text { color: #DCDCDC !important; font-size: 16px; margin-left: 5px; }
-
-        /* 戰術開關 (Toggle) 標籤強制不換行 */
+        
         div[data-testid="stWidgetLabel"] p { 
             color: #DCDCDC !important; 
             white-space: nowrap !important;
         }
+        div[data-testid="stToggle"] div[data-baseweb="checkbox"] > div { background-color: #555555 !important; }
+        div[data-testid="stToggle"] input:checked + div { background-color: #276EF1 !important; }
 
-        /* --- 核心 UX 修正：自訂 Toggle 開關底色 --- */
-        /* 關閉狀態：灰色 */
-        div[data-testid="stToggle"] div[data-baseweb="checkbox"] > div {
-            background-color: #555555 !important;
-        }
-        /* 開啟狀態：藍色 */
-        div[data-testid="stToggle"] input:checked + div {
-            background-color: #276EF1 !important;
-        }
-
-        /* 數據卡片 (Metric) */
         div[data-testid="stMetric"] {
             background-color: #242424 !important;
             border: 1px solid #333333 !important;
@@ -68,18 +52,16 @@ st.markdown("""
         [data-testid="stMetricValue"] { color: #E0E0E0 !important; font-weight: 700 !important; }
         [data-testid="stMetricLabel"] { color: #909090 !important; font-size: 14px !important; }
 
-        /* 地圖邊框 */
         .leaflet-container { 
             border: 2px solid #000000 !important;
             border-radius: 8px !important;
             background-color: #1A1A1A !important;
         }
-        
         hr { border-top: 1px solid #333333 !important; }
     </style>
 """, unsafe_allow_html=True)
 
-# --- 2. 核心數據邏輯與圖資快取 ---
+# --- 2. 核心數據邏輯 ---
 transformer = Transformer.from_crs("epsg:3826", "epsg:4326")
 
 def get_address_pro(lat, lon):
@@ -95,7 +77,6 @@ def get_address_pro(lat, lon):
 
 @st.cache_data(ttl=300)
 def get_radar_base64():
-    """ 透過後端抓取雨圖並轉 Base64，突破氣象署防盜鏈與瀏覽器 CORS 限制 """
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         'Referer': 'https://www.cwa.gov.tw/'
@@ -117,7 +98,7 @@ def get_radar_base64():
 def fetch_complete_data():
     all_data = []
     
-    # --- 台北市資料 ---
+    # 台北市資料
     try:
         t_d = requests.get("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_alldesc.json", timeout=10).json()['data']['park']
         t_a = requests.get("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_allavailable.json", timeout=10).json()['data']['park']
@@ -126,10 +107,11 @@ def fetch_complete_data():
             lat, lon = transformer.transform(float(r['tw97x']), float(r['tw97y']))
             total, avail = float(r.get('totalcar', 0)), float(r.get('availablecar', 0))
             occ = (total - avail) / total * 100 if total > 0 else 0
-            all_data.append({'場站名稱': r['name'], 'lat': lat, 'lon': lon, '佔用%': round(max(0, min(100, occ)), 1), '行政區': r['area'], '縣市': '台北'})
+            dist_name = str(r.get('area', '')).replace('臺', '台').strip()
+            all_data.append({'場站名稱': r['name'], 'lat': lat, 'lon': lon, '佔用%': round(max(0, min(100, occ)), 1), '行政區': dist_name, '縣市': '台北'})
     except: pass
     
-    # --- 新北市資料 ---
+    # 新北市資料
     try:
         s_url = "https://data.ntpc.gov.tw/api/datasets/B1464EF0-9C7C-4A6F-ABF7-6BDF32847E68/json?page=0&size=2000"
         d_url = "https://data.ntpc.gov.tw/api/datasets/E09B35A5-A738-48CC-B0F5-570B67AD9C78/json?page=0&size=2000"
@@ -154,18 +136,21 @@ def fetch_complete_data():
                     try:
                         lat, lon = transformer.transform(float(tw97x), float(tw97y))
                         occ = (total - avail) / total * 100
+                        dist_name = str(s.get('AREA', '新北市')).replace('臺', '台').strip()
+                        if dist_name == '台北縣': dist_name = '新北市'
+                        
                         all_data.append({
                             '場站名稱': s.get('NAME', '未知站點'),
                             'lat': lat, 'lon': lon,
                             '佔用%': round(max(0, min(100, occ)), 1),
-                            '行政區': s.get('AREA', '新北市'),
+                            '行政區': dist_name,
                             '縣市': '新北'
                         })
                     except: pass
     except: pass
     return pd.DataFrame(all_data)
 
-# --- 3. 側邊欄：極簡 UI 控制項 ---
+# --- 3. 側邊欄 ---
 with st.sidebar:
     st.image("logo.png", width=240)
     st.markdown("### 🛠️ 戰術圖層控制")
@@ -174,7 +159,7 @@ with st.sidebar:
     with c1:
         show_rain = st.toggle("🌧️ 雷達雨圖", value=True)
     with c2:
-        show_heatmap = st.toggle("🔥 熱區著色", value=True)
+        show_heatmap = st.toggle("🔥 熱區光罩", value=True)
     
     st.divider()
     zoom_val = st.slider("地圖縮放級別", 10, 18, 14)
@@ -188,7 +173,7 @@ with st.sidebar:
         <div style="margin-bottom: 5px;"><span class="dot-red">●</span><span class="legend-text">站點紅區 (>= 90%)</span></div>
         <div style="margin-bottom: 5px;"><span class="dot-orange">●</span><span class="legend-text">站點高潛力 (75-89%)</span></div>
         <div style="margin-bottom: 5px;"><span class="dot-green">●</span><span class="legend-text">站點正常 (< 75%)</span></div>
-        <div style="margin-bottom: 5px; color:#FF3D00; font-weight:bold;">🔥 TOP 3 戰區：半徑 8 公里光罩</div>
+        <div style="margin-bottom: 5px; color:#FF3D00; font-weight:bold;">🔥 TOP 3 戰區：核心 2 公里光罩</div>
     """, unsafe_allow_html=True)
 
 # --- 4. 畫面渲染 ---
@@ -219,11 +204,9 @@ st.divider()
 col_map, col_list = st.columns([2.8, 1.2])
 
 with col_map:
-    # 建立 Google Maps 底圖
     m = folium.Map(location=st.session_state['gps_pos'], zoom_start=zoom_val, 
                    tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", attr="Google Maps")
     
-    # A. 疊加雷達雨圖 (Base64 版)
     if show_rain:
         rain_b64 = get_radar_base64()
         if rain_b64:
@@ -232,10 +215,10 @@ with col_map:
                 opacity=0.45, name="雷達回波圖"
             ).add_to(m)
 
-    # B. TOP 3 戰區：半徑 2 公里光罩 (高彩度、低透明度強化版)
-    if show_heatmap and not df.empty and not red_counts.empty:
-        # 計算各行政區的地理中心點
-        district_centers = df.groupby('行政區')[['lat', 'lon']].mean().to_dict('index')
+    # B. TOP 3 戰區：精準鎖定「紅區聚落」核心 (2公里光罩)
+    if show_heatmap and not red_zones.empty and not red_counts.empty:
+        # 【關鍵修復】只針對「紅區(>=90%)站點」去計算地理中位數！徹底排除外縣市同名區或荒郊野外站點的干擾
+        hotspot_centers = red_zones.groupby('行政區')[['lat', 'lon']].median().to_dict('index')
         top3_districts = red_counts.head(3)
         
         for rank_idx, row in top3_districts.iterrows():
@@ -243,28 +226,25 @@ with col_map:
             count = row['紅區數']
             rank = rank_idx + 1
             
-            if t_name in district_centers:
-                center_lat = district_centers[t_name]['lat']
-                center_lon = district_centers[t_name]['lon']
+            # 從紅區聚落中心提取座標
+            if t_name in hotspot_centers:
+                center_lat = hotspot_centers[t_name]['lat']
+                center_lon = hotspot_centers[t_name]['lon']
                 
-                # 強化視覺：提高彩度，並大幅增加不透明度 (Opacity)
-                if rank == 1:
-                    color, opac = '#FF0000', 0.45  # TOP 1：純紅，最強烈
-                elif rank == 2:
-                    color, opac = '#FF3D00', 0.35  # TOP 2：高亮橘紅
-                else:
-                    color, opac = '#FF9100', 0.25  # TOP 3：耀眼橘黃
+                if rank == 1: color, opac = '#FF0000', 0.45  
+                elif rank == 2: color, opac = '#FF3D00', 0.35 
+                else: color, opac = '#FF9100', 0.25  
                 
-                # 畫出 2 公里半徑的圓，並加粗邊框 (weight) 提升輪廓清晰度
+                # 半徑設為精準的 2000 公尺 (2 公里)
                 folium.Circle(
                     location=[center_lat, center_lon],
-                    radius=3000, 
+                    radius=2000, 
                     color=color,
                     weight=3,
                     fill=True,
                     fill_color=color,
                     fill_opacity=opac,
-                    tooltip=f"🏆 TOP {rank}: {t_name} (紅區: {count} 處)"
+                    tooltip=f"🏆 TOP {rank}: {t_name} (爆滿核心區)"
                 ).add_to(m)
                 
     # C. 停車場站點標記
@@ -277,7 +257,6 @@ with col_map:
     # D. 車子定位圖示
     folium.Marker(st.session_state['gps_pos'], icon=folium.Icon(color='blue', icon='car', prefix='fa')).add_to(m)
     
-    # 強制重繪 key
     st_folium(m, width="100%", height=600, key=f"map_{show_rain}_{show_heatmap}_{zoom_val}")
 
 with col_list:
