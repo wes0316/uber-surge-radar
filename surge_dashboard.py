@@ -17,29 +17,16 @@ st.markdown("""
         }
         [data-testid="stSidebar"] { background-color: #111111 !important; }
         .stMetric { background-color: #242424 !important; border-radius: 4px; padding: 10px; border-left: 5px solid #276EF1 !important; }
+        .dot-red { color: #FF0000 !important; font-size: 20px; font-weight: bold; }
+        .dot-orange { color: #FFAA00 !important; font-size: 20px; font-weight: bold; }
+        .dot-green { color: #28A745 !important; font-size: 20px; font-weight: bold; }
+        .legend-text { color: #DCDCDC !important; font-size: 16px; margin-left: 5px; }
+        .leaflet-container { border-radius: 8px !important; }
     </style>
 """, unsafe_allow_html=True)
 
-# --- 2. 核心參數與 TDX 認證 ---
-TDX_CLIENT_ID = 'muder13-4330ef53-c3cc-45b2' 
-TDX_CLIENT_SECRET = '82d70330-f112-4101-9d88-252e0c9b7da8'
-
+# --- 2. 核心參數與資料抓取 (免認證 Open Data 版) ---
 transformer = Transformer.from_crs("epsg:3826", "epsg:4326")
-
-def get_tdx_token():
-    auth_url = "https://tdx.transportdata.tw/auth/realms/TDXConnect/protocol/openid-connect/token"
-    payload = {
-        'content-type': 'application/x-www-form-urlencoded',
-        'grant_type': 'client_credentials',
-        'client_id': TDX_CLIENT_ID,
-        'client_secret': TDX_CLIENT_SECRET
-    }
-    try:
-        response = requests.post(auth_url, data=payload, timeout=10)
-        return response.json().get('access_token')
-    except Exception as e:
-        st.sidebar.error(f"❌ Token 取得失敗: {e}")
-        return None
 
 def get_address_pro(lat, lon):
     try:
@@ -53,7 +40,7 @@ def get_address_pro(lat, lon):
 def fetch_complete_data():
     all_data = []
     
-    # --- 台北市部分 ---
+    # --- Part A: 台北市 (穩定 Blob 來源) ---
     try:
         t_d = requests.get("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_alldesc.json", timeout=10).json()['data']['park']
         t_a = requests.get("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_allavailable.json", timeout=10).json()['data']['park']
@@ -63,65 +50,59 @@ def fetch_complete_data():
             total, avail = float(r.get('totalcar', 0)), float(r.get('availablecar', 0))
             occ = (total - avail) / total * 100 if total > 0 else 0
             all_data.append({'場站名稱': r['name'], 'lat': lat, 'lon': lon, '佔用%': round(max(0, min(100, occ)), 1), '行政區': r['area'], '縣市': '台北'})
-    except: st.sidebar.warning("⚠️ 台北資料連線異常")
+    except: pass
 
-    # --- 新北市部分 (強化診斷版) ---
-    token = get_tdx_token()
-    if token:
-        st.sidebar.success("✅ TDX 認證成功")
-        headers = {'authorization': f'Bearer {token}', 'Accept-Encoding': 'gzip'}
-        try:
-            # 1. 抓取靜態與動態
-            s_url = "https://tdx.transportdata.tw/api/basic/v2/Parking/OffStreet/CarPark/City/NewTaipei?$format=JSON"
-            d_url = "https://tdx.transportdata.tw/api/basic/v2/Parking/OffStreet/Remaining/City/NewTaipei?$format=JSON"
-            
-            s_res = requests.get(s_url, headers=headers, timeout=15).json()
-            d_res = requests.get(d_url, headers=headers, timeout=15).json()
-            
-            # 診斷：抓到幾筆原始資料？
-            s_list = s_res.get('CarParks', []) if isinstance(s_res, dict) else s_res
-            d_list = d_res.get('RemainingResearches', []) if isinstance(d_res, dict) else d_res
-            
-            st.sidebar.write(f"📊 新北靜態站點: {len(s_list)} 筆")
-            st.sidebar.write(f"📊 新北動態車位: {len(d_list)} 筆")
-
-            # 建立動態地圖
-            dyn_map = {item['CarParkID']: item for item in d_list}
-            
-            n_count = 0
-            for s in s_list:
-                pid = s['CarParkID']
-                if pid in dyn_map:
-                    lat = s['CarParkPosition']['PositionLat']
-                    lon = s['CarParkPosition']['PositionLon']
-                    total = s.get('CarCapacity', {}).get('Car', 0)
-                    avail = dyn_map[pid].get('RemainingSpace', {}).get('Car', 0)
-                    
-                    if total > 0:
+    # --- Part B: 新北市 (新北市資料開放平臺) ---
+    try:
+        # 新北市路外公共停車場資訊 (靜態，UUID: B146...)，設定 size=2000 確保抓取全部站點
+        s_url = "https://data.ntpc.gov.tw/api/datasets/B1464EF0-9C7C-4A6F-ABF7-6BDF32847E68/json?page=0&size=2000"
+        # 新北市公有路外停車場即時賸餘車位數 (動態，UUID: E09B...)
+        d_url = "https://data.ntpc.gov.tw/api/datasets/E09B35A5-A738-48CC-B0F5-570B67AD9C78/json?page=0&size=2000"
+        
+        s_res = requests.get(s_url, timeout=15).json()
+        d_res = requests.get(d_url, timeout=15).json()
+        
+        # 建立動態資料字典，以 ID 為 Key，AVAILABLE 為 Value
+        dyn_map = {str(item.get('ID', '')).strip(): float(item.get('AVAILABLE', 0)) for item in d_res if 'ID' in item}
+        
+        for s in s_res:
+            pid = str(s.get('ID', '')).strip()
+            # 如果該停車場有在動態資料庫中
+            if pid in dyn_map:
+                tw97x, tw97y = s.get('TW97X'), s.get('TW97Y')
+                total = float(s.get('TOTALCAR', 0) or 0)
+                avail = dyn_map[pid]
+                
+                # 排除無座標，或 API 回傳 -9 (表示設備斷線/無連線) 的站點
+                if tw97x and tw97y and total > 0 and avail >= 0:
+                    try:
+                        lat, lon = transformer.transform(float(tw97x), float(tw97y))
                         occ = (total - avail) / total * 100
                         all_data.append({
-                            '場站名稱': s['CarParkName']['Zh_tw'],
+                            '場站名稱': s.get('NAME', '未知站點'),
                             'lat': lat, 'lon': lon,
                             '佔用%': round(max(0, min(100, occ)), 1),
-                            '行政區': s.get('Address', '新北市')[3:6],
+                            '行政區': s.get('AREA', '新北市'),
                             '縣市': '新北'
                         })
-                        n_count += 1
-            st.sidebar.write(f"✅ 成功合併新北: {n_count} 筆")
-        except Exception as e:
-            st.sidebar.error(f"❌ 新北解析失敗: {e}")
-    else:
-        st.sidebar.error("❌ 無法取得 Token，請檢查 Client ID/Secret")
+                    except: pass
+    except Exception as e:
+        st.sidebar.error(f"新北開放平臺連線異常: {e}")
             
     return pd.DataFrame(all_data)
 
-# --- 3. UI 與地圖渲染 ---
+# --- 3. 介面渲染 ---
 with st.sidebar:
-    st.markdown("### 🛠️ 偵錯與控制")
-    if st.button("🔄 強制重新同步"):
+    st.markdown("### 🛠️ 控制中心")
+    if st.button("🔄 重新同步數據"):
         st.cache_data.clear()
         st.rerun()
-    zoom_val = st.slider("縮放級別", 10, 18, 14)
+    zoom_val = st.slider("地圖縮放級別", 10, 18, 14)
+    st.divider()
+    st.markdown("### 📍 雷達圖例說明")
+    st.markdown('<span class="dot-red">●</span><span class="legend-text">需求紅區 (>= 90%)</span>', unsafe_allow_html=True)
+    st.markdown('<span class="dot-orange">●</span><span class="legend-text">高潛力區 (75-89%)</span>', unsafe_allow_html=True)
+    st.markdown('<span class="dot-green">●</span><span class="legend-text">正常區域 (< 75%)</span>', unsafe_allow_html=True)
 
 st.title("🛡️ Uber運輸需求預測")
 df = fetch_complete_data()
@@ -141,18 +122,23 @@ m1, m2, m3, m4 = st.columns(4)
 m1.metric("台北站點", f"{len(df[df['縣市']=='台北']) if not df.empty else 0}")
 m2.metric("新北站點", f"{len(df[df['縣市']=='新北']) if not df.empty else 0}")
 m3.metric("雙北紅區", f"{len(red_zones)}")
-m4.metric("座標", f"{st.session_state['gps_pos']}")
+m4.metric("目前座標", f"{st.session_state['gps_pos']}")
+
+st.divider()
 
 col_map, col_list = st.columns([3, 1])
-
 with col_map:
     m = folium.Map(location=st.session_state['gps_pos'], zoom_start=zoom_val, tiles="cartodb dark_matter")
     if not df.empty:
         for _, row in df.iterrows():
             c = '#FF0000' if row['佔用%'] >= 90 else ('#FFA500' if row['佔用%'] >= 75 else '#28A745')
-            folium.CircleMarker(location=[row['lat'], row['lon']], radius=6, color=c, fill=True, fill_opacity=0.6).add_to(m)
+            folium.CircleMarker(
+                location=[row['lat'], row['lon']], 
+                radius=6, color=c, fill=True, fill_opacity=0.6,
+                tooltip=f"{row['場站名稱']}: {row['佔用%']}%"
+            ).add_to(m)
     folium.Marker(st.session_state['gps_pos'], icon=folium.Icon(color='blue', icon='car', prefix='fa')).add_to(m)
-    st_folium(m, width="100%", height=600, key="uber_radar")
+    st_folium(m, width="100%", height=600, key="uber_radar_opendata")
 
 with col_list:
     st.markdown("### 🔥 紅區排行")
