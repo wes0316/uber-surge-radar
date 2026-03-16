@@ -15,7 +15,7 @@ st.markdown("""
         /* 全域底色：深炭灰 (非全黑) */
         html, body, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {
             background-color: #1A1A1A !important;
-            color: #DCDCDC !important; /* 鉑金灰文字，抗疲勞 */
+            color: #DCDCDC !important; /* 鉑金灰文字，減少刺眼感 */
             font-family: 'Inter', -apple-system, sans-serif !important;
         }
 
@@ -28,7 +28,7 @@ st.markdown("""
             color: #B0B0B0 !important;
         }
 
-        /* 戰術開關 (Toggle) 特效：開啟時顯示 Uber Blue */
+        /* 戰術開關 (Toggle) 特效：開啟時顯示亮藍色，關閉時為暗灰色 */
         div[data-testid="stWidgetLabel"] p { color: #DCDCDC !important; }
         .st-at { background-color: #276EF1 !important; } 
 
@@ -55,7 +55,7 @@ st.markdown("""
         .leaflet-container { 
             border: 2px solid #000000 !important;
             border-radius: 8px !important;
-            filter: none !important; /* 地圖保持明亮系 */
+            filter: none !important; /* 地圖保持明亮系，方便閱讀路名 */
             background-color: white !important;
         }
 
@@ -105,9 +105,9 @@ def fetch_complete_data():
     except: pass
     return pd.DataFrame(all_data)
 
-# --- 3. 側邊欄控制 ---
+# --- 3. 側邊欄：左上角 Logo 置入 ---
 with st.sidebar:
-    # 這裡也保留亮色 Logo 保持一致性
+    # 採用亮白色 Uber Logo，確保在深色背景下清晰
     st.image("https://upload.wikimedia.org/wikipedia/commons/b/b1/Uber_logo_2018_white.png", width=120)
     st.markdown("### 🛠️ 戰術控制")
     show_rain = st.toggle("疊加雷達雨圖", value=True)
@@ -118,20 +118,15 @@ with st.sidebar:
         st.rerun()
     st.divider()
     st.markdown("### 📍 雷達圖例說明")
-    st.markdown('<p style="color:#FF4B4B; font-size:14px;">● 需求紅區 (>= 90%)</p>', unsafe_allow_html=True)
-    st.markdown('<p style="color:#FFAA00; font-size:14px;">● 高潛力區 (75-89%)</p>', unsafe_allow_html=True)
-    st.markdown('<p style="color:#28A745; font-size:14px;">● 正常區域 (< 75%)</p>', unsafe_allow_html=True)
+    st.markdown('<p style="color:#FF4B4B; font-size:14px;">● 需求紅區 (佔用 >= 90%)</p>', unsafe_allow_html=True)
+    st.markdown('<p style="color:#FFAA00; font-size:14px;">● 高潛力區 (佔用 75-89%)</p>', unsafe_allow_html=True)
+    st.markdown('<p style="color:#28A745; font-size:14px;">● 正常區域 (佔用 < 75%)</p>', unsafe_allow_html=True)
 
 # --- 4. 畫面渲染 ---
-# 使用 columns 在主畫面左上角再次置入 Logo
-header_left, header_right = st.columns([1, 8])
-with header_left:
-    st.image("https://upload.wikimedia.org/wikipedia/commons/b/b1/Uber_logo_2018_white.png", width=100)
-with header_right:
-    st.title("🛡️ 雙北需求戰報")
-
+st.title("🛡️ Uber 雙北需求戰報")
 df = fetch_complete_data()
 
+# 數據統計
 red_zones = df[df['佔用%'] >= 90] if not df.empty else pd.DataFrame()
 red_counts = red_zones['行政區'].value_counts().reset_index()
 red_counts.columns = ['行政區', '紅區數']
@@ -146,7 +141,7 @@ if curr and 'coords' in curr:
         st.session_state['gps_pos'] = (n_lat, n_lon)
         st.session_state['addr_label'] = get_address_pro(n_lat, n_lon)
 
-# 頂部四格指標
+# 頂部儀表板卡片
 m1, m2, m3, m4 = st.columns(4)
 m1.metric("台北站點", f"{len(df[df['縣市']=='台北']) if not df.empty else 0} 處")
 m2.metric("新北站點", f"{len(df[df['縣市']=='新北']) if not df.empty else 0} 處")
@@ -158,6 +153,7 @@ st.divider()
 col_map, col_list = st.columns([2.8, 1.2])
 
 with col_map:
+    # 保持最清晰的 Google 明亮瓦片
     m = folium.Map(location=st.session_state['gps_pos'], zoom_start=zoom_val, 
                    tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", attr="Google Maps")
     
@@ -171,7 +167,7 @@ with col_map:
             folium.CircleMarker(location=[row['lat'], row['lon']], radius=7, color=c, fill=True, fill_opacity=0.7, weight=1).add_to(m)
     
     folium.Marker(st.session_state['gps_pos'], icon=folium.Icon(color='blue', icon='car', prefix='fa')).add_to(m)
-    st_folium(m, width="100%", height=600, key="uber_tactical_vfinal")
+    st_folium(m, width="100%", height=600, key="uber_tech_radar_vfinal")
 
 with col_list:
     st.markdown("### 📈 紅區排行榜")
