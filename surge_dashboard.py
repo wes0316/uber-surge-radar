@@ -79,8 +79,8 @@ with st.sidebar:
     st.divider()
     
     # 這裡就是你要的圖例區，文字不換行
-    st.subheader("📍 戰術分級圖例")
-    st.markdown('<span class="legend-text">🔴 <b>Surge 警戒</b> (佔用 >= 90%)</span>', unsafe_allow_html=True)
+    st.subheader("📍 出車分級圖例")
+    st.markdown('<span class="legend-text">🔴 <b>需求紅區</b> (佔用 >= 90%)</span>', unsafe_allow_html=True)
     st.markdown('<span class="legend-text">🟠 <b>高潛力區</b> (佔用 75-89%)</span>', unsafe_allow_html=True)
     st.markdown('<span class="legend-text">🟢 <b>正常區域</b> (佔用 < 75%)</span>', unsafe_allow_html=True)
 
@@ -98,7 +98,7 @@ if curr and 'coords' in curr:
 u_lat, u_lon = st.session_state['gps_pos']
 
 # --- 5. UI 渲染 ---
-st.header("🛡️ 雙北全域戰情室 (圖例強化版)")
+st.header("🛡️ Uber雙北戰情室")
 df = fetch_complete_data()
 
 m1, m2, m3, m4 = st.columns(4)
@@ -125,7 +125,7 @@ with col_map:
     st_folium(m, width="100%", height=550, key="legend_fix_map")
 
 with col_list:
-    st.subheader("🔥 滿位警戒 (行政區版)")
+    st.subheader("🔥 滿位警戒 ")
     if not df.empty:
         high_df = df[df['佔用%'] >= 80].sort_values('佔用%', ascending=False).head(20)
         st.dataframe(high_df[['場站名稱', '佔用%', '行政區']], hide_index=True)
