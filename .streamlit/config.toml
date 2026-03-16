@@ -1,9 +1,26 @@
 [theme]
+# 強制基礎主題為亮色，這是解決暗色地圖最關鍵的一行
 base = "light"
+
+# 介面主要顏色 (例如按鈕、拉桿)，維持專業的深灰色
 primaryColor = "#212529"
+
+# 網頁背景顏色 (純白)
 backgroundColor = "#ffffff"
+
+# 次要背景顏色 (例如側邊欄、數據指標卡)，使用亮灰色
 secondaryBackgroundColor = "#f8f9fa"
+
+# 主要文字顏色 (深灰黑色)
 textColor = "#31333f"
 
+# 字體設定
+font = "sans serif"
+
 [server]
+# 雲端佈署建議開啟，不顯示瀏覽器控制列
 headless = true
+
+[browser]
+# 隱藏側邊欄顯示/隱藏的提示，讓 iPad 畫面更乾淨
+showSidebarNavigation = false
