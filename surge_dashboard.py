@@ -105,10 +105,10 @@ def fetch_complete_data():
     except: pass
     return pd.DataFrame(all_data)
 
-# --- 3. 側邊欄：左上角亮色 Logo 與控制項 ---
+# --- 3. 側邊欄控制 ---
 with st.sidebar:
-    # 使用亮色版 Uber Logo
-    st.image("https://upload.wikimedia.org/wikipedia/commons/c/cc/Uber_logo_2018.png", width=120)
+    # 這裡也保留亮色 Logo 保持一致性
+    st.image("https://upload.wikimedia.org/wikipedia/commons/b/b1/Uber_logo_2018_white.png", width=120)
     st.markdown("### 🛠️ 戰術控制")
     show_rain = st.toggle("疊加雷達雨圖", value=True)
     show_heatmap = st.toggle("紅區行政區著色", value=True)
@@ -117,13 +117,19 @@ with st.sidebar:
         st.cache_data.clear()
         st.rerun()
     st.divider()
-    st.markdown("### 📍 雷達圖例")
+    st.markdown("### 📍 雷達圖例說明")
     st.markdown('<p style="color:#FF4B4B; font-size:14px;">● 需求紅區 (>= 90%)</p>', unsafe_allow_html=True)
     st.markdown('<p style="color:#FFAA00; font-size:14px;">● 高潛力區 (75-89%)</p>', unsafe_allow_html=True)
     st.markdown('<p style="color:#28A745; font-size:14px;">● 正常區域 (< 75%)</p>', unsafe_allow_html=True)
 
-# --- 4. 數據準備與 UI 渲染 ---
-st.title("🛡️ Uber 雙北需求戰報")
+# --- 4. 畫面渲染 ---
+# 使用 columns 在主畫面左上角再次置入 Logo
+header_left, header_right = st.columns([1, 8])
+with header_left:
+    st.image("https://upload.wikimedia.org/wikipedia/commons/b/b1/Uber_logo_2018_white.png", width=100)
+with header_right:
+    st.title("🛡️ 雙北需求戰報")
+
 df = fetch_complete_data()
 
 red_zones = df[df['佔用%'] >= 90] if not df.empty else pd.DataFrame()
@@ -152,7 +158,6 @@ st.divider()
 col_map, col_list = st.columns([2.8, 1.2])
 
 with col_map:
-    # 保持明亮地圖圖磚 (Google Maps Style)
     m = folium.Map(location=st.session_state['gps_pos'], zoom_start=zoom_val, 
                    tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", attr="Google Maps")
     
@@ -166,7 +171,7 @@ with col_map:
             folium.CircleMarker(location=[row['lat'], row['lon']], radius=7, color=c, fill=True, fill_opacity=0.7, weight=1).add_to(m)
     
     folium.Marker(st.session_state['gps_pos'], icon=folium.Icon(color='blue', icon='car', prefix='fa')).add_to(m)
-    st_folium(m, width="100%", height=600, key="uber_tactical_v3")
+    st_folium(m, width="100%", height=600, key="uber_tactical_vfinal")
 
 with col_list:
     st.markdown("### 📈 紅區排行榜")
