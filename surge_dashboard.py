@@ -7,7 +7,6 @@ from pyproj import Transformer
 from streamlit_js_eval import get_geolocation
 import time
 import urllib3
-import copy
 import base64
 
 # --- 隱藏 SSL 憑證警告 (針對政府 API) ---
@@ -39,15 +38,23 @@ st.markdown("""
         .dot-red { color: #FF0000 !important; font-size: 20px; font-weight: bold; }
         .dot-orange { color: #FFAA00 !important; font-size: 20px; font-weight: bold; }
         .dot-green { color: #28A745 !important; font-size: 20px; font-weight: bold; }
-        .dot-gray { color: #666666 !important; font-size: 20px; font-weight: bold; }
         .legend-text { color: #DCDCDC !important; font-size: 16px; margin-left: 5px; }
 
         /* 戰術開關 (Toggle) 標籤強制不換行 */
         div[data-testid="stWidgetLabel"] p { 
             color: #DCDCDC !important; 
-            white-space: nowrap !important; /* 修正文字被擠壓換行的問題 */
+            white-space: nowrap !important;
         }
-        .st-at { background-color: #276EF1 !important; } 
+
+        /* --- 核心 UX 修正：自訂 Toggle 開關底色 --- */
+        /* 關閉狀態：灰色 */
+        div[data-testid="stToggle"] div[data-baseweb="checkbox"] > div {
+            background-color: #555555 !important;
+        }
+        /* 開啟狀態：藍色 */
+        div[data-testid="stToggle"] input:checked + div {
+            background-color: #276EF1 !important;
+        }
 
         /* 數據卡片 (Metric) */
         div[data-testid="stMetric"] {
@@ -72,7 +79,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 2. 核心數據邏輯與圖資快取 ---
+# --- 2. 核心數據邏輯 ---
 transformer = Transformer.from_crs("epsg:3826", "epsg:4326")
 
 def get_address_pro(lat, lon):
@@ -86,18 +93,9 @@ def get_address_pro(lat, lon):
         return f"{dist} {road}".strip() if (dist or road) else f"{lat}, {lon}"
     except: return f"{lat}, {lon}"
 
-@st.cache_data(ttl=86400)
-def fetch_geojson():
-    url = "https://raw.githubusercontent.com/ronnywang/twgeojson/master/twtown2010.3.json"
-    headers = {'User-Agent': 'Mozilla/5.0'}
-    try:
-        res = requests.get(url, headers=headers, timeout=10)
-        return res.json()
-    except:
-        return None
-
 @st.cache_data(ttl=300)
 def get_radar_base64():
+    """ 透過後端抓取雨圖並轉 Base64，突破氣象署防盜鏈與瀏覽器 CORS 限制 """
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         'Referer': 'https://www.cwa.gov.tw/'
@@ -167,18 +165,17 @@ def fetch_complete_data():
     except: pass
     return pd.DataFrame(all_data)
 
-# --- 3. 側邊欄：指示燈 UI 與控制項 ---
+# --- 3. 側邊欄：極簡 UI 控制項 ---
 with st.sidebar:
     st.image("logo.png", width=240)
     st.markdown("### 🛠️ 戰術圖層控制")
     
+    # 移除原本的 ON/OFF 文字，依賴 CSS 背景色自動變更
     c1, c2 = st.columns(2)
     with c1:
         show_rain = st.toggle("🌧️ 雷達雨圖", value=True)
-        st.markdown(f"<span style='color:{'#00FFC8' if show_rain else '#888'}; font-weight:bold;'>{'🟢 ON' if show_rain else '⚫ OFF'}</span>", unsafe_allow_html=True)
     with c2:
         show_heatmap = st.toggle("🔥 熱區著色", value=True)
-        st.markdown(f"<span style='color:{'#00FFC8' if show_heatmap else '#888'}; font-weight:bold;'>{'🟢 ON' if show_heatmap else '⚫ OFF'}</span>", unsafe_allow_html=True)
     
     st.divider()
     zoom_val = st.slider("地圖縮放級別", 10, 18, 14)
@@ -259,7 +256,7 @@ with col_map:
                 else:
                     color, opac = '#FFAA00', 0.1  # TOP 3：橘黃光罩
                 
-                # 畫出 8 公里半徑的圓 (folium.Circle 的 radius 單位為公尺)
+                # 畫出 8 公里半徑的圓
                 folium.Circle(
                     location=[center_lat, center_lon],
                     radius=8000, 
