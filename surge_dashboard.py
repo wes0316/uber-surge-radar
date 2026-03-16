@@ -102,7 +102,7 @@ if curr and 'coords' in curr:
         st.session_state['addr_label'] = get_address_pro(n_lat, n_lon) or f"{n_lat}, {n_lon}"
 
 # --- 5. UI 渲染與熱力邏輯 ---
-st.header("🛡️ 雙北全域戰情室 (需求紅區強化版)")
+st.header("🛡️ Uber 雙北全域戰情室 ")
 df = fetch_complete_data()
 
 red_zones = df[df['佔用%'] >= 90] if not df.empty else pd.DataFrame()
