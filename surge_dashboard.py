@@ -124,7 +124,27 @@ with st.sidebar:
 
 # --- 4. 畫面渲染 ---
 st.title("🛡️ Uber 雙北需求戰報")
+st.title("🛡️ Uber 雙北需求戰報")
 df = fetch_complete_data()
+
+red_zones = df[df['佔用%'] >= 90] if not df.empty else pd.DataFrame()
+red_counts = red_zones['行政區'].value_counts().reset_index()
+red_counts.columns = ['行政區', '紅區數']
+
+if 'gps_pos' not in st.session_state: st.session_state['gps_pos'] = (24.9669, 121.5451)
+curr = get_geolocation()
+if curr and 'coords' in curr:
+    st.session_state['gps_pos'] = (round(curr['coords']['latitude'], 4), round(curr['coords']['longitude'], 4))
+
+m1, m2, m3, m4 = st.columns(4)
+m1.metric("台北站點", f"{len(df[df['縣市']=='台北']) if not df.empty else 0} 處")
+m2.metric("新北站點", f"{len(df[df['縣市']=='新北']) if not df.empty else 0} 處")
+m3.metric("全域需求紅區", f"{len(red_zones)} 處")
+m4.metric("中心座標", f"{st.session_state['gps_pos'][0]}, {st.session_state['gps_pos'][1]}")
+
+st.divider()
+
+col_map, col_list = st.columns([2.8, 1.2])
 
 # 數據統計
 red_zones = df[df['佔用%'] >= 90] if not df.empty else pd.DataFrame()
