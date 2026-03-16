@@ -104,7 +104,7 @@ df = fetch_complete_data()
 m1, m2, m3, m4 = st.columns(4)
 m1.metric("台北站點", f"{len(df[df['縣市'] == '台北']) if not df.empty else 0} 處")
 m2.metric("新北站點", f"{len(df[df['縣市'] == '新北']) if not df.empty else 0} 處")
-m3.metric("Surge 警戒點", f"{len(df[df['佔用%'] >= 90]) if not df.empty else 0} 處")
+m3.metric("雙北需求紅區", f"{len(df[df['佔用%'] >= 90]) if not df.empty else 0} 處")
 m4.metric("目前位置", st.session_state['addr_label'])
 
 st.divider()
