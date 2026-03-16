@@ -259,7 +259,7 @@ with col_map:
                 # 畫出 8 公里半徑的圓
                 folium.Circle(
                     location=[center_lat, center_lon],
-                    radius=8000, 
+                    radius=2000, 
                     color=color,
                     weight=2,
                     fill=True,
