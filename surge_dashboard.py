@@ -91,7 +91,6 @@ def fetch_geojson():
 
 @st.cache_data(ttl=300)
 def get_radar_base64():
-    """ 透過後端抓取雨圖並轉 Base64，突破氣象署防盜鏈與瀏覽器 CORS 限制 """
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         'Referer': 'https://www.cwa.gov.tw/'
@@ -113,7 +112,7 @@ def get_radar_base64():
 def fetch_complete_data():
     all_data = []
     
-    # --- 台北市資料 (Blob 來源) ---
+    # --- 台北市資料 ---
     try:
         t_d = requests.get("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_alldesc.json", timeout=10).json()['data']['park']
         t_a = requests.get("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_allavailable.json", timeout=10).json()['data']['park']
@@ -125,7 +124,7 @@ def fetch_complete_data():
             all_data.append({'場站名稱': r['name'], 'lat': lat, 'lon': lon, '佔用%': round(max(0, min(100, occ)), 1), '行政區': r['area'], '縣市': '台北'})
     except: pass
     
-    # --- 新北市資料 (Open Data + SSL 豁免 + 精準解析) ---
+    # --- 新北市資料 ---
     try:
         s_url = "https://data.ntpc.gov.tw/api/datasets/B1464EF0-9C7C-4A6F-ABF7-6BDF32847E68/json?page=0&size=2000"
         d_url = "https://data.ntpc.gov.tw/api/datasets/E09B35A5-A738-48CC-B0F5-570B67AD9C78/json?page=0&size=2000"
@@ -135,7 +134,6 @@ def fetch_complete_data():
         dyn_map = {}
         for item in d_res:
             if 'ID' in item:
-                # 解決新北 100% 滿車問題：相容 AVAILABLECAR
                 avail_val = item.get('AVAILABLECAR') if item.get('AVAILABLECAR') is not None else item.get('AVAILABLE', 0)
                 dyn_map[str(item['ID']).strip()] = float(avail_val)
         
@@ -143,7 +141,6 @@ def fetch_complete_data():
             pid = str(s.get('ID', '')).strip()
             if pid in dyn_map:
                 tw97x, tw97y = s.get('TW97X'), s.get('TW97Y')
-                # 相容 TOTALCAR 欄位
                 total_val = s.get('TOTALCAR') if s.get('TOTALCAR') is not None else s.get('TOTAL', 0)
                 total = float(total_val or 0) 
                 avail = dyn_map[pid]
@@ -163,12 +160,11 @@ def fetch_complete_data():
     except: pass
     return pd.DataFrame(all_data)
 
-# --- 3. 側邊欄：改善識別度的 UI 控制項 ---
+# --- 3. 側邊欄：指示燈 UI 與控制項 ---
 with st.sidebar:
     st.image("logo.png", width=240)
     st.markdown("### 🛠️ 戰術圖層控制")
     
-    # 改善 UX：顯示狀態指示燈
     c1, c2 = st.columns(2)
     with c1:
         show_rain = st.toggle("🌧️ 雷達雨圖", value=True)
@@ -186,10 +182,10 @@ with st.sidebar:
     
     st.markdown("### 📍 圖例說明")
     st.markdown(f"""
-        <div style="margin-bottom: 5px;"><span class="dot-red">●</span><span class="legend-text">需求紅區 (>= 90%)</span></div>
-        <div style="margin-bottom: 5px;"><span class="dot-orange">●</span><span class="legend-text">高潛力區 (75-89%)</span></div>
-        <div style="margin-bottom: 5px;"><span class="dot-green">●</span><span class="legend-text">正常區域 (< 75%)</span></div>
-        <div style="margin-bottom: 5px;"><span class="dot-gray">●</span><span class="legend-text">行政區底層 (無資料)</span></div>
+        <div style="margin-bottom: 5px;"><span class="dot-red">●</span><span class="legend-text">站點紅區 (>= 90%)</span></div>
+        <div style="margin-bottom: 5px;"><span class="dot-orange">●</span><span class="legend-text">站點高潛力 (75-89%)</span></div>
+        <div style="margin-bottom: 5px;"><span class="dot-green">●</span><span class="legend-text">站點正常 (< 75%)</span></div>
+        <div style="margin-bottom: 5px; color:#FFAA00; font-weight:bold;">🔥 行政區：僅高亮著色 TOP 3 戰區</div>
     """, unsafe_allow_html=True)
 
 # --- 4. 畫面渲染 ---
@@ -214,7 +210,7 @@ m1, m2, m3, m4 = st.columns(4)
 m1.metric("台北站點", f"{len(df[df['縣市']=='台北']) if not df.empty else 0} 處")
 m2.metric("新北站點", f"{len(df[df['縣市']=='新北']) if not df.empty else 0} 處")
 m3.metric("雙北需求紅區", f"{len(red_zones)} 處")
-m4.metric("目前位置", st.session_label if 'session_label' in st.session_state else st.session_state['addr_label'])
+m4.metric("目前位置", st.session_state['addr_label'])
 
 st.divider()
 col_map, col_list = st.columns([2.8, 1.2])
@@ -233,32 +229,55 @@ with col_map:
                 opacity=0.45, name="雷達回波圖"
             ).add_to(m)
 
-    # B. 行政區著色 (字元統一與容錯版)
+    # B. 行政區著色 (TOP 3 菁英過濾版)
     if show_heatmap:
         geo_data = fetch_geojson()
         if geo_data:
             geo_data_copy = copy.deepcopy(geo_data)
-            df_pure = df.copy()
-            df_pure['行政區_純化'] = df_pure['行政區'].astype(str).str.replace('臺', '台').str.strip()
-            red_dict = df_pure[df_pure['佔用%'] >= 90]['行政區_純化'].value_counts().to_dict()
-            valid_set = set(df_pure['行政區_純化'].unique())
+            
+            if not df.empty and '行政區' in df.columns:
+                df_pure = df.copy()
+                df_pure['行政區_純化'] = df_pure['行政區'].astype(str).str.replace('臺', '台').str.strip()
+                
+                # 計算紅區數並取得前三名
+                red_counts_pure = df_pure[df_pure['佔用%'] >= 90]['行政區_純化'].value_counts()
+                red_dict = red_counts_pure.to_dict()
+                top3_districts = red_counts_pure.head(3).index.tolist()
+                valid_set = set(df_pure['行政區_純化'].unique())
+            else:
+                red_dict, top3_districts, valid_set = {}, [], set()
             
             features = []
             for f in geo_data_copy.get('features', []):
                 p = f.get('properties', {})
                 t_name = str(p.get('TOWNNAME') or p.get('name') or '').replace('臺', '台').strip()
-                c_name = str(p.get('COUNTYNAME') or '').replace('臺', '台').strip()
+                c_name = str(p.get('COUNTYNAME') or props.get('County_Name') or '').replace('臺', '台').strip()
                 
                 if '台北' in c_name or '新北' in c_name:
                     if t_name.endswith(('市', '鎮', '鄉')): t_name = t_name[:-1] + '區'
                     count = red_dict.get(t_name, 0)
-                    if count >= 5: color, opac = '#FF0000', 0.45 
-                    elif count > 0: color, opac = '#FFAA00', 0.25 
-                    elif t_name in valid_set: color, opac = '#28A745', 0.05 
-                    else: color, opac = '#666666', 0.1 
-                    f['properties']['DisplayName'] = f"{t_name} (紅區: {count})"
+                    
+                    # 嚴格過濾：只針對前三名進行高亮著色
+                    if t_name in top3_districts:
+                        rank = top3_districts.index(t_name) + 1
+                        if rank == 1:
+                            color, opac = '#FF0000', 0.5  # TOP 1：深紅
+                        elif rank == 2:
+                            color, opac = '#FF5500', 0.4  # TOP 2：橘紅
+                        else:
+                            color, opac = '#FFAA00', 0.3  # TOP 3：橘黃
+                            
+                        f['properties']['DisplayName'] = f"🏆 TOP {rank}: {t_name} (紅區: {count})"
+                    elif t_name in valid_set: 
+                        color, opac = '#28A745', 0.05     # 其餘正常區塊降階為極淡的綠色背景
+                        f['properties']['DisplayName'] = f"{t_name} (紅區: {count})"
+                    else: 
+                        color, opac = '#666666', 0.1      # 無資料區塊
+                        f['properties']['DisplayName'] = f"{t_name} (無資料)"
+                        
                     f['properties']['style'] = {'fillColor': color, 'color': color, 'weight': 1.5, 'fillOpacity': opac}
                     features.append(f)
+            
             geo_data_copy['features'] = features
             if features:
                 folium.GeoJson(geo_data_copy, style_function=lambda x: x['properties']['style'],
