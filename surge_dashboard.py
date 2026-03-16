@@ -7,7 +7,7 @@ from pyproj import Transformer
 from streamlit_js_eval import get_geolocation
 import time
 
-# --- 1. 現代工業風視覺系統 (CSS) ---
+# --- 1. 現代工業風視覺系統 (高對比版 CSS) ---
 st.set_page_config(page_title="Uber 雙北需求戰報", page_icon="🚕", layout="wide")
 
 st.markdown("""
@@ -15,49 +15,49 @@ st.markdown("""
         /* 全域底色：工業混凝土深灰 */
         html, body, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {
             background-color: #2B2B2B !important;
-            color: #E0E0E0 !important;
-            font-family: 'Inter', sans-serif !important;
+            color: #FFFFFF !important; /* 強制純白文字增加對比 */
+            font-family: 'Inter', -apple-system, sans-serif !important;
         }
 
         /* 側邊欄：深碳黑 */
         [data-testid="stSidebar"] {
-            background-color: #1F1F1F !important;
-            border-right: 2px solid #3D3D3D !important;
+            background-color: #000000 !important;
+            border-right: 2px solid #444444 !important;
+        }
+        [data-testid="stSidebar"] .stMarkdown, [data-testid="stSidebar"] p, [data-testid="stSidebar"] h3 {
+            color: #FFFFFF !important;
         }
 
-        /* 數據卡片 (Metric)：嵌入式立體感 */
+        /* 數據卡片 (Metric)：極簡高對比 */
         div[data-testid="stMetric"] {
-            background-color: #333333 !important;
-            border: 1px solid #4D4D4D !important;
-            border-bottom: 4px solid #FF8C00 !important; /* 安全橘底條 */
-            border-radius: 4px !important;
+            background-color: #1A1A1A !important;
+            border: 2px solid #444444 !important;
+            border-bottom: 5px solid #FF8C00 !important; /* 安全橘 */
+            border-radius: 8px !important;
             padding: 20px !important;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 4px 8px rgba(0,0,0,0.3) !important;
         }
-        
-        [data-testid="stMetricValue"] { color: #FFFFFF !important; font-weight: bold !important; }
-        [data-testid="stMetricLabel"] { color: #FF8C00 !important; text-transform: uppercase; letter-spacing: 1px; }
+        [data-testid="stMetricValue"] { color: #FFFFFF !important; font-weight: 800 !important; font-size: 2.2rem !important; }
+        [data-testid="stMetricLabel"] { color: #FF8C00 !important; font-weight: bold !important; font-size: 1.1rem !important; }
 
-        /* 資料表格暗色化 */
+        /* 資料表格：暗色背景、亮色文字 */
         [data-testid="stDataFrame"] {
-            border: 1px solid #4D4D4D !important;
-            background-color: #262626 !important;
+            border: 1px solid #444444 !important;
         }
 
-        /* 地圖邊框：強化明亮地圖的對比 */
+        /* 地圖邊框與強制明亮 */
         .leaflet-container { 
-            border: 4px solid #1F1F1F !important;
-            box-shadow: 0 0 20px rgba(0,0,0,0.4) !important;
-            filter: none !important; /* 強制保持明亮 */
+            border: 4px solid #000000 !important;
+            filter: none !important; 
             background-color: white !important;
         }
 
-        /* 按鈕：琥珀色 */
+        /* 按鈕：顯眼的琥珀橘 */
         .stButton>button {
             background-color: #FF8C00 !important;
             color: #000000 !important;
-            border-radius: 2px !important;
-            font-weight: bold !important;
+            border-radius: 4px !important;
+            font-weight: 900 !important;
+            height: 3rem !important;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -103,31 +103,31 @@ def fetch_data():
 def get_addr_pro(lat, lon):
     try:
         url = f"https://nominatim.openstreetmap.org/reverse?format=json&lat={lat}&lon={lon}&addressdetails=1&accept-language=zh-TW"
-        res = requests.get(url, headers={'User-Agent': f'UberRadar_{int(time.time())}'}, timeout=5).json()
+        res = requests.get(url, headers={'User-Agent': f'UberRadar_V2_{int(time.time())}'}, timeout=5).json()
         addr = res.get('address', {})
         dist = addr.get('suburb') or addr.get('city_district') or addr.get('town') or ""
         road = addr.get('road') or ""
         return f"{dist} {road}".strip() if (dist or road) else "定位校準中"
     except: return None
 
-# --- 3. 側邊欄控制 ---
+# --- 3. 側邊欄：中文控制項 ---
 with st.sidebar:
-    st.image("https://upload.wikimedia.org/wikipedia/commons/c/cc/Uber_logo_2018.png", width=110)
-    st.markdown("### [ SYSTEM CONTROL ]")
-    show_rain = st.toggle("疊加即時雨雲", value=True)
-    show_heatmap = st.toggle("需求紅區著色", value=True)
-    zoom_val = st.slider("地圖初始縮放", 10, 18, 14)
-    if st.button("RUN SYSTEM UPDATE"):
+    st.image("https://upload.wikimedia.org/wikipedia/commons/c/cc/Uber_logo_2018.png", width=120)
+    st.markdown("### 🛠️ 系統戰術控制")
+    show_rain = st.toggle("疊加即時雨雲雷達", value=True)
+    show_heatmap = st.toggle("顯示行政區熱力著色", value=True)
+    zoom_val = st.slider("地圖縮放級別", 10, 18, 14)
+    if st.button("🔄 同步最新雙北數據"):
         st.cache_data.clear()
         st.rerun()
     st.divider()
-    st.markdown("### [ RADAR LEGEND ]")
-    st.markdown('<p style="color:#FF4B4B;">● SURGE RED (>= 90%)</p>', unsafe_allow_html=True)
-    st.markdown('<p style="color:#FFAA00;">● POTENTIAL (75-89%)</p>', unsafe_allow_html=True)
-    st.markdown('<p style="color:#28A745;">● NORMAL (< 75%)</p>', unsafe_allow_html=True)
+    st.markdown("### 📍 雷達圖例說明")
+    st.markdown('<p style="color:#FF4B4B; font-weight:bold;">● 需求紅區 (>= 90%)</p>', unsafe_allow_html=True)
+    st.markdown('<p style="color:#FFAA00; font-weight:bold;">● 高潛力區 (75-89%)</p>', unsafe_allow_html=True)
+    st.markdown('<p style="color:#28A745; font-weight:bold;">● 正常區域 (< 75%)</p>', unsafe_allow_html=True)
 
-# --- 4. 數據準備與 UI 渲染 ---
-st.title("🛡️ UBER TACTICAL RADAR")
+# --- 4. 畫面渲染 ---
+st.title("🛡️ UBER 雙北需求戰情報告")
 df = fetch_data()
 
 red_zones = df[df['佔用%'] >= 90] if not df.empty else pd.DataFrame()
@@ -141,23 +141,23 @@ if 'addr' not in st.session_state: st.session_state['addr'] = "定位校準中..
 curr = get_geolocation()
 if curr and 'coords' in curr:
     n_lat, n_lon = round(curr['coords']['latitude'], 4), round(curr['coords']['longitude'], 4)
-    if abs(n_lat - st.session_state['gps'][0]) > 0.0005 or st.session_state['addr'] == "定位校準中...":
+    if abs(n_lat - st.session_state['gps'][0]) > 0.0005:
         st.session_state['gps'] = (n_lat, n_lon)
         st.session_state['addr'] = get_addr_pro(n_lat, n_lon)
 
-# 頂部四格戰術卡片
+# 頂部四格戰術指標
 m1, m2, m3, m4 = st.columns(4)
-m1.metric("TP SECTOR", f"{len(df[df['縣市'] == '台北']) if not df.empty else 0}")
-m2.metric("NTP SECTOR", f"{len(df[df['縣市'] == '新北']) if not df.empty else 0}")
-m3.metric("DEMAND RED", f"{len(red_zones)}")
-m4.metric("LOC SECTOR", st.session_state['addr'])
+m1.metric("台北站點總數", f"{len(df[df['縣市'] == '台北']) if not df.empty else 0}")
+m2.metric("新北站點總數", f"{len(df[df['縣市'] == '新北']) if not df.empty else 0}")
+m3.metric("當前全域紅區", f"{len(red_zones)}")
+m4.metric("目前所在位置", st.session_state['addr'])
 
 st.divider()
 
 col_map, col_list = st.columns([2.8, 1.2])
 
 with col_map:
-    # 保持最清晰的 Google 明亮瓦片
+    # 採用最清晰的 Google 明亮瓦片
     m = folium.Map(location=st.session_state['gps'], zoom_start=zoom_val, 
                    tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", attr="Google Maps")
     
@@ -174,16 +174,14 @@ with col_map:
         rain_url = f"https://www.cwa.gov.tw/Data/radar/CV1_3600_EL.png?v={int(time.time()/300)}"
         folium.raster_layers.ImageOverlay(image=rain_url, bounds=[[21.7, 118.0], [25.5, 122.5]], opacity=0.3).add_to(m)
 
-    # 繪製點位 (修正後的關鍵迴圈)
     if not df.empty:
         for _, row in df.iterrows():
-            # 這裡修正了 Key 錯誤：row['佔用%']
             c = '#FF0000' if row['佔用%'] >= 90 else ('#FFA500' if row['佔用%'] >= 75 else '#28A745')
-            folium.CircleMarker(location=[row['lat'], row['lon']], radius=6, color=c, fill=True, fill_opacity=0.7, weight=1).add_to(m)
+            folium.CircleMarker(location=[row['lat'], row['lon']], radius=7, color=c, fill=True, fill_opacity=0.8, weight=1).add_to(m)
     
     folium.Marker(st.session_state['gps'], icon=folium.Icon(color='orange', icon='car', prefix='fa')).add_to(m)
-    st_folium(m, width="100%", height=600, key="fixed_industrial_map")
+    st_folium(m, width="100%", height=600, key="high_contrast_map")
 
 with col_list:
-    st.markdown("### 📈 SECTOR RANKING")
+    st.markdown("### 📈 行政區紅區排行")
     st.dataframe(red_counts.head(10), hide_index=True, use_container_width=True)
