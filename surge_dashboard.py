@@ -8,7 +8,7 @@ from streamlit_js_eval import get_geolocation
 import time
 
 # --- 1. Uber 旗艦科技視覺系統 (CSS 強制顯色版) ---
-st.set_page_config(page_title="Uber 雙北需求戰報", page_icon="🚕", layout="wide")
+st.set_page_config(page_title="Uber 運輸需求預測", page_icon="🚕", layout="wide")
 
 st.markdown("""
     <style>
@@ -107,11 +107,11 @@ def fetch_complete_data():
 # --- 3. 側邊欄：Logo 與最終修正彩色圖例 ---
 with st.sidebar:
     st.image("logo.png", width=240)
-    st.markdown("### 🛠️ 戰術控制")
+    st.markdown("### 🛠️ 需求變因控制")
     show_rain = st.toggle("疊加雷達雨圖", value=True)
     show_heatmap = st.toggle("紅區行政區著色", value=True)
     zoom_val = st.slider("地圖縮放級別", 10, 18, 14)
-    if st.button("🔄 同步數據"):
+    if st.button("🔄 同步API數據"):
         st.cache_data.clear()
         st.rerun()
     st.divider()
@@ -131,7 +131,7 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
 # --- 4. 畫面渲染 ---
-st.title("🛡️ Uber 雙北需求戰報")
+st.title("🛡️ Uber運輸需求預測")
 df = fetch_complete_data()
 
 red_zones = df[df['佔用%'] >= 90] if not df.empty else pd.DataFrame()
@@ -151,7 +151,7 @@ if curr and 'coords' in curr:
 m1, m2, m3, m4 = st.columns(4)
 m1.metric("台北站點", f"{len(df[df['縣市']=='台北']) if not df.empty else 0} 處")
 m2.metric("新北站點", f"{len(df[df['縣市']=='新北']) if not df.empty else 0} 處")
-m3.metric("全域需求紅區", f"{len(red_zones)} 處")
+m3.metric("雙北需求紅區", f"{len(red_zones)} 處")
 m4.metric("目前位置", st.session_state['addr_label'])
 
 st.divider()
@@ -175,5 +175,5 @@ with col_map:
     st_folium(m, width="100%", height=600, key="uber_radar_final_fix")
 
 with col_list:
-    st.markdown("### 📈 紅區排行榜")
+    st.markdown("### 📈 紅區排行 TOP 10")
     st.dataframe(red_counts.head(10), hide_index=True, use_container_width=True)
