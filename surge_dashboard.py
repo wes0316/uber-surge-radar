@@ -79,7 +79,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 2. 核心數據邏輯 ---
+# --- 2. 核心數據邏輯與圖資快取 ---
 transformer = Transformer.from_crs("epsg:3826", "epsg:4326")
 
 def get_address_pro(lat, lon):
@@ -170,7 +170,6 @@ with st.sidebar:
     st.image("logo.png", width=240)
     st.markdown("### 🛠️ 戰術圖層控制")
     
-    # 移除原本的 ON/OFF 文字，依賴 CSS 背景色自動變更
     c1, c2 = st.columns(2)
     with c1:
         show_rain = st.toggle("🌧️ 雷達雨圖", value=True)
@@ -189,7 +188,7 @@ with st.sidebar:
         <div style="margin-bottom: 5px;"><span class="dot-red">●</span><span class="legend-text">站點紅區 (>= 90%)</span></div>
         <div style="margin-bottom: 5px;"><span class="dot-orange">●</span><span class="legend-text">站點高潛力 (75-89%)</span></div>
         <div style="margin-bottom: 5px;"><span class="dot-green">●</span><span class="legend-text">站點正常 (< 75%)</span></div>
-        <div style="margin-bottom: 5px; color:#FFAA00; font-weight:bold;">🔥 TOP 3 戰區：半徑 8 公里光罩</div>
+        <div style="margin-bottom: 5px; color:#FF3D00; font-weight:bold;">🔥 TOP 3 戰區：半徑 8 公里光罩</div>
     """, unsafe_allow_html=True)
 
 # --- 4. 畫面渲染 ---
@@ -233,9 +232,9 @@ with col_map:
                 opacity=0.45, name="雷達回波圖"
             ).add_to(m)
 
-    # B. TOP 3 戰區：半徑 8 公里光罩
+    # B. TOP 3 戰區：半徑 2 公里光罩 (高彩度、低透明度強化版)
     if show_heatmap and not df.empty and not red_counts.empty:
-        # 計算各行政區的地理中心點 (將該區所有停車場的經緯度平均)
+        # 計算各行政區的地理中心點
         district_centers = df.groupby('行政區')[['lat', 'lon']].mean().to_dict('index')
         top3_districts = red_counts.head(3)
         
@@ -248,20 +247,20 @@ with col_map:
                 center_lat = district_centers[t_name]['lat']
                 center_lon = district_centers[t_name]['lon']
                 
-                # 依照排名設定光罩顏色
+                # 強化視覺：提高彩度，並大幅增加不透明度 (Opacity)
                 if rank == 1:
-                    color, opac = '#FF0000', 0.2  # TOP 1：紅色光罩
+                    color, opac = '#FF0000', 0.45  # TOP 1：純紅，最強烈
                 elif rank == 2:
-                    color, opac = '#FF5500', 0.15 # TOP 2：橘紅光罩
+                    color, opac = '#FF3D00', 0.35  # TOP 2：高亮橘紅
                 else:
-                    color, opac = '#FFAA00', 0.1  # TOP 3：橘黃光罩
+                    color, opac = '#FF9100', 0.25  # TOP 3：耀眼橘黃
                 
-                # 畫出 8 公里半徑的圓
+                # 畫出 2 公里半徑的圓，並加粗邊框 (weight) 提升輪廓清晰度
                 folium.Circle(
                     location=[center_lat, center_lon],
                     radius=2000, 
                     color=color,
-                    weight=2,
+                    weight=3,
                     fill=True,
                     fill_color=color,
                     fill_opacity=opac,
