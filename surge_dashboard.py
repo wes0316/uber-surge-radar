@@ -11,40 +11,27 @@ import urllib3
 # --- 隱藏 SSL 憑證警告 (針對政府 API) ---
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# --- 1. Uber 旗艦科技視覺系統 (CSS 強制顯色版) ---
+# --- 1. Uber 旗艦科技視覺系統 ---
 st.set_page_config(page_title="Uber 運輸需求預測", page_icon="🚕", layout="wide")
 
 st.markdown("""
     <style>
-        /* 全域底色：深炭灰 */
         html, body, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {
             background-color: #1A1A1A !important;
             color: #DCDCDC !important; 
             font-family: 'Inter', -apple-system, sans-serif !important;
         }
-
-        /* 側邊欄：Uber Black 質感 */
         [data-testid="stSidebar"] {
             background-color: #111111 !important;
             border-right: 1px solid #333333 !important;
         }
-        
-        /* 修正文字顏色，但不使用 !important 蓋掉所有內容 */
-        [data-testid="stSidebar"] h3, [data-testid="stSidebar"] p {
-            color: #B0B0B0; 
-        }
-
-        /* --- 核心修正：定義圖例專用顏色類別 --- */
+        [data-testid="stSidebar"] h3, [data-testid="stSidebar"] p { color: #B0B0B0; }
         .dot-red { color: #FF0000 !important; font-size: 20px; font-weight: bold; }
         .dot-orange { color: #FFAA00 !important; font-size: 20px; font-weight: bold; }
         .dot-green { color: #28A745 !important; font-size: 20px; font-weight: bold; }
         .legend-text { color: #DCDCDC !important; font-size: 16px; margin-left: 5px; }
-
-        /* 戰術開關 (Toggle) 特效 */
         div[data-testid="stWidgetLabel"] p { color: #DCDCDC !important; }
         .st-at { background-color: #276EF1 !important; } 
-
-        /* 數據卡片 (Metric) */
         div[data-testid="stMetric"] {
             background-color: #242424 !important;
             border: 1px solid #333333 !important;
@@ -55,21 +42,17 @@ st.markdown("""
         }
         [data-testid="stMetricValue"] { color: #E0E0E0 !important; font-weight: 700 !important; }
         [data-testid="stMetricLabel"] { color: #909090 !important; font-size: 14px !important; }
-
-        /* 地圖邊框 */
         .leaflet-container { 
             border: 2px solid #000000 !important;
             border-radius: 8px !important;
             filter: none !important; 
             background-color: white !important;
         }
-        
-        /* 分隔線 */
         hr { border-top: 1px solid #333333 !important; }
     </style>
 """, unsafe_allow_html=True)
 
-# --- 2. 核心數據邏輯 (整合 SSL 豁免與 Open Data) ---
+# --- 2. 核心數據與圖資快取 ---
 transformer = Transformer.from_crs("epsg:3826", "epsg:4326")
 
 def get_address_pro(lat, lon):
@@ -83,12 +66,21 @@ def get_address_pro(lat, lon):
         return f"{dist} {road}".strip() if (dist or road) else f"{lat}, {lon}"
     except: return f"{lat}, {lon}"
 
+@st.cache_data(ttl=86400) # 邊界圖資不常變動，快取一整天
+def fetch_geojson():
+    # 採用開源社群 ronnywang 的精簡版台灣鄉鎮邊界 (約 1.1MB，載入極快)
+    url = "https://raw.githubusercontent.com/ronnywang/twgeojson/master/twtown2010.3.json"
+    try:
+        res = requests.get(url, timeout=10)
+        return res.json()
+    except:
+        return None
+
 @st.cache_data(ttl=60)
 def fetch_complete_data():
     all_data = []
-    headers = {'User-Agent': 'Mozilla/5.0'}
     
-    # --- 台北市資料 (保持不變) ---
+    # 台北市資料
     try:
         t_d = requests.get("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_alldesc.json", timeout=10).json()['data']['park']
         t_a = requests.get("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_allavailable.json", timeout=10).json()['data']['park']
@@ -100,16 +92,14 @@ def fetch_complete_data():
             all_data.append({'場站名稱': r['name'], 'lat': lat, 'lon': lon, '佔用%': round(occ, 1), '行政區': r['area'], '縣市': '台北'})
     except: pass
     
-    # --- 新北市資料 (採用雙 API + verify=False 略過 SSL) ---
+    # 新北市資料 (SSL 豁免版)
     try:
         s_url = "https://data.ntpc.gov.tw/api/datasets/B1464EF0-9C7C-4A6F-ABF7-6BDF32847E68/json?page=0&size=2000"
         d_url = "https://data.ntpc.gov.tw/api/datasets/E09B35A5-A738-48CC-B0F5-570B67AD9C78/json?page=0&size=2000"
         
-        # 關鍵：加上 verify=False
         s_res = requests.get(s_url, timeout=15, verify=False).json()
         d_res = requests.get(d_url, timeout=15, verify=False).json()
         
-        # 建立動態資料字典
         dyn_map = {str(item.get('ID', '')).strip(): float(item.get('AVAILABLE', 0)) for item in d_res if 'ID' in item}
         
         for s in s_res:
@@ -119,7 +109,6 @@ def fetch_complete_data():
                 total = float(s.get('TOTALCAR', 0) or 0)
                 avail = dyn_map[pid]
                 
-                # 確保座標與車位資料合理
                 if tw97x and tw97y and total > 0 and avail >= 0:
                     try:
                         lat, lon = transformer.transform(float(tw97x), float(tw97y))
@@ -137,7 +126,7 @@ def fetch_complete_data():
         
     return pd.DataFrame(all_data)
 
-# --- 3. 側邊欄：Logo 與最終修正彩色圖例 ---
+# --- 3. 側邊欄與圖例 ---
 with st.sidebar:
     st.image("logo.png", width=240)
     st.markdown("### 🛠️ 需求變因控制")
@@ -191,25 +180,68 @@ st.divider()
 col_map, col_list = st.columns([2.8, 1.2])
 
 with col_map:
-    # 保持原有的 Google Maps 底圖
     m = folium.Map(location=st.session_state['gps_pos'], zoom_start=zoom_val, 
                    tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", attr="Google Maps")
     
+    # 疊加雷達雨圖
     if show_rain:
         rain_url = f"https://www.cwa.gov.tw/Data/radar/CV1_3600_EL.png?v={int(time.time()/300)}"
         folium.raster_layers.ImageOverlay(image=rain_url, bounds=[[21.7, 118.0], [25.5, 122.5]], opacity=0.35).add_to(m)
 
+    # 動態行政區著色 (GeoJSON)
+    if show_heatmap:
+        geo_data = fetch_geojson()
+        if geo_data and not df.empty:
+            red_dict = red_counts.set_index('行政區')['紅區數'].to_dict()
+            valid_districts = df['行政區'].unique()
+            
+            filtered_features = []
+            for feature in geo_data.get('features', []):
+                props = feature.get('properties', {})
+                # 兼容開源資料的欄位名稱
+                t_name = props.get('TOWNNAME') or props.get('name') or props.get('T_Name') or ''
+                
+                # 只繪製我們有數據的行政區 (雙北)
+                if t_name in valid_districts:
+                    count = red_dict.get(t_name, 0)
+                    
+                    # 戰術配色邏輯
+                    if count >= 5: 
+                        color, opac = '#FF0000', 0.4 # 高密集紅區
+                    elif count > 0: 
+                        color, opac = '#FFAA00', 0.25 # 潛力區
+                    else: 
+                        color, opac = '#28A745', 0.05 # 正常/冷清區
+                        
+                    feature['properties']['DisplayName'] = t_name
+                    feature['properties']['style'] = {
+                        'fillColor': color, 'color': color, 'weight': 1.5, 'fillOpacity': opac
+                    }
+                    filtered_features.append(feature)
+                    
+            geo_data['features'] = filtered_features
+            
+            # 加入地圖圖層並附帶滑鼠懸停提示
+            folium.GeoJson(
+                geo_data,
+                name="行政區熱點著色",
+                style_function=lambda x: x['properties']['style'],
+                tooltip=folium.GeoJsonTooltip(fields=['DisplayName'], aliases=['行政區:'])
+            ).add_to(m)
+
+    # 繪製各個停車場站點圓餅
     if not df.empty:
         for _, row in df.iterrows():
             c = '#FF0000' if row['佔用%'] >= 90 else ('#FFA500' if row['佔用%'] >= 75 else '#28A745')
             folium.CircleMarker(
                 location=[row['lat'], row['lon']], 
                 radius=7, color=c, fill=True, fill_opacity=0.7, weight=1,
-                tooltip=f"{row['場站名稱']}: {row['佔用%']}%" # 加入懸停提示，方便司機查看
+                tooltip=f"{row['場站名稱']}: {row['佔用%']}%"
             ).add_to(m)
     
+    # 繪製目前位置車子圖示
     folium.Marker(st.session_state['gps_pos'], icon=folium.Icon(color='blue', icon='car', prefix='fa')).add_to(m)
-    st_folium(m, width="100%", height=600, key="uber_radar_final_fix")
+    st_folium(m, width="100%", height=600, key="uber_radar_district_colored")
 
 with col_list:
     st.markdown("### 📈 紅區排行 TOP 10")
