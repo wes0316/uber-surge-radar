@@ -17,30 +17,47 @@ st.set_page_config(page_title="Uber 運輸需求預測", page_icon="🚕", layou
 
 st.markdown("""
     <style>
+        /* 全域底色：深炭灰 */
         html, body, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {
             background-color: #1A1A1A !important;
             color: #DCDCDC !important; 
             font-family: 'Inter', -apple-system, sans-serif !important;
         }
+
+        /* 側邊欄：Uber Black 質感 */
         [data-testid="stSidebar"] {
             background-color: #111111 !important;
             border-right: 1px solid #333333 !important;
         }
+        
         [data-testid="stSidebar"] h3, [data-testid="stSidebar"] p {
             color: #B0B0B0; 
         }
+
+        /* 圖例顏色類別 */
         .dot-red { color: #FF0000 !important; font-size: 20px; font-weight: bold; }
         .dot-orange { color: #FFAA00 !important; font-size: 20px; font-weight: bold; }
         .dot-green { color: #28A745 !important; font-size: 20px; font-weight: bold; }
         .legend-text { color: #DCDCDC !important; font-size: 16px; margin-left: 5px; }
-        
+
+        /* 戰術開關標籤強制不換行 */
         div[data-testid="stWidgetLabel"] p { 
             color: #DCDCDC !important; 
             white-space: nowrap !important;
         }
-        div[data-testid="stToggle"] div[data-baseweb="checkbox"] > div { background-color: #555555 !important; }
-        div[data-testid="stToggle"] input:checked + div { background-color: #276EF1 !important; }
 
+        /* --- 核心 UX 修正：Toggle 開關狀態變色 --- */
+        /* 關閉狀態的軌道 (深灰色) */
+        div[data-testid="stToggle"] input[type="checkbox"] + div {
+            background-color: #555555 !important;
+            transition: background-color 0.2s ease;
+        }
+        /* 開啟狀態的軌道 (科技藍色) */
+        div[data-testid="stToggle"] input[type="checkbox"]:checked + div {
+            background-color: #276EF1 !important;
+        }
+
+        /* 數據卡片 (Metric) */
         div[data-testid="stMetric"] {
             background-color: #242424 !important;
             border: 1px solid #333333 !important;
@@ -52,11 +69,13 @@ st.markdown("""
         [data-testid="stMetricValue"] { color: #E0E0E0 !important; font-weight: 700 !important; }
         [data-testid="stMetricLabel"] { color: #909090 !important; font-size: 14px !important; }
 
+        /* 地圖邊框 */
         .leaflet-container { 
             border: 2px solid #000000 !important;
             border-radius: 8px !important;
             background-color: #1A1A1A !important;
         }
+        
         hr { border-top: 1px solid #333333 !important; }
     </style>
 """, unsafe_allow_html=True)
@@ -138,7 +157,6 @@ def fetch_complete_data():
                         occ = (total - avail) / total * 100
                         dist_name = str(s.get('AREA', '新北市')).replace('臺', '台').strip()
                         if dist_name == '台北縣': dist_name = '新北市'
-                        
                         all_data.append({
                             '場站名稱': s.get('NAME', '未知站點'),
                             'lat': lat, 'lon': lon,
@@ -215,9 +233,7 @@ with col_map:
                 opacity=0.45, name="雷達回波圖"
             ).add_to(m)
 
-    # B. TOP 3 戰區：精準鎖定「紅區聚落」核心 (2公里光罩)
     if show_heatmap and not red_zones.empty and not red_counts.empty:
-        # 【關鍵修復】只針對「紅區(>=90%)站點」去計算地理中位數！徹底排除外縣市同名區或荒郊野外站點的干擾
         hotspot_centers = red_zones.groupby('行政區')[['lat', 'lon']].median().to_dict('index')
         top3_districts = red_counts.head(3)
         
@@ -226,7 +242,6 @@ with col_map:
             count = row['紅區數']
             rank = rank_idx + 1
             
-            # 從紅區聚落中心提取座標
             if t_name in hotspot_centers:
                 center_lat = hotspot_centers[t_name]['lat']
                 center_lon = hotspot_centers[t_name]['lon']
@@ -235,7 +250,6 @@ with col_map:
                 elif rank == 2: color, opac = '#FF3D00', 0.35 
                 else: color, opac = '#FF9100', 0.25  
                 
-                # 半徑設為精準的 2000 公尺 (2 公里)
                 folium.Circle(
                     location=[center_lat, center_lon],
                     radius=2000, 
@@ -247,16 +261,13 @@ with col_map:
                     tooltip=f"🏆 TOP {rank}: {t_name} (爆滿核心區)"
                 ).add_to(m)
                 
-    # C. 停車場站點標記
     if not df.empty:
         for _, row in df.iterrows():
             c = '#FF0000' if row['佔用%'] >= 90 else ('#FFA500' if row['佔用%'] >= 75 else '#28A745')
             folium.CircleMarker(location=[row['lat'], row['lon']], radius=6, color=c, fill=True, fill_opacity=0.7, weight=1,
                                 tooltip=f"{row['場站名稱']}: {row['佔用%']}%").add_to(m)
     
-    # D. 車子定位圖示
     folium.Marker(st.session_state['gps_pos'], icon=folium.Icon(color='blue', icon='car', prefix='fa')).add_to(m)
-    
     st_folium(m, width="100%", height=600, key=f"map_{show_rain}_{show_heatmap}_{zoom_val}")
 
 with col_list:
