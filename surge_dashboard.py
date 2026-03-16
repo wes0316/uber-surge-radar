@@ -7,7 +7,7 @@ from pyproj import Transformer
 from streamlit_js_eval import get_geolocation
 import time
 
-# --- 1. Uber 旗艦科技視覺系統 (CSS 深度修復) ---
+# --- 1. Uber 旗艦科技視覺系統 (CSS 強制顯色版) ---
 st.set_page_config(page_title="Uber 雙北需求戰報", page_icon="🚕", layout="wide")
 
 st.markdown("""
@@ -25,10 +25,16 @@ st.markdown("""
             border-right: 1px solid #333333 !important;
         }
         
-        /* 修正點 1：移除 !important，允許內層 HTML 覆蓋顏色 */
+        /* 修正文字顏色，但不使用 !important 蓋掉所有內容 */
         [data-testid="stSidebar"] h3, [data-testid="stSidebar"] p {
             color: #B0B0B0; 
         }
+
+        /* --- 核心修正：定義圖例專用顏色類別 --- */
+        .dot-red { color: #FF0000 !important; font-size: 20px; font-weight: bold; }
+        .dot-orange { color: #FFAA00 !important; font-size: 20px; font-weight: bold; }
+        .dot-green { color: #28A745 !important; font-size: 20px; font-weight: bold; }
+        .legend-text { color: #DCDCDC !important; font-size: 16px; margin-left: 5px; }
 
         /* 戰術開關 (Toggle) 特效 */
         div[data-testid="stWidgetLabel"] p { color: #DCDCDC !important; }
@@ -59,7 +65,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 2. 核心數據邏輯 ---
+# --- 2. 核心數據邏輯 (與前版一致) ---
 transformer = Transformer.from_crs("epsg:3826", "epsg:4326")
 
 def get_address_pro(lat, lon):
@@ -98,31 +104,29 @@ def fetch_complete_data():
     except: pass
     return pd.DataFrame(all_data)
 
-# --- 3. 側邊欄 ---
+# --- 3. 側邊欄：Logo 與最終修正彩色圖例 ---
 with st.sidebar:
     st.image("logo.png", width=120)
     st.markdown("### 🛠️ 戰術控制")
     show_rain = st.toggle("疊加雷達雨圖", value=True)
     show_heatmap = st.toggle("紅區行政區著色", value=True)
     zoom_val = st.slider("地圖縮放級別", 10, 18, 14)
-    if st.button("🔄 同步最新數據"):
+    if st.button("🔄 同步數據"):
         st.cache_data.clear()
         st.rerun()
     st.divider()
     
-    # 修正點 2：改用獨立 div 並強化 inline CSS 確保顏色強制生效
+    # 這裡使用剛才在 CSS 裡定義的 Class
     st.markdown("### 📍 雷達圖例說明")
-    st.markdown("""
-        <div style="line-height: 2;">
-            <div style="color: #DCDCDC; font-size: 16px;">
-                <span style="color: #FF0000 !important; font-size: 20px;">●</span> 需求紅區 (佔用 >= 90%)
-            </div>
-            <div style="color: #DCDCDC; font-size: 16px;">
-                <span style="color: #FFAA00 !important; font-size: 20px;">●</span> 高潛力區 (佔用 75-89%)
-            </div>
-            <div style="color: #DCDCDC; font-size: 16px;">
-                <span style="color: #28A745 !important; font-size: 20px;">●</span> 正常區域 (佔用 < 75%)
-            </div>
+    st.markdown(f"""
+        <div style="margin-bottom: 10px;">
+            <span class="dot-red">●</span><span class="legend-text">需求紅區 (佔用 >= 90%)</span>
+        </div>
+        <div style="margin-bottom: 10px;">
+            <span class="dot-orange">●</span><span class="legend-text">高潛力區 (佔用 75-89%)</span>
+        </div>
+        <div style="margin-bottom: 10px;">
+            <span class="dot-green">●</span><span class="legend-text">正常區域 (佔用 < 75%)</span>
         </div>
     """, unsafe_allow_html=True)
 
@@ -168,7 +172,7 @@ with col_map:
             folium.CircleMarker(location=[row['lat'], row['lon']], radius=7, color=c, fill=True, fill_opacity=0.7, weight=1).add_to(m)
     
     folium.Marker(st.session_state['gps_pos'], icon=folium.Icon(color='blue', icon='car', prefix='fa')).add_to(m)
-    st_folium(m, width="100%", height=600, key="uber_tech_radar_vfinal")
+    st_folium(m, width="100%", height=600, key="uber_radar_final_fix")
 
 with col_list:
     st.markdown("### 📈 紅區排行榜")
