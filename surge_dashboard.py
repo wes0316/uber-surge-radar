@@ -175,7 +175,7 @@ with col_map:
             t = row['行政區']
             if t in centers:
                 color = '#FF0000' if i==0 else ('#FF3D00' if i==1 else '#FF9100')
-                folium.Circle(location=[centers[t]['lat'], centers[t]['lon']], radius=2000, color=color, weight=3, fill=True, fill_opacity=0.35).add_to(m)
+                folium.Circle(location=[centers[t]['lat'], centers[t]['lon']], radius=1500, color=color, weight=3, fill=True, fill_opacity=0.35).add_to(m)
     
     if not df.empty:
         for _, r in df.iterrows():
