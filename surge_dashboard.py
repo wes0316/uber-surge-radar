@@ -13,21 +13,35 @@ import base64
 # --- 隱藏 SSL 憑證警告 ---
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# --- 1. Uber 旗艦科技視覺系統 ---
+# --- 1. Uber 旗艦科技視覺系統 (無捲軸強化版) ---
 st.set_page_config(page_title="Uber 運輸需求預測", page_icon="🚕", layout="wide")
 
 st.markdown("""
     <style>
-        html, body, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {
+        /* 強制移除整頁捲軸並優化空間 */
+        html, body, [data-testid="stAppViewContainer"] {
+            overflow: hidden !important; 
             background-color: #1A1A1A !important;
             color: #DCDCDC !important; 
             font-family: 'Inter', -apple-system, sans-serif !important;
         }
+        
+        /* 縮減頂部內距 */
+        [data-testid="stAppViewBlockContainer"] {
+            padding-top: 1.5rem !important;
+            padding-bottom: 0 !important;
+            padding-left: 2rem !important;
+            padding-right: 2rem !important;
+        }
+
+        /* 側邊欄：Uber Black 質感 */
         [data-testid="stSidebar"] { background-color: #111111 !important; border-right: 1px solid #333333 !important; }
         [data-testid="stSidebar"] h3, [data-testid="stSidebar"] p { color: #B0B0B0; }
+        
+        /* 戰術開關文字樣式 */
         div[data-testid="stWidgetLabel"] p { color: #DCDCDC !important; white-space: nowrap !important; }
         
-        /* Toggle 開關變色 */
+        /* Toggle 開關變色邏輯 */
         div[data-testid="stToggle"] div[role="switch"] { background-color: #444444 !important; }
         div[data-testid="stToggle"] div[aria-checked="true"] { background-color: #276EF1 !important; }
 
@@ -37,14 +51,17 @@ st.markdown("""
             border: 1px solid #333333 !important;
             border-left: 5px solid #276EF1 !important; 
             border-radius: 4px !important;
-            padding: 15px !important;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
+            padding: 10px !important;
         }
-        [data-testid="stMetricValue"] { color: #E0E0E0 !important; font-weight: 700 !important; }
-        [data-testid="stMetricLabel"] { color: #909090 !important; font-size: 14px !important; }
+        [data-testid="stMetricValue"] { color: #E0E0E0 !important; font-size: 24px !important; font-weight: 700 !important; }
 
+        /* 地圖與表格容器 */
         .leaflet-container { border: 2px solid #000000 !important; border-radius: 8px !important; background-color: #1A1A1A !important; }
-        hr { border-top: 1px solid #333333 !important; }
+        
+        /* 隱藏 Streamlit 預設裝飾 */
+        #MainMenu {visibility: hidden;}
+        footer {visibility: hidden;}
+        header {visibility: hidden;}
     </style>
 """, unsafe_allow_html=True)
 
@@ -64,14 +81,9 @@ def get_address_pro(lat, lon):
 
 @st.cache_data(ttl=300)
 def get_radar_base64():
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-        'Referer': 'https://www.cwa.gov.tw/'
-    }
-    urls = [
-        f"https://www.cwa.gov.tw/Data/radar/CV1_3600_EL.png?v={int(time.time()/300)}",
-        f"https://www.cwa.gov.tw/Data/radar/CV1_3600.png?v={int(time.time()/300)}"
-    ]
+    headers = {'User-Agent': 'Mozilla/5.0 Chrome/122.0.0.0', 'Referer': 'https://www.cwa.gov.tw/'}
+    urls = [f"https://www.cwa.gov.tw/Data/radar/CV1_3600_EL.png?v={int(time.time()/300)}", 
+            f"https://www.cwa.gov.tw/Data/radar/CV1_3600.png?v={int(time.time()/300)}"]
     for url in urls:
         try:
             res = requests.get(url, headers=headers, verify=False, timeout=10)
@@ -114,40 +126,36 @@ def fetch_complete_data():
 
 # --- 3. 側邊欄 ---
 with st.sidebar:
-    st.image("logo.png", width=240)
+    st.image("logo.png", width=220)
     st.markdown("### 🛠️ 戰術圖層控制")
     c1, c2 = st.columns(2)
-    with c1:
-        show_rain = st.toggle("🌧️ 雷達雨圖", value=True)
-    with c2:
-        show_heatmap = st.toggle("🔥 熱區光罩", value=True)
+    with c1: show_rain = st.toggle("🌧️ 雷達雨圖", value=True)
+    with c2: show_heatmap = st.toggle("🔥 熱區光罩", value=True)
     zoom_val = st.slider("地圖縮放級別", 10, 18, 14)
     if st.button("🔄 同步數據庫", use_container_width=True):
         st.cache_data.clear()
         st.rerun()
-    st.markdown("### 📍 圖例")
-    st.markdown("""<div style='color:#FF0000; font-weight:bold;'>● <span style='color:#DCDCDC'>紅區 (>= 90%)</span></div>""", unsafe_allow_html=True)
+    st.divider()
+    st.markdown("### 📍 圖例說明")
+    st.markdown("""<div style='color:#FF0000; font-weight:bold;'>● <span style='color:#DCDCDC'>爆滿紅區 (>= 90%)</span></div>""", unsafe_allow_html=True)
 
 # --- 4. 畫面渲染 ---
-st.title("🛡️ Uber運輸需求預測")
 df = fetch_complete_data()
 red_zones = df[df['佔用%'] >= 90] if not df.empty else pd.DataFrame()
 red_counts = red_zones['行政區'].value_counts().reset_index()
 red_counts.columns = ['行政區', '紅區數']
 
-# 狀態管理
 if 'gps_pos' not in st.session_state: st.session_state['gps_pos'] = (24.9669, 121.5451)
 if 'addr_label' not in st.session_state: st.session_state['addr_label'] = "正在定位..."
 
-# 定位與地址反查
 curr = get_geolocation()
 if curr and 'coords' in curr:
     n_lat, n_lon = round(curr['coords']['latitude'], 4), round(curr['coords']['longitude'], 4)
-    # 只有當經緯度變化超過一定門檻時才重新查詢地址，節省 API 額度
     if abs(n_lat - st.session_state['gps_pos'][0]) > 0.0005 or st.session_state['addr_label'] == "正在定位...":
         st.session_state['gps_pos'] = (n_lat, n_lon)
         st.session_state['addr_label'] = get_address_pro(n_lat, n_lon)
 
+# 指標列
 m1, m2, m3, m4 = st.columns(4)
 m1.metric("台北站點", f"{len(df[df['縣市']=='台北']) if not df.empty else 0}")
 m2.metric("新北站點", f"{len(df[df['縣市']=='新北']) if not df.empty else 0}")
@@ -155,9 +163,12 @@ m3.metric("雙北紅區", f"{len(red_zones)}")
 m4.metric("目前位置", st.session_state['addr_label'])
 
 st.divider()
+
+# 主內容區
 col_map, col_list = st.columns([2.8, 1.2])
 
 with col_map:
+    # 修正 Marker 圖標路徑
     folium.Marker._icon_image_url = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png"
     folium.Marker._shadow_image_url = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png"
 
@@ -175,7 +186,7 @@ with col_map:
             t = row['行政區']
             if t in centers:
                 color = '#FF0000' if i==0 else ('#FF3D00' if i==1 else '#FF9100')
-                folium.Circle(location=[centers[t]['lat'], centers[t]['lon']], radius=1500, color=color, weight=3, fill=True, fill_opacity=0.35).add_to(m)
+                folium.Circle(location=[centers[t]['lat'], centers[t]['lon']], radius=2000, color=color, weight=3, fill=True, fill_opacity=0.35).add_to(m)
     
     if not df.empty:
         for _, r in df.iterrows():
@@ -183,8 +194,14 @@ with col_map:
             folium.CircleMarker(location=[r['lat'], r['lon']], radius=6, color=c, fill=True, fill_opacity=0.7, weight=1).add_to(m)
     
     folium.Marker(st.session_state['gps_pos'], icon=folium.Icon(color='blue', icon='car', prefix='fa')).add_to(m)
-    st_folium(m, width="100%", height=600, key=f"map_{show_rain}_{show_heatmap}_{zoom_val}")
+    
+    # 鎖定地圖高度為 650
+    st_folium(m, width="100%", height=650, key=f"map_{show_rain}_{show_heatmap}_{zoom_val}")
 
 with col_list:
     st.markdown("### 📈 紅區排行 TOP 10")
-    if not red_counts.empty: st.dataframe(red_counts.head(10), hide_index=True, use_container_width=True)
+    # 鎖定表格高度為 650，移除內部多餘捲軸
+    if not red_counts.empty:
+        st.dataframe(red_counts.head(10), hide_index=True, use_container_width=True, height=650)
+    else:
+        st.info("目前無需求紅區")
