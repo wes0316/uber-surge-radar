@@ -137,7 +137,7 @@ def fetch_complete_data():
 # --- 3. 側邊欄 ---
 with st.sidebar:
     st.image("logo.png", width=220)
-    st.markdown("### 🛠️ 戰術圖層控制")
+    st.markdown("### 🛠️ 運輸需求因子圖層")
     c1, c2 = st.columns(2)
     with c1: show_rain = st.toggle("🌧️ 雷達雨圖", value=True)
     with c2: show_heatmap = st.toggle("🔥 熱區光罩", value=True)
