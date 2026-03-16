@@ -7,7 +7,7 @@ from pyproj import Transformer
 from streamlit_js_eval import get_geolocation
 import time
 
-# --- 1. 介面設定與 CSS ---
+# --- 1. 介面與 CSS 設定 ---
 st.set_page_config(page_title="雙北需求紅區戰情室", page_icon="💎", layout="wide")
 
 st.markdown("""
@@ -21,15 +21,21 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 2. 核心數據與地址邏輯 ---
+# --- 2. 核心數據處理 ---
 transformer = Transformer.from_crs("epsg:3826", "epsg:4326")
 
-@st.cache_data(ttl=3600)
-def get_geojson():
-    """獲取雙北行政區邊界數據"""
-    url = "https://raw.githubusercontent.com/g0v/twgeojson/master/json/twTownVillageCity.topo.json"
-    # 這裡簡化處理，實際運行建議使用預存的雙北過濾版 json
-    return "https://raw.githubusercontent.com/f7481263/Taipei_Geojson/master/taipei_new_taipei_town.json"
+@st.cache_data(ttl=86400)
+def fetch_geojson_data():
+    """修復版：手動抓取並檢查 GeoJSON 資料"""
+    # 這裡換一個更穩定的雙北邊界來源
+    url = "https://raw.githubusercontent.com/chaoyunchen/map/master/taipei.json" 
+    try:
+        res = requests.get(url, timeout=10)
+        if res.status_code == 200:
+            return res.json()
+    except:
+        return None
+    return None
 
 def get_address_pro(lat, lon):
     try:
@@ -86,22 +92,19 @@ with st.sidebar:
 
 # --- 4. GPS 處理 ---
 if 'gps_pos' not in st.session_state: st.session_state['gps_pos'] = (24.9669, 121.5451)
-if 'addr_label' not in st.session_state: st.session_state['addr_label'] = "定位中..."
+if 'addr_label' not in st.session_state: st.session_state['addr_label'] = "正在定位..."
 
 curr = get_geolocation()
 if curr and 'coords' in curr:
     n_lat, n_lon = round(curr['coords']['latitude'], 4), round(curr['coords']['longitude'], 4)
-    if abs(n_lat - st.session_state['gps_pos'][0]) > 0.0005 or st.session_state['addr_label'] == "定位中...":
+    if abs(n_lat - st.session_state['gps_pos'][0]) > 0.0005 or st.session_state['addr_label'] == "正在定位...":
         st.session_state['gps_pos'] = (n_lat, n_lon)
         st.session_state['addr_label'] = get_address_pro(n_lat, n_lon) or f"{n_lat}, {n_lon}"
-
-u_lat, u_lon = st.session_state['gps_pos']
 
 # --- 5. UI 渲染與熱力邏輯 ---
 st.header("🛡️ 雙北全域戰情室 (需求紅區強化版)")
 df = fetch_complete_data()
 
-# 統計紅區
 red_zones = df[df['佔用%'] >= 90] if not df.empty else pd.DataFrame()
 red_counts = red_zones['行政區'].value_counts().reset_index()
 red_counts.columns = ['行政區', '紅區數']
@@ -118,22 +121,23 @@ st.divider()
 col_map, col_list = st.columns([2.8, 1.2])
 
 with col_map:
-    m = folium.Map(location=[u_lat, u_lon], zoom_start=zoom_val, tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", attr="Google")
+    m = folium.Map(location=st.session_state['gps_pos'], zoom_start=zoom_val, 
+                   tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", attr="Google")
     
-    # 熱力著色疊加 (前三名行政區)
+    # 熱力疊加 (安全檢查版)
     if show_heatmap and not red_counts.empty:
-        geojson_url = get_geojson()
-        folium.Choropleth(
-            geo_data=geojson_url,
-            name="需求紅區熱力",
-            data=red_counts[red_counts['行政區'].isin(top_3_districts)],
-            columns=["行政區", "紅區數"],
-            key_on="feature.properties.TOWNNAME",
-            fill_color="OrRd",
-            fill_opacity=0.4,
-            line_opacity=0.2,
-            legend_name="紅區集中度",
-        ).add_to(m)
+        geo_json_data = fetch_geojson_data()
+        if geo_json_data:
+            folium.Choropleth(
+                geo_data=geo_json_data, # 直接傳入 dict 避開 JSONDecodeError
+                name="需求紅區熱力",
+                data=red_counts[red_counts['行政區'].isin(top_3_districts)],
+                columns=["行政區", "紅區數"],
+                key_on="feature.properties.TOWNNAME",
+                fill_color="YlOrRd",
+                fill_opacity=0.4,
+                line_opacity=0.1,
+            ).add_to(m)
 
     if show_rain:
         rain_url = f"https://www.cwa.gov.tw/Data/radar/CV1_3600_EL.png?v={int(time.time()/300)}"
@@ -143,12 +147,10 @@ with col_map:
         for _, row in df.iterrows():
             c = '#d32f2f' if row['佔用%'] >= 90 else ('#ffa500' if row['佔用%'] >= 75 else '#388e3c')
             folium.CircleMarker(location=[row['lat'], row['lon']], radius=7, color=c, fill=True, fill_opacity=0.6).add_to(m)
-    folium.Marker([u_lat, u_lon], icon=folium.Icon(color='blue', icon='car', prefix='fa')).add_to(m)
-    st_folium(m, width="100%", height=550, key="heatmap_surge_map")
+    folium.Marker(st.session_state['gps_pos'], icon=folium.Icon(color='blue', icon='car', prefix='fa')).add_to(m)
+    st_folium(m, width="100%", height=550, key="final_v15_map")
 
 with col_list:
     st.subheader("📊 紅區排行榜 (Top 10)")
     if not red_counts.empty:
         st.dataframe(red_counts.head(10), hide_index=True, use_container_width=True)
-    else:
-        st.write("目前無需求紅區")
