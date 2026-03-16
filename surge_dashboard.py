@@ -13,7 +13,7 @@ import base64
 # --- 隱藏 SSL 憑證警告 ---
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# --- 1. Uber 旗艦科技視覺系統 (無捲軸強化版) ---
+# --- 1. Uber 旗艦科技視覺系統 (高對比無捲軸版) ---
 st.set_page_config(page_title="Uber 運輸需求預測", page_icon="🚕", layout="wide")
 
 st.markdown("""
@@ -22,46 +22,57 @@ st.markdown("""
         html, body, [data-testid="stAppViewContainer"] {
             overflow: hidden !important; 
             background-color: #1A1A1A !important;
-            color: #DCDCDC !important; 
+            color: #FFFFFF !important; /* 全域文字調為白色 */
             font-family: 'Inter', -apple-system, sans-serif !important;
         }
         
-        /* 縮減頂部內距 */
-        [data-testid="stAppViewBlockContainer"] {
-            padding-top: 1.5rem !important;
-            padding-bottom: 0 !important;
-            padding-left: 2rem !important;
-            padding-right: 2rem !important;
+        /* 側邊欄文字亮度調整 */
+        [data-testid="stSidebar"] { 
+            background-color: #111111 !important; 
+            border-right: 1px solid #333333 !important; 
+        }
+        [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 {
+            color: #FFFFFF !important; /* 側邊欄標題改為純白 */
+        }
+        [data-testid="stSidebar"] p, [data-testid="stSidebar"] label {
+            color: #E0E0E0 !important; /* 側邊欄一般文字改為亮銀 */
         }
 
-        /* 側邊欄：Uber Black 質感 */
-        [data-testid="stSidebar"] { background-color: #111111 !important; border-right: 1px solid #333333 !important; }
-        [data-testid="stSidebar"] h3, [data-testid="stSidebar"] p { color: #B0B0B0; }
+        /* 戰術開關文字強制加亮 */
+        div[data-testid="stWidgetLabel"] p { 
+            color: #FFFFFF !important; 
+            font-weight: 500 !important;
+            white-space: nowrap !important;
+        }
         
-        /* 戰術開關文字樣式 */
-        div[data-testid="stWidgetLabel"] p { color: #DCDCDC !important; white-space: nowrap !important; }
-        
-        /* Toggle 開關變色邏輯 */
+        /* Toggle 開關顏色邏輯 */
         div[data-testid="stToggle"] div[role="switch"] { background-color: #444444 !important; }
         div[data-testid="stToggle"] div[aria-checked="true"] { background-color: #276EF1 !important; }
 
-        /* 數據卡片 (Metric) */
+        /* 數據卡片 (Metric) 顯色調整 */
         div[data-testid="stMetric"] {
             background-color: #242424 !important;
-            border: 1px solid #333333 !important;
+            border: 1px solid #444444 !important;
             border-left: 5px solid #276EF1 !important; 
             border-radius: 4px !important;
             padding: 10px !important;
         }
-        [data-testid="stMetricValue"] { color: #E0E0E0 !important; font-size: 24px !important; font-weight: 700 !important; }
+        [data-testid="stMetricValue"] { color: #FFFFFF !important; font-size: 26px !important; font-weight: 700 !important; }
+        [data-testid="stMetricLabel"] { color: #B0B0B0 !important; font-size: 14px !important; font-weight: 500 !important; }
 
-        /* 地圖與表格容器 */
+        /* 排行榜標題加亮 */
+        h1, h2, h3 { color: #FFFFFF !important; }
+
+        /* 地圖邊框 */
         .leaflet-container { border: 2px solid #000000 !important; border-radius: 8px !important; background-color: #1A1A1A !important; }
         
-        /* 隱藏 Streamlit 預設裝飾 */
+        /* 隱藏裝飾 */
         #MainMenu {visibility: hidden;}
         footer {visibility: hidden;}
         header {visibility: hidden;}
+        
+        /* 修正表格文字顏色 */
+        [data-testid="stDataFrame"] { background-color: #242424 !important; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -103,8 +114,7 @@ def fetch_complete_data():
         for _, r in t_df.iterrows():
             lat, lon = transformer.transform(float(r['tw97x']), float(r['tw97y']))
             total, avail = float(r.get('totalcar', 0)), float(r.get('availablecar', 0))
-            occ = (total - avail) / total * 100 if total > 0 else 0
-            all_data.append({'場站名稱': r['name'], 'lat': lat, 'lon': lon, '佔用%': round(max(0, min(100, occ)), 1), '行政區': str(r.get('area', '')).replace('臺', '台'), '縣市': '台北'})
+            all_data.append({'場站名稱': r['name'], 'lat': lat, 'lon': lon, '佔用%': round(max(0, min(100, (total-avail)/total*100)), 1) if total>0 else 0, '行政區': str(r.get('area', '')).replace('臺', '台'), '縣市': '台北'})
     except: pass
     # 新北市
     try:
@@ -137,7 +147,7 @@ with st.sidebar:
         st.rerun()
     st.divider()
     st.markdown("### 📍 圖例說明")
-    st.markdown("""<div style='color:#FF0000; font-weight:bold;'>● <span style='color:#DCDCDC'>爆滿紅區 (>= 90%)</span></div>""", unsafe_allow_html=True)
+    st.markdown("""<div style='color:#FF0000; font-weight:bold;'>● <span style='color:#FFFFFF'>爆滿紅區 (>= 90%)</span></div>""", unsafe_allow_html=True)
 
 # --- 4. 畫面渲染 ---
 df = fetch_complete_data()
@@ -155,7 +165,7 @@ if curr and 'coords' in curr:
         st.session_state['gps_pos'] = (n_lat, n_lon)
         st.session_state['addr_label'] = get_address_pro(n_lat, n_lon)
 
-# 指標列
+# 指標列 (加亮版)
 m1, m2, m3, m4 = st.columns(4)
 m1.metric("台北站點", f"{len(df[df['縣市']=='台北']) if not df.empty else 0}")
 m2.metric("新北站點", f"{len(df[df['縣市']=='新北']) if not df.empty else 0}")
@@ -164,11 +174,9 @@ m4.metric("目前位置", st.session_state['addr_label'])
 
 st.divider()
 
-# 主內容區
 col_map, col_list = st.columns([2.8, 1.2])
 
 with col_map:
-    # 修正 Marker 圖標路徑
     folium.Marker._icon_image_url = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png"
     folium.Marker._shadow_image_url = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png"
 
@@ -195,12 +203,10 @@ with col_map:
     
     folium.Marker(st.session_state['gps_pos'], icon=folium.Icon(color='blue', icon='car', prefix='fa')).add_to(m)
     
-    # 鎖定地圖高度為 650
     st_folium(m, width="100%", height=650, key=f"map_{show_rain}_{show_heatmap}_{zoom_val}")
 
 with col_list:
     st.markdown("### 📈 紅區排行 TOP 10")
-    # 鎖定表格高度為 650，移除內部多餘捲軸
     if not red_counts.empty:
         st.dataframe(red_counts.head(10), hide_index=True, use_container_width=True, height=650)
     else:
