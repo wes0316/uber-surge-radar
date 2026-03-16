@@ -118,9 +118,9 @@ with st.sidebar:
     
     st.markdown("### 📍 雷達圖例說明")
     # 使用 <span> 包裹並直接給予顏色，現在不會被 CSS 蓋掉了
-    st.markdown('<p style="font-size:14px;"><span style="color:#FF0000 !important;">●</span> 需求紅區 (佔用 >= 90%)</p>', unsafe_allow_html=True)
-    st.markdown('<p style="font-size:14px;"><span style="color:#FFAA00 !important;">●</span> 高潛力區 (佔用 75-89%)</p>', unsafe_allow_html=True)
-    st.markdown('<p style="font-size:14px;"><span style="color:#28A745 !important;">●</span> 正常區域 (佔用 < 75%)</p>', unsafe_allow_html=True)
+    st.markdown('<p style="font-size:18px;"><span style="color:#FF0000 !important;">●</span> 需求紅區 (佔用 >= 90%)</p>', unsafe_allow_html=True)
+    st.markdown('<p style="font-size:18px;"><span style="color:#FFAA00 !important;">●</span> 高潛力區 (佔用 75-89%)</p>', unsafe_allow_html=True)
+    st.markdown('<p style="font-size:18px;"><span style="color:#28A745 !important;">●</span> 正常區域 (佔用 < 75%)</p>', unsafe_allow_html=True)
 
 # --- 4. 畫面渲染 ---
 st.title("🛡️ Uber 雙北需求戰報")
