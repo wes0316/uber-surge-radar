@@ -7,6 +7,7 @@ from pyproj import Transformer
 from streamlit_js_eval import get_geolocation
 import time
 import urllib3
+import copy
 import base64
 
 # --- 隱藏 SSL 憑證警告 ---
@@ -40,20 +41,14 @@ st.markdown("""
             white-space: nowrap !important;
         }
 
-        /* --- 核心 UX 修正：Toggle 開關狀態變色 (強力覆寫版) --- */
-        /* 1. 先定義所有開關的基礎底色 (關閉時為暗灰色) */
+        /* --- 修正 Toggle 開關顏色 --- */
+        /* 關閉狀態的軌道 (深灰色) */
         div[data-testid="stToggle"] div[role="switch"] {
             background-color: #444444 !important;
         }
-        
-        /* 2. 當開關被勾選時 (開啟狀態)，強制切換為 Uber 藍 */
+        /* 開啟狀態的軌道 (Uber 科技藍色) */
         div[data-testid="stToggle"] div[aria-checked="true"] {
             background-color: #276EF1 !important;
-        }
-        
-        /* 3. 調整滑塊圓點的顏色，讓它在暗色背景下更突出 */
-        div[data-testid="stToggle"] div[role="switch"] > div {
-            background-color: #FFFFFF !important;
         }
 
         /* 數據卡片 (Metric) */
@@ -93,18 +88,20 @@ def get_address_pro(lat, lon):
 
 @st.cache_data(ttl=300)
 def get_radar_base64():
+    """ 透過後端抓取雨圖並轉 Base64，繞過 CORS 與 CORB 阻擋 """
     headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
         'Referer': 'https://www.cwa.gov.tw/'
     }
+    # 嘗試多個可能的氣象署檔案路徑
     urls_to_try = [
-        f"https://www.cwa.gov.tw/Data/radar/CV1_3600_EL.png?v={int(time.time()/300)}",
-        f"https://www.cwa.gov.tw/Data/radar/CV1_3600.png?v={int(time.time()/300)}"
+        f"https://www.cwa.gov.tw/Data/radar/CV1_3600.png?v={int(time.time()/300)}",
+        f"https://www.cwa.gov.tw/Data/radar/CV1_3600_EL.png?v={int(time.time()/300)}"
     ]
     for url in urls_to_try:
         try:
             res = requests.get(url, headers=headers, verify=False, timeout=10)
-            if res.status_code == 200:
+            if res.status_code == 200 and len(res.content) > 1000:
                 b64 = base64.b64encode(res.content).decode('utf-8')
                 return f"data:image/png;base64,{b64}"
         except: continue
@@ -113,6 +110,7 @@ def get_radar_base64():
 @st.cache_data(ttl=60)
 def fetch_complete_data():
     all_data = []
+    # 台北市資料
     try:
         t_d = requests.get("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_alldesc.json", timeout=10).json()['data']['park']
         t_a = requests.get("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_allavailable.json", timeout=10).json()['data']['park']
@@ -124,23 +122,19 @@ def fetch_complete_data():
             dist_name = str(r.get('area', '')).replace('臺', '台').strip()
             all_data.append({'場站名稱': r['name'], 'lat': lat, 'lon': lon, '佔用%': round(max(0, min(100, occ)), 1), '行政區': dist_name, '縣市': '台北'})
     except: pass
-    
+    # 新北市資料
     try:
         s_url = "https://data.ntpc.gov.tw/api/datasets/B1464EF0-9C7C-4A6F-ABF7-6BDF32847E68/json?page=0&size=2000"
         d_url = "https://data.ntpc.gov.tw/api/datasets/E09B35A5-A738-48CC-B0F5-570B67AD9C78/json?page=0&size=2000"
         s_res = requests.get(s_url, timeout=15, verify=False).json()
         d_res = requests.get(d_url, timeout=15, verify=False).json()
-        dyn_map = {}
-        for item in d_res:
-            if 'ID' in item:
-                avail_val = item.get('AVAILABLECAR') if item.get('AVAILABLECAR') is not None else item.get('AVAILABLE', 0)
-                dyn_map[str(item['ID']).strip()] = float(avail_val)
+        dyn_map = {str(item['ID']).strip(): float(item.get('AVAILABLECAR', item.get('AVAILABLE', 0))) for item in d_res if 'ID' in item}
         for s in s_res:
             pid = str(s.get('ID', '')).strip()
             if pid in dyn_map:
                 tw97x, tw97y = s.get('TW97X'), s.get('TW97Y')
-                total_val = s.get('TOTALCAR') if s.get('TOTALCAR') is not None else s.get('TOTAL', 0)
-                total, avail = float(total_val or 0), dyn_map[pid]
+                total = float(s.get('TOTALCAR', s.get('TOTAL', 0)))
+                avail = dyn_map[pid]
                 if tw97x and tw97y and total > 0 and avail >= 0:
                     try:
                         lat, lon = transformer.transform(float(tw97x), float(tw97y))
@@ -160,6 +154,7 @@ with st.sidebar:
         show_rain = st.toggle("🌧️ 雷達雨圖", value=True)
     with c2:
         show_heatmap = st.toggle("🔥 熱區光罩", value=True)
+    
     st.divider()
     zoom_val = st.slider("地圖縮放級別", 10, 18, 14)
     if st.button("🔄 同步數據庫", use_container_width=True):
@@ -183,9 +178,7 @@ red_counts.columns = ['行政區', '紅區數']
 if 'gps_pos' not in st.session_state: st.session_state['gps_pos'] = (24.9669, 121.5451)
 curr = get_geolocation()
 if curr and 'coords' in curr:
-    n_lat, n_lon = round(curr['coords']['latitude'], 4), round(curr['coords']['longitude'], 4)
-    if abs(n_lat - st.session_state['gps_pos'][0]) > 0.0005:
-        st.session_state['gps_pos'] = (n_lat, n_lon)
+    st.session_state['gps_pos'] = (round(curr['coords']['latitude'], 4), round(curr['coords']['longitude'], 4))
 
 m1, m2, m3, m4 = st.columns(4)
 m1.metric("台北站點", f"{len(df[df['縣市']=='台北']) if not df.empty else 0} 處")
@@ -199,10 +192,24 @@ col_map, col_list = st.columns([2.8, 1.2])
 with col_map:
     m = folium.Map(location=st.session_state['gps_pos'], zoom_start=zoom_val, 
                    tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", attr="Google Maps")
+    
+    # 修正 Folium 預設圖標 CORB 阻擋問題
+    folium.Marker._icon_image_url = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png"
+    folium.Marker._shadow_image_url = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png"
+
     if show_rain:
         rain_b64 = get_radar_base64()
         if rain_b64:
-            folium.raster_layers.ImageOverlay(image=rain_b64, bounds=[[21.8, 118.0], [25.4, 122.2]], opacity=0.45).add_to(m)
+            # 微調 bounds 確保涵蓋整個大台北
+            folium.raster_layers.ImageOverlay(
+                image=rain_b64, 
+                bounds=[[21.7, 118.0], [25.5, 122.5]], 
+                opacity=0.45,
+                zindex=10
+            ).add_to(m)
+        else:
+            st.sidebar.error("⚠️ 無法載入雷達雨圖")
+
     if show_heatmap and not red_zones.empty:
         hotspot_centers = red_zones.groupby('行政區')[['lat', 'lon']].median().to_dict('index')
         top3 = red_counts.head(3)
@@ -212,10 +219,12 @@ with col_map:
                 c = hotspot_centers[t]
                 color = '#FF0000' if i==0 else ('#FF3D00' if i==1 else '#FF9100')
                 folium.Circle(location=[c['lat'], c['lon']], radius=2000, color=color, weight=3, fill=True, fill_opacity=0.35).add_to(m)
+    
     if not df.empty:
         for _, r in df.iterrows():
             c = '#FF0000' if r['佔用%'] >= 90 else ('#FFA500' if r['佔用%'] >= 75 else '#28A745')
             folium.CircleMarker(location=[r['lat'], r['lon']], radius=6, color=c, fill=True, fill_opacity=0.7, weight=1).add_to(m)
+    
     folium.Marker(st.session_state['gps_pos'], icon=folium.Icon(color='blue', icon='car', prefix='fa')).add_to(m)
     st_folium(m, width="100%", height=600, key=f"map_{show_rain}_{show_heatmap}_{zoom_val}")
 
