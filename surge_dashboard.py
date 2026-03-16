@@ -7,7 +7,6 @@ from pyproj import Transformer
 from streamlit_js_eval import get_geolocation
 import time
 import urllib3
-import copy
 import base64
 
 # --- 隱藏 SSL 憑證警告 (針對政府 API) ---
@@ -39,7 +38,6 @@ st.markdown("""
         .dot-red { color: #FF0000 !important; font-size: 20px; font-weight: bold; }
         .dot-orange { color: #FFAA00 !important; font-size: 20px; font-weight: bold; }
         .dot-green { color: #28A745 !important; font-size: 20px; font-weight: bold; }
-        .dot-gray { color: #666666 !important; font-size: 20px; font-weight: bold; }
         .legend-text { color: #DCDCDC !important; font-size: 16px; margin-left: 5px; }
 
         /* 數據卡片 (Metric) */
@@ -79,18 +77,9 @@ def get_address_pro(lat, lon):
         return f"{dist} {road}".strip() if (dist or road) else f"{lat}, {lon}"
     except: return f"{lat}, {lon}"
 
-@st.cache_data(ttl=86400)
-def fetch_geojson():
-    url = "https://raw.githubusercontent.com/ronnywang/twgeojson/master/twtown2010.3.json"
-    headers = {'User-Agent': 'Mozilla/5.0'}
-    try:
-        res = requests.get(url, headers=headers, timeout=10)
-        return res.json()
-    except:
-        return None
-
 @st.cache_data(ttl=300)
 def get_radar_base64():
+    """ 透過後端抓取雨圖並轉 Base64，突破氣象署防盜鏈與瀏覽器 CORS 限制 """
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         'Referer': 'https://www.cwa.gov.tw/'
@@ -185,7 +174,7 @@ with st.sidebar:
         <div style="margin-bottom: 5px;"><span class="dot-red">●</span><span class="legend-text">站點紅區 (>= 90%)</span></div>
         <div style="margin-bottom: 5px;"><span class="dot-orange">●</span><span class="legend-text">站點高潛力 (75-89%)</span></div>
         <div style="margin-bottom: 5px;"><span class="dot-green">●</span><span class="legend-text">站點正常 (< 75%)</span></div>
-        <div style="margin-bottom: 5px; color:#FFAA00; font-weight:bold;">🔥 行政區：僅高亮著色 TOP 3 戰區</div>
+        <div style="margin-bottom: 5px; color:#FFAA00; font-weight:bold;">🔥 TOP 3 戰區：半徑 8 公里光罩</div>
     """, unsafe_allow_html=True)
 
 # --- 4. 畫面渲染 ---
@@ -229,61 +218,40 @@ with col_map:
                 opacity=0.45, name="雷達回波圖"
             ).add_to(m)
 
-    # B. 行政區著色 (修正 NameError 版)
-    if show_heatmap:
-        geo_data = fetch_geojson()
-        if geo_data:
-            geo_data_copy = copy.deepcopy(geo_data)
+    # B. TOP 3 戰區：半徑 8 公里光罩 (100% 成功繪製版)
+    if show_heatmap and not df.empty and not red_counts.empty:
+        # 計算各行政區的地理中心點 (將該區所有停車場的經緯度平均)
+        district_centers = df.groupby('行政區')[['lat', 'lon']].mean().to_dict('index')
+        top3_districts = red_counts.head(3)
+        
+        for rank_idx, row in top3_districts.iterrows():
+            t_name = row['行政區']
+            count = row['紅區數']
+            rank = rank_idx + 1
             
-            if not df.empty and '行政區' in df.columns:
-                df_pure = df.copy()
-                df_pure['行政區_純化'] = df_pure['行政區'].astype(str).str.replace('臺', '台').str.strip()
+            if t_name in district_centers:
+                center_lat = district_centers[t_name]['lat']
+                center_lon = district_centers[t_name]['lon']
                 
-                # 計算紅區數並取得前三名
-                red_counts_pure = df_pure[df_pure['佔用%'] >= 90]['行政區_純化'].value_counts()
-                red_dict = red_counts_pure.to_dict()
-                top3_districts = red_counts_pure.head(3).index.tolist()
-                valid_set = set(df_pure['行政區_純化'].unique())
-            else:
-                red_dict, top3_districts, valid_set = {}, [], set()
-            
-            features = []
-            for f in geo_data_copy.get('features', []):
-                p = f.get('properties', {})
-                t_name = str(p.get('TOWNNAME') or p.get('name') or '').replace('臺', '台').strip()
+                # 依照排名設定光罩顏色
+                if rank == 1:
+                    color, opac = '#FF0000', 0.2  # TOP 1：紅色光罩
+                elif rank == 2:
+                    color, opac = '#FF5500', 0.15 # TOP 2：橘紅光罩
+                else:
+                    color, opac = '#FFAA00', 0.1  # TOP 3：橘黃光罩
                 
-                # 關鍵修正：將 props.get 改回 p.get
-                c_name = str(p.get('COUNTYNAME') or p.get('County_Name') or '').replace('臺', '台').strip()
-                
-                if '台北' in c_name or '新北' in c_name:
-                    if t_name.endswith(('市', '鎮', '鄉')): t_name = t_name[:-1] + '區'
-                    count = red_dict.get(t_name, 0)
-                    
-                    # 嚴格過濾：只針對前三名進行高亮著色
-                    if t_name in top3_districts:
-                        rank = top3_districts.index(t_name) + 1
-                        if rank == 1:
-                            color, opac = '#FF0000', 0.5  # TOP 1：深紅
-                        elif rank == 2:
-                            color, opac = '#FF5500', 0.4  # TOP 2：橘紅
-                        else:
-                            color, opac = '#FFAA00', 0.3  # TOP 3：橘黃
-                            
-                        f['properties']['DisplayName'] = f"🏆 TOP {rank}: {t_name} (紅區: {count})"
-                    elif t_name in valid_set: 
-                        color, opac = '#28A745', 0.05     # 其餘正常區塊降階為極淡的綠色背景
-                        f['properties']['DisplayName'] = f"{t_name} (紅區: {count})"
-                    else: 
-                        color, opac = '#666666', 0.1      # 無資料區塊
-                        f['properties']['DisplayName'] = f"{t_name} (無資料)"
-                        
-                    f['properties']['style'] = {'fillColor': color, 'color': color, 'weight': 1.5, 'fillOpacity': opac}
-                    features.append(f)
-            
-            geo_data_copy['features'] = features
-            if features:
-                folium.GeoJson(geo_data_copy, style_function=lambda x: x['properties']['style'],
-                               tooltip=folium.GeoJsonTooltip(fields=['DisplayName'], aliases=['區域狀態:'])).add_to(m)
+                # 畫出 8 公里半徑的圓 (folium.Circle 的 radius 單位為公尺)
+                folium.Circle(
+                    location=[center_lat, center_lon],
+                    radius=8000, 
+                    color=color,
+                    weight=2,
+                    fill=True,
+                    fill_color=color,
+                    fill_opacity=opac,
+                    tooltip=f"🏆 TOP {rank}: {t_name} (紅區: {count} 處)"
+                ).add_to(m)
                 
     # C. 停車場站點標記
     if not df.empty:
