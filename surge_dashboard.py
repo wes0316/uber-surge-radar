@@ -258,7 +258,7 @@ with col_map:
                 # 畫出 2 公里半徑的圓，並加粗邊框 (weight) 提升輪廓清晰度
                 folium.Circle(
                     location=[center_lat, center_lon],
-                    radius=2000, 
+                    radius=3000, 
                     color=color,
                     weight=3,
                     fill=True,
