@@ -98,7 +98,7 @@ def fetch_complete_data():
 
 # --- 3. 側邊欄：Logo 與彩色圖例 ---
 with st.sidebar:
-    st.image("logo.png", width=120)
+    st.image("logo.png", width=240)
     st.markdown("### 🛠️ 戰術控制")
     show_rain = st.toggle("疊加雷達雨圖", value=True)
     show_heatmap = st.toggle("紅區行政區著色", value=True)
