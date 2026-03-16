@@ -64,12 +64,10 @@ def get_address_pro(lat, lon):
 
 @st.cache_data(ttl=300)
 def get_radar_base64():
-    """ 透過後端抓取地形版雨圖，避免 CORB 阻擋並提供視覺底圖 """
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
         'Referer': 'https://www.cwa.gov.tw/'
     }
-    # 優先嘗試 CV1_3600_EL (地形版)，這樣沒雨也能看到地圖範圍
     urls = [
         f"https://www.cwa.gov.tw/Data/radar/CV1_3600_EL.png?v={int(time.time()/300)}",
         f"https://www.cwa.gov.tw/Data/radar/CV1_3600.png?v={int(time.time()/300)}"
@@ -137,21 +135,29 @@ red_zones = df[df['佔用%'] >= 90] if not df.empty else pd.DataFrame()
 red_counts = red_zones['行政區'].value_counts().reset_index()
 red_counts.columns = ['行政區', '紅區數']
 
+# 狀態管理
 if 'gps_pos' not in st.session_state: st.session_state['gps_pos'] = (24.9669, 121.5451)
+if 'addr_label' not in st.session_state: st.session_state['addr_label'] = "正在定位..."
+
+# 定位與地址反查
 curr = get_geolocation()
-if curr and 'coords' in curr: st.session_state['gps_pos'] = (round(curr['coords']['latitude'], 4), round(curr['coords']['longitude'], 4))
+if curr and 'coords' in curr:
+    n_lat, n_lon = round(curr['coords']['latitude'], 4), round(curr['coords']['longitude'], 4)
+    # 只有當經緯度變化超過一定門檻時才重新查詢地址，節省 API 額度
+    if abs(n_lat - st.session_state['gps_pos'][0]) > 0.0005 or st.session_state['addr_label'] == "正在定位...":
+        st.session_state['gps_pos'] = (n_lat, n_lon)
+        st.session_state['addr_label'] = get_address_pro(n_lat, n_lon)
 
 m1, m2, m3, m4 = st.columns(4)
 m1.metric("台北站點", f"{len(df[df['縣市']=='台北']) if not df.empty else 0}")
 m2.metric("新北站點", f"{len(df[df['縣市']=='新北']) if not df.empty else 0}")
 m3.metric("雙北紅區", f"{len(red_zones)}")
-m4.metric("目前座標", f"{st.session_state['gps_pos']}")
+m4.metric("目前位置", st.session_state['addr_label'])
 
 st.divider()
 col_map, col_list = st.columns([2.8, 1.2])
 
 with col_map:
-    # 修正 Marker 圖標 CORB 問題
     folium.Marker._icon_image_url = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png"
     folium.Marker._shadow_image_url = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png"
 
@@ -161,13 +167,7 @@ with col_map:
     if show_rain:
         rain_b64 = get_radar_base64()
         if rain_b64:
-            # 修正邊界：避免文字過大與比例失調 (氣象署 3600px 標準座標範圍)
-            folium.raster_layers.ImageOverlay(
-                image=rain_b64, 
-                bounds=[[21.8, 120.0], [25.4, 122.2]], 
-                opacity=0.45,
-                zindex=1
-            ).add_to(m)
+            folium.raster_layers.ImageOverlay(image=rain_b64, bounds=[[21.8, 120.0], [25.4, 122.2]], opacity=0.45, zindex=1).add_to(m)
 
     if show_heatmap and not red_zones.empty:
         centers = red_zones.groupby('行政區')[['lat', 'lon']].median().to_dict('index')
@@ -175,7 +175,7 @@ with col_map:
             t = row['行政區']
             if t in centers:
                 color = '#FF0000' if i==0 else ('#FF3D00' if i==1 else '#FF9100')
-                folium.Circle(location=[centers[t]['lat'], centers[t]['lon']], radius=2000, color=color, fill=True, fill_opacity=0.3).add_to(m)
+                folium.Circle(location=[centers[t]['lat'], centers[t]['lon']], radius=2000, color=color, weight=3, fill=True, fill_opacity=0.35).add_to(m)
     
     if not df.empty:
         for _, r in df.iterrows():
