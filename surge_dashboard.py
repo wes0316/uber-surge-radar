@@ -6,8 +6,10 @@ from streamlit_folium import st_folium
 from pyproj import Transformer
 from streamlit_js_eval import get_geolocation
 import time
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
-# --- 1. 旗艦視覺系統 ---
+# --- 1. 旗艦視覺系統 (暗灰科技 + 彩色圖例) ---
 st.set_page_config(page_title="Uber 雙北需求戰報", page_icon="🚕", layout="wide")
 
 st.markdown("""
@@ -32,64 +34,71 @@ st.markdown("""
             padding: 15px !important;
         }
         .leaflet-container { border: 2px solid #000000 !important; border-radius: 8px !important; }
+        hr { border-top: 1px solid #333333 !important; }
     </style>
 """, unsafe_allow_html=True)
 
-# --- 2. 數據引擎：終極診斷與抓取 ---
+# --- 2. 數據引擎：新北終極連線救援 ---
 transformer = Transformer.from_crs("epsg:3826", "epsg:4326")
+
+def create_robust_session():
+    """建立具備自動重試與偽裝功能的連線"""
+    session = requests.Session()
+    retry = Retry(total=3, backoff_factor=1, status_forcelist=[500, 502, 503, 504])
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+    session.headers.update({
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+        'Accept': 'application/json, text/plain, */*',
+        'Referer': 'https://data.ntpc.gov.tw/datasets/E09B3532-60D6-4547-BE9A-60C1F7AA0B0A'
+    })
+    return session
 
 @st.cache_data(ttl=60)
 def fetch_complete_data():
     all_data = []
-    # 更加強大的瀏覽器偽裝
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-        'Accept-Language': 'zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7',
-        'Referer': 'https://data.ntpc.gov.tw/'
-    }
+    session = create_robust_session()
     
-    # 台北市部分 (通常很穩)
+    # --- 台北市部分 (直連) ---
     try:
-        t_desc = requests.get("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_alldesc.json", timeout=10).json()['data']['park']
-        t_avail = requests.get("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_allavailable.json", timeout=10).json()['data']['park']
+        t_desc = session.get("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_alldesc.json", timeout=10).json()['data']['park']
+        t_avail = session.get("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_allavailable.json", timeout=10).json()['data']['park']
         t_df = pd.merge(pd.DataFrame(t_desc), pd.DataFrame(t_avail), on='id')
         for _, r in t_df.iterrows():
             lat, lon = transformer.transform(float(r['tw97x']), float(r['tw97y']))
-            all_data.append({'場站名稱': r['name'], 'lat': lat, 'lon': lon, '佔用%': round(max(0, min(100, ((float(r.get('totalcar',1))-float(r.get('availablecar',0)))/float(r.get('totalcar',1))*100))), 1), '行政區': r['area'], '縣市': '台北'})
+            occ = round(max(0, min(100, ((float(r.get('totalcar',1))-float(r.get('availablecar',0)))/float(r.get('totalcar',1))*100))), 1)
+            all_data.append({'場站名稱': r['name'], 'lat': lat, 'lon': lon, '佔用%': occ, '行政區': r['area'], '縣市': '台北'})
     except: pass
 
-    # 新北市部分 (暴力救援)
+    # --- 新北市部分 (三段救援) ---
     ntp_urls = [
         "https://data.ntpc.gov.tw/api/datasets/E09B3532-60D6-4547-BE9A-60C1F7AA0B0A/json?size=1000",
-        "http://data.ntpc.gov.tw/api/datasets/E09B3532-60D6-4547-BE9A-60C1F7AA0B0A/json"
+        "http://data.ntpc.gov.tw/api/datasets/E09B3532-60D6-4547-BE9A-60C1F7AA0B0A/json?size=1000",
+        "https://opendata.ntpc.gov.tw/api/datasets/E09B3532-60D6-4547-BE9A-60C1F7AA0B0A/json?size=1000"
     ]
     
-    ntp_success = False
+    success = False
     for url in ntp_urls:
-        if ntp_success: break
+        if success: break
         try:
-            res = requests.get(url, headers=headers, timeout=15, verify=False)
+            # 增加 timeout 到 25 秒，並強制不校驗 SSL
+            res = session.get(url, timeout=25, verify=False)
             if res.status_code == 200:
-                # 關鍵診斷：檢查是否為真正的 JSON
-                try:
-                    n_res = res.json()
-                    if isinstance(n_res, list) and len(n_res) > 0:
-                        for r in n_res:
-                            lat = float(r.get('LAT') or r.get('lat') or 0)
-                            lon = float(r.get('LON') or r.get('lon') or 0)
-                            if 24.5 < lat < 25.5:
-                                total = float(r.get('TOTAL') or r.get('total') or 1)
-                                avail = float(r.get('AVAILABLE') or r.get('available') or 0)
-                                occ = round(max(0, min(100, ((total - avail) / total * 100))), 1)
-                                all_data.append({'場站名稱': r.get('NAME') or r.get('name'), 'lat': lat, 'lon': lon, '佔用%': occ, '行政區': r.get('AREA') or r.get('area'), '縣市': '新北'})
-                        ntp_success = True
-                    else: st.session_state['ntp_diag'] = "回傳資料格式不符 (空列表)"
-                except:
-                    st.session_state['ntp_diag'] = f"解析失敗，回傳內容：{res.text[:30]}..."
+                n_res = res.json()
+                for r in n_res:
+                    lat = float(r.get('LAT') or r.get('lat') or 0)
+                    lon = float(r.get('LON') or r.get('lon') or 0)
+                    if 24.5 < lat < 25.5:
+                        total = float(r.get('TOTAL') or r.get('total') or 1)
+                        avail = float(r.get('AVAILABLE') or r.get('available') or 0)
+                        occ = round(max(0, min(100, ((total - avail) / total * 100))), 1)
+                        all_data.append({'場站名稱': r.get('NAME') or r.get('name'), 'lat': lat, 'lon': lon, '佔用%': occ, '行政區': r.get('AREA') or r.get('area'), '縣市': '新北'})
+                success = True
             else:
-                st.session_state['ntp_diag'] = f"伺服器錯誤代碼: {res.status_code}"
+                st.session_state['ntp_status'] = f"錯誤 {res.status_code}"
         except Exception as e:
-            st.session_state['ntp_diag'] = f"連線異常: {str(e)[:20]}"
+            st.session_state['ntp_status'] = f"網路阻斷: {type(e).__name__}"
 
     return pd.DataFrame(all_data)
 
@@ -100,7 +109,7 @@ with st.sidebar:
     show_rain = st.toggle("疊加雷達雨圖", value=True)
     show_heatmap = st.toggle("紅區行政區著色", value=True)
     zoom_val = st.slider("地圖縮放", 10, 18, 14)
-    if st.button("🔄 強制同步所有數據"):
+    if st.button("🔄 同步戰情數據"):
         st.cache_data.clear()
         st.rerun()
     st.divider()
@@ -135,7 +144,7 @@ m1.metric("台北站點", f"{len(df[df['縣市']=='台北']) if not df.empty els
 ntp_count = len(df[df['縣市']=='新北']) if not df.empty else 0
 m2.metric("新北站點", f"{ntp_count} 處")
 if ntp_count == 0:
-    st.caption(f"⚠️ 新北診斷: {st.session_state.get('ntp_diag', '未偵測到異常')}")
+    st.caption(f"⚠️ 網路狀態: {st.session_state.get('ntp_status', '嘗試連線中')}")
 
 m3.metric("全域需求紅區", f"{len(red_zones)} 處")
 m4.metric("目前座標", f"{st.session_state['gps'][0]}, {st.session_state['gps'][1]}")
@@ -153,7 +162,7 @@ with col_map:
             c = '#FF0000' if row['佔用%'] >= 90 else ('#FFA500' if row['佔用%'] >= 75 else '#28A745')
             folium.CircleMarker(location=[row['lat'], row['lon']], radius=7, color=c, fill=True, fill_opacity=0.7, weight=1).add_to(m)
     folium.Marker(st.session_state['gps'], icon=folium.Icon(color='blue', icon='car', prefix='fa')).add_to(m)
-    st_folium(m, width="100%", height=600, key="uber_radar_v_final_debug")
+    st_folium(m, width="100%", height=600, key="uber_radar_vfinal_stable")
 
 with col_list:
     st.markdown("### 📈 紅區排行榜")
