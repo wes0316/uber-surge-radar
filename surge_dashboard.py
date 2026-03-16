@@ -218,7 +218,7 @@ with col_map:
                 opacity=0.45, name="雷達回波圖"
             ).add_to(m)
 
-    # B. TOP 3 戰區：半徑 8 公里光罩 (100% 成功繪製版)
+    # B. TOP 3 戰區：半徑 2 公里光罩 
     if show_heatmap and not df.empty and not red_counts.empty:
         # 計算各行政區的地理中心點 (將該區所有停車場的經緯度平均)
         district_centers = df.groupby('行政區')[['lat', 'lon']].mean().to_dict('index')
@@ -241,7 +241,7 @@ with col_map:
                 else:
                     color, opac = '#FFAA00', 0.1  # TOP 3：橘黃光罩
                 
-                # 畫出 8 公里半徑的圓 (folium.Circle 的 radius 單位為公尺)
+                # 畫出 2 公里半徑的圓 (folium.Circle 的 radius 單位為公尺)
                 folium.Circle(
                     location=[center_lat, center_lon],
                     radius=2000, 
