@@ -229,7 +229,7 @@ with col_map:
                 opacity=0.45, name="雷達回波圖"
             ).add_to(m)
 
-    # B. 行政區著色 (TOP 3 菁英過濾版)
+    # B. 行政區著色 (修正 NameError 版)
     if show_heatmap:
         geo_data = fetch_geojson()
         if geo_data:
@@ -251,7 +251,9 @@ with col_map:
             for f in geo_data_copy.get('features', []):
                 p = f.get('properties', {})
                 t_name = str(p.get('TOWNNAME') or p.get('name') or '').replace('臺', '台').strip()
-                c_name = str(p.get('COUNTYNAME') or props.get('County_Name') or '').replace('臺', '台').strip()
+                
+                # 關鍵修正：將 props.get 改回 p.get
+                c_name = str(p.get('COUNTYNAME') or p.get('County_Name') or '').replace('臺', '台').strip()
                 
                 if '台北' in c_name or '新北' in c_name:
                     if t_name.endswith(('市', '鎮', '鄉')): t_name = t_name[:-1] + '區'
