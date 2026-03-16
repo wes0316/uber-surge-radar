@@ -7,7 +7,7 @@ from pyproj import Transformer
 from streamlit_js_eval import get_geolocation
 import time
 
-# --- 1. Uber 旗艦科技視覺系統 (CSS 修復版) ---
+# --- 1. Uber 旗艦科技視覺系統 (CSS 深度修復) ---
 st.set_page_config(page_title="Uber 雙北需求戰報", page_icon="🚕", layout="wide")
 
 st.markdown("""
@@ -25,9 +25,9 @@ st.markdown("""
             border-right: 1px solid #333333 !important;
         }
         
-        /* 修正點：移除 span 的強制灰色，讓圖例顏色能生效 */
+        /* 修正點 1：移除 !important，允許內層 HTML 覆蓋顏色 */
         [data-testid="stSidebar"] h3, [data-testid="stSidebar"] p {
-            color: #B0B0B0 !important;
+            color: #B0B0B0; 
         }
 
         /* 戰術開關 (Toggle) 特效 */
@@ -46,12 +46,6 @@ st.markdown("""
         [data-testid="stMetricValue"] { color: #E0E0E0 !important; font-weight: 700 !important; }
         [data-testid="stMetricLabel"] { color: #909090 !important; font-size: 14px !important; }
 
-        /* 資料表格暗色化 */
-        [data-testid="stDataFrame"] {
-            background-color: #242424 !important;
-            border: 1px solid #333333 !important;
-        }
-
         /* 地圖邊框 */
         .leaflet-container { 
             border: 2px solid #000000 !important;
@@ -59,7 +53,7 @@ st.markdown("""
             filter: none !important; 
             background-color: white !important;
         }
-
+        
         /* 分隔線 */
         hr { border-top: 1px solid #333333 !important; }
     </style>
@@ -104,7 +98,7 @@ def fetch_complete_data():
     except: pass
     return pd.DataFrame(all_data)
 
-# --- 3. 側邊欄：Logo 與彩色圖例 (已修正 CSS 覆蓋問題) ---
+# --- 3. 側邊欄 ---
 with st.sidebar:
     st.image("logo.png", width=120)
     st.markdown("### 🛠️ 戰術控制")
@@ -116,11 +110,21 @@ with st.sidebar:
         st.rerun()
     st.divider()
     
+    # 修正點 2：改用獨立 div 並強化 inline CSS 確保顏色強制生效
     st.markdown("### 📍 雷達圖例說明")
-    # 使用 <span> 包裹並直接給予顏色，現在不會被 CSS 蓋掉了
-    st.markdown('<p style="font-size:18px;"><span style="color:#FF0000 !important;">●</span> 需求紅區 (佔用 >= 90%)</p>', unsafe_allow_html=True)
-    st.markdown('<p style="font-size:18px;"><span style="color:#FFAA00 !important;">●</span> 高潛力區 (佔用 75-89%)</p>', unsafe_allow_html=True)
-    st.markdown('<p style="font-size:18px;"><span style="color:#28A745 !important;">●</span> 正常區域 (佔用 < 75%)</p>', unsafe_allow_html=True)
+    st.markdown("""
+        <div style="line-height: 2;">
+            <div style="color: #DCDCDC; font-size: 16px;">
+                <span style="color: #FF0000 !important; font-size: 20px;">●</span> 需求紅區 (佔用 >= 90%)
+            </div>
+            <div style="color: #DCDCDC; font-size: 16px;">
+                <span style="color: #FFAA00 !important; font-size: 20px;">●</span> 高潛力區 (佔用 75-89%)
+            </div>
+            <div style="color: #DCDCDC; font-size: 16px;">
+                <span style="color: #28A745 !important; font-size: 20px;">●</span> 正常區域 (佔用 < 75%)
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
 
 # --- 4. 畫面渲染 ---
 st.title("🛡️ Uber 雙北需求戰報")
