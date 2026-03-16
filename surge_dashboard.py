@@ -7,45 +7,46 @@ from pyproj import Transformer
 from streamlit_js_eval import get_geolocation
 import time
 
-# --- 1. 物理級強制亮色 CSS (對抗手機強制深色) ---
+# --- 1. 物理級強制亮色 CSS (升級版：對抗瀏覽器強制反轉) ---
 st.set_page_config(page_title="雙北戰情雷達", page_icon="🚕", layout="wide")
 
 st.markdown("""
     <style>
-        /* 1. 強制 App 背景與文字，不准被反轉 */
-        html, body, [data-testid="stAppViewContainer"] {
-            background-color: white !important;
-            color: black !important;
-            filter: none !important; /* 防止瀏覽器強制反轉 */
+        /* 強制全局背景 */
+        html, body, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {
+            background-color: #ffffff !important;
+            color: #000000 !important;
         }
         
-        /* 2. 側邊欄也要刷白 */
-        [data-testid="stSidebar"] {
-            background-color: #f8f9fa !important;
+        /* 針對地圖容器：防止被瀏覽器 Dark Mode 濾鏡影響 */
+        .leaflet-container {
+            background: #fff !important;
+            filter: none !important;
         }
-
-        /* 3. 地圖專用：強制移除所有濾鏡，確保地圖瓦片不變黑 */
-        .leaflet-tile-pane, .leaflet-container {
+        
+        /* 核心黑科技：如果瀏覽器強行對地圖圖片進行反轉(invert)，我們就在 CSS 層級強制轉回來 */
+        .leaflet-tile-pane {
             filter: brightness(1) contrast(1) invert(0) !important;
         }
-
-        /* 4. 數據看板樣式 */
+        
+        /* 數據指標卡 */
         .stMetric { 
-            background-color: #ffffff !important; 
-            border: 1px solid #dddddd !important; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            background-color: #f8f9fa !important; 
+            border: 1px solid #eeeeee !important; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
     </style>
 """, unsafe_allow_html=True)
 
-# --- 2. 數據處理 ---
+# --- 2. 數據處理核心 ---
 transformer = Transformer.from_crs("epsg:3826", "epsg:4326")
 HEADERS = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)'}
 
 @st.cache_data(ttl=60)
-def fetch_data():
+def fetch_dual_data():
     all_data = []
     log = {"台北": 0, "新北": 0}
+    # 台北抓取
     try:
         t_d = requests.get("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_alldesc.json", timeout=12).json()['data']['park']
         t_a = requests.get("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_allavailable.json", timeout=12).json()['data']['park']
@@ -58,6 +59,7 @@ def fetch_data():
             all_data.append({'name': r['name'], 'lat': lat, 'lon': lon, 'occ': round(occ, 1), 'color': color, 'city': '台北'})
         log["台北"] = len(t_df)
     except: pass
+    # 新北抓取
     try:
         n_res = requests.get("https://data.ntpc.gov.tw/api/datasets/E09B3532-60D6-4547-BE9A-60C1F7AA0B0A/json", headers=HEADERS, timeout=15).json()
         for r in n_res:
@@ -82,8 +84,8 @@ if curr_pos and 'coords' in curr_pos:
 u_lat, u_lon = st.session_state['pos']
 
 # --- 4. UI 渲染 ---
-st.title("🛡️ 雙北戰情雷達 (絕對亮色版)")
-df, stats = fetch_data()
+st.title("🛡️ 雙北戰情雷達 (強制明亮修復版)")
+df, stats = fetch_dual_data()
 
 m1, m2, m3, m4 = st.columns(4)
 m1.metric("台北站點", f"{stats['台北']} 處")
@@ -94,12 +96,12 @@ m4.metric("GPS 狀態", "📡 定位中" if curr_pos else "⌛ 搜尋中")
 col_map, col_list = st.columns([3, 1])
 
 with col_map:
-    # 這裡使用最標準的 OpenStreetMap 瓦片 URL
+    # 這裡換成 CartoDB 的亮色底圖，它比 OSM 更亮、更乾淨
     m = folium.Map(
         location=[u_lat, u_lon], 
         zoom_start=14, 
-        tiles="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        attr='&copy; OpenStreetMap'
+        tiles="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+        attr='&copy; CartoDB'
     )
     
     # 疊加雨雲圖
@@ -108,11 +110,14 @@ with col_map:
 
     if not df.empty:
         for _, row in df.iterrows():
-            folium.CircleMarker(location=[row['lat'], row['lon']], radius=8, color=row['color'], fill=True, fill_opacity=0.7).add_to(m)
+            folium.CircleMarker(
+                location=[row['lat'], row['lon']], 
+                radius=8, color=row['color'], 
+                fill=True, fill_opacity=0.7, weight=1
+            ).add_to(m)
     
     folium.Marker([u_lat, u_lon], icon=folium.Icon(color='blue')).add_to(m)
-    
-    st_folium(m, width="100%", height=600, key="force_bright_v6")
+    st_folium(m, width="100%", height=600, key="force_bright_v7")
 
 with col_list:
     st.subheader("🔥 優先導航")
