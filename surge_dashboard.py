@@ -7,62 +7,76 @@ from pyproj import Transformer
 from streamlit_js_eval import get_geolocation
 import time
 
-# --- 1. Uber 科技感抗疲勞視覺系統 (CSS) ---
+# --- 1. Uber 旗艦科技視覺系統 (CSS) ---
 st.set_page_config(page_title="Uber 雙北需求戰報", page_icon="🚕", layout="wide")
 
 st.markdown("""
     <style>
-        /* 1. 全域底色：深炭灰 (非全黑) */
+        /* 全域底色：深炭灰 (非全黑) */
         html, body, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {
             background-color: #1A1A1A !important;
-            color: #DCDCDC !important; /* 淺煙灰文字，防刺眼 */
-            font-family: 'Inter', sans-serif !important;
+            color: #DCDCDC !important; /* 鉑金灰文字，抗疲勞 */
+            font-family: 'Inter', -apple-system, sans-serif !important;
         }
 
-        /* 2. 側邊欄：Uber Black 質感 */
+        /* 側邊欄：Uber Black 質感 */
         [data-testid="stSidebar"] {
             background-color: #111111 !important;
             border-right: 1px solid #333333 !important;
         }
-        [data-testid="stSidebar"] h2, [data-testid="stSidebar"] p {
+        [data-testid="stSidebar"] h3, [data-testid="stSidebar"] p, [data-testid="stSidebar"] span {
             color: #B0B0B0 !important;
         }
 
-        /* 3. 戰術開關 (Toggle) 強度優化 */
-        /* 當開關為 ON 時顯示 Uber Blue，OFF 時顯示深灰色 */
-        .st-at { background-color: #276EF1 !important; } /* Toggle 開啟顏色 */
+        /* 戰術開關 (Toggle) 特效：開啟時顯示 Uber Blue */
+        div[data-testid="stWidgetLabel"] p { color: #DCDCDC !important; }
+        .st-at { background-color: #276EF1 !important; } 
 
-        /* 4. 數據卡片 (Metric) */
+        /* 數據卡片 (Metric)：嵌入式科技感 */
         div[data-testid="stMetric"] {
             background-color: #242424 !important;
             border: 1px solid #333333 !important;
-            border-left: 5px solid #276EF1 !important; /* Uber 招牌藍條 */
+            border-left: 5px solid #276EF1 !important; /* Uber 標誌藍條 */
             border-radius: 4px !important;
             padding: 15px !important;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.4) !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
         }
         [data-testid="stMetricValue"] { color: #E0E0E0 !important; font-weight: 700 !important; }
         [data-testid="stMetricLabel"] { color: #909090 !important; font-size: 14px !important; }
 
-        /* 5. 資料表格暗色化 */
+        /* 資料表格暗色化 */
         [data-testid="stDataFrame"] {
             background-color: #242424 !important;
-            color: #DCDCDC !important;
+            border: 1px solid #333333 !important;
         }
 
-        /* 6. 標題與地圖邊框 */
-        h1, h2, h3 { color: #E0E0E0 !important; }
+        /* 標題與地圖邊框 */
+        h1, h2, h3 { color: #E0E0E0 !important; font-weight: 700 !important; }
         .leaflet-container { 
-            border: 2px solid #333333 !important;
+            border: 2px solid #000000 !important;
             border-radius: 8px !important;
-            filter: none !important; /* 地圖保持明亮 */
+            filter: none !important; /* 地圖保持明亮系 */
             background-color: white !important;
         }
+
+        /* 分隔線 */
+        hr { border-top: 1px solid #333333 !important; }
     </style>
 """, unsafe_allow_html=True)
 
 # --- 2. 核心數據邏輯 ---
 transformer = Transformer.from_crs("epsg:3826", "epsg:4326")
+
+def get_address_pro(lat, lon):
+    try:
+        headers = {'User-Agent': f'UberRadar_Ayan_{int(time.time())}'}
+        url = f"https://nominatim.openstreetmap.org/reverse?format=json&lat={lat}&lon={lon}&addressdetails=1&accept-language=zh-TW"
+        res = requests.get(url, headers=headers, timeout=5).json()
+        addr = res.get('address', {})
+        dist = addr.get('suburb') or addr.get('city_district') or addr.get('town') or ""
+        road = addr.get('road') or ""
+        return f"{dist} {road}".strip() if (dist or road) else f"{lat}, {lon}"
+    except: return f"{lat}, {lon}"
 
 @st.cache_data(ttl=60)
 def fetch_complete_data():
@@ -91,24 +105,24 @@ def fetch_complete_data():
     except: pass
     return pd.DataFrame(all_data)
 
-# --- 3. 側邊欄：左上角 Logo 與功能控制 ---
+# --- 3. 側邊欄：左上角亮色 Logo 與控制項 ---
 with st.sidebar:
-    # 置入白色 Uber Logo
+    # 使用亮色版 Uber Logo
     st.image("https://upload.wikimedia.org/wikipedia/commons/c/cc/Uber_logo_2018.png", width=120)
     st.markdown("### 🛠️ 戰術控制")
     show_rain = st.toggle("疊加雷達雨圖", value=True)
     show_heatmap = st.toggle("紅區行政區著色", value=True)
     zoom_val = st.slider("地圖縮放級別", 10, 18, 14)
-    if st.button("🔄 同步數據"):
+    if st.button("🔄 同步最新數據"):
         st.cache_data.clear()
         st.rerun()
     st.divider()
     st.markdown("### 📍 雷達圖例")
-    st.markdown('<p style="color:#FF4B4B;">● 需求紅區 (>= 90%)</p>', unsafe_allow_html=True)
-    st.markdown('<p style="color:#FFAA00;">● 高潛力區 (75-89%)</p>', unsafe_allow_html=True)
-    st.markdown('<p style="color:#28A745;">● 正常區域 (< 75%)</p>', unsafe_allow_html=True)
+    st.markdown('<p style="color:#FF4B4B; font-size:14px;">● 需求紅區 (>= 90%)</p>', unsafe_allow_html=True)
+    st.markdown('<p style="color:#FFAA00; font-size:14px;">● 高潛力區 (75-89%)</p>', unsafe_allow_html=True)
+    st.markdown('<p style="color:#28A745; font-size:14px;">● 正常區域 (< 75%)</p>', unsafe_allow_html=True)
 
-# --- 4. 畫面渲染 ---
+# --- 4. 數據準備與 UI 渲染 ---
 st.title("🛡️ Uber 雙北需求戰報")
 df = fetch_complete_data()
 
@@ -117,22 +131,28 @@ red_counts = red_zones['行政區'].value_counts().reset_index()
 red_counts.columns = ['行政區', '紅區數']
 
 if 'gps_pos' not in st.session_state: st.session_state['gps_pos'] = (24.9669, 121.5451)
+if 'addr_label' not in st.session_state: st.session_state['addr_label'] = "正在定位..."
+
 curr = get_geolocation()
 if curr and 'coords' in curr:
-    st.session_state['gps_pos'] = (round(curr['coords']['latitude'], 4), round(curr['coords']['longitude'], 4))
+    n_lat, n_lon = round(curr['coords']['latitude'], 4), round(curr['coords']['longitude'], 4)
+    if abs(n_lat - st.session_state['gps_pos'][0]) > 0.0005 or st.session_state['addr_label'] == "正在定位...":
+        st.session_state['gps_pos'] = (n_lat, n_lon)
+        st.session_state['addr_label'] = get_address_pro(n_lat, n_lon)
 
+# 頂部四格指標
 m1, m2, m3, m4 = st.columns(4)
 m1.metric("台北站點", f"{len(df[df['縣市']=='台北']) if not df.empty else 0} 處")
 m2.metric("新北站點", f"{len(df[df['縣市']=='新北']) if not df.empty else 0} 處")
 m3.metric("全域需求紅區", f"{len(red_zones)} 處")
-m4.metric("中心座標", f"{st.session_state['gps_pos'][0]}, {st.session_state['gps_pos'][1]}")
+m4.metric("目前位置", st.session_state['addr_label'])
 
 st.divider()
 
 col_map, col_list = st.columns([2.8, 1.2])
 
 with col_map:
-    # 保持明亮地圖
+    # 保持明亮地圖圖磚 (Google Maps Style)
     m = folium.Map(location=st.session_state['gps_pos'], zoom_start=zoom_val, 
                    tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", attr="Google Maps")
     
@@ -146,7 +166,7 @@ with col_map:
             folium.CircleMarker(location=[row['lat'], row['lon']], radius=7, color=c, fill=True, fill_opacity=0.7, weight=1).add_to(m)
     
     folium.Marker(st.session_state['gps_pos'], icon=folium.Icon(color='blue', icon='car', prefix='fa')).add_to(m)
-    st_folium(m, width="100%", height=600, key="uber_tactical_v2")
+    st_folium(m, width="100%", height=600, key="uber_tactical_v3")
 
 with col_list:
     st.markdown("### 📈 紅區排行榜")
