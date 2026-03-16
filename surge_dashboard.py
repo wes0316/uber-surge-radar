@@ -15,7 +15,7 @@ st.markdown("""
         /* 全域底色：深炭灰 (非全黑) */
         html, body, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {
             background-color: #1A1A1A !important;
-            color: #DCDCDC !important; /* 鉑金灰文字，減少刺眼感 */
+            color: #DCDCDC !important; 
             font-family: 'Inter', -apple-system, sans-serif !important;
         }
 
@@ -28,15 +28,15 @@ st.markdown("""
             color: #B0B0B0 !important;
         }
 
-        /* 戰術開關 (Toggle) 特效：開啟時顯示亮藍色，關閉時為暗灰色 */
+        /* 戰術開關 (Toggle) 特效：開啟時顯示 Uber Blue */
         div[data-testid="stWidgetLabel"] p { color: #DCDCDC !important; }
         .st-at { background-color: #276EF1 !important; } 
 
-        /* 數據卡片 (Metric)：嵌入式科技感 */
+        /* 數據卡片 (Metric) */
         div[data-testid="stMetric"] {
             background-color: #242424 !important;
             border: 1px solid #333333 !important;
-            border-left: 5px solid #276EF1 !important; /* Uber 標誌藍條 */
+            border-left: 5px solid #276EF1 !important; 
             border-radius: 4px !important;
             padding: 15px !important;
             box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
@@ -55,7 +55,7 @@ st.markdown("""
         .leaflet-container { 
             border: 2px solid #000000 !important;
             border-radius: 8px !important;
-            filter: none !important; /* 地圖保持明亮系，方便閱讀路名 */
+            filter: none !important; 
             background-color: white !important;
         }
 
@@ -82,7 +82,6 @@ def get_address_pro(lat, lon):
 def fetch_complete_data():
     all_data = []
     headers = {'User-Agent': 'Mozilla/5.0'}
-    # 台北市
     try:
         t_d = requests.get("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_alldesc.json", timeout=10).json()['data']['park']
         t_a = requests.get("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_allavailable.json", timeout=10).json()['data']['park']
@@ -93,7 +92,6 @@ def fetch_complete_data():
             occ = max(0, min(100, ((total - avail) / total * 100))) if total > 0 else 0
             all_data.append({'場站名稱': r['name'], 'lat': lat, 'lon': lon, '佔用%': round(occ, 1), '行政區': r['area'], '縣市': '台北'})
     except: pass
-    # 新北市
     try:
         n_res = requests.get("https://data.ntpc.gov.tw/api/datasets/E09B3532-60D6-4547-BE9A-60C1F7AA0B0A/json", headers=headers, timeout=15).json()
         for r in n_res:
@@ -105,9 +103,8 @@ def fetch_complete_data():
     except: pass
     return pd.DataFrame(all_data)
 
-# --- 3. 側邊欄：左上角 Logo 置入 ---
+# --- 3. 側邊欄：Logo 與更新後的圖例 ---
 with st.sidebar:
-    # 採用亮白色 Uber Logo，確保在深色背景下清晰
     st.image("logo.png", width=120)
     st.markdown("### 🛠️ 戰術控制")
     show_rain = st.toggle("疊加雷達雨圖", value=True)
@@ -117,6 +114,8 @@ with st.sidebar:
         st.cache_data.clear()
         st.rerun()
     st.divider()
+    
+    # 這是你剛才要求更新的部分
     st.markdown("### 📍 雷達圖例說明")
     st.markdown('<p style="color:#FF4B4B; font-size:14px;">● 需求紅區 (佔用 >= 90%)</p>', unsafe_allow_html=True)
     st.markdown('<p style="color:#FFAA00; font-size:14px;">● 高潛力區 (佔用 75-89%)</p>', unsafe_allow_html=True)
@@ -126,7 +125,6 @@ with st.sidebar:
 st.title("🛡️ Uber 雙北需求戰報")
 df = fetch_complete_data()
 
-# 數據統計
 red_zones = df[df['佔用%'] >= 90] if not df.empty else pd.DataFrame()
 red_counts = red_zones['行政區'].value_counts().reset_index()
 red_counts.columns = ['行政區', '紅區數']
@@ -141,7 +139,6 @@ if curr and 'coords' in curr:
         st.session_state['gps_pos'] = (n_lat, n_lon)
         st.session_state['addr_label'] = get_address_pro(n_lat, n_lon)
 
-# 頂部儀表板卡片
 m1, m2, m3, m4 = st.columns(4)
 m1.metric("台北站點", f"{len(df[df['縣市']=='台北']) if not df.empty else 0} 處")
 m2.metric("新北站點", f"{len(df[df['縣市']=='新北']) if not df.empty else 0} 處")
@@ -153,7 +150,6 @@ st.divider()
 col_map, col_list = st.columns([2.8, 1.2])
 
 with col_map:
-    # 保持最清晰的 Google 明亮瓦片
     m = folium.Map(location=st.session_state['gps_pos'], zoom_start=zoom_val, 
                    tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", attr="Google Maps")
     
