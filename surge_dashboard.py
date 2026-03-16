@@ -16,7 +16,7 @@ st.markdown("""
         html, body, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {
             background-color: #2B2B2B !important;
             color: #E0E0E0 !important;
-            font-family: 'Roboto Mono', monospace !important; /* 工業風字體 */
+            font-family: 'Inter', sans-serif !important;
         }
 
         /* 側邊欄：深碳黑 */
@@ -62,7 +62,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 2. 核心數據邏輯 (保持不變) ---
+# --- 2. 核心數據邏輯 ---
 transformer = Transformer.from_crs("epsg:3826", "epsg:4326")
 
 @st.cache_data(ttl=86400)
@@ -77,7 +77,7 @@ def fetch_geojson():
 def fetch_data():
     all_data = []
     headers = {'User-Agent': 'Mozilla/5.0'}
-    # 台北與新北抓取邏輯
+    # 台北市
     try:
         t_d = requests.get("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_alldesc.json", timeout=10).json()['data']['park']
         t_a = requests.get("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_allavailable.json", timeout=10).json()['data']['park']
@@ -88,6 +88,7 @@ def fetch_data():
             occ = max(0, min(100, ((total - avail) / total * 100))) if total > 0 else 0
             all_data.append({'場站名稱': r['name'], 'lat': lat, 'lon': lon, '佔用%': round(occ, 1), '行政區': r['area'], '縣市': '台北'})
     except: pass
+    # 新北市
     try:
         n_res = requests.get("https://data.ntpc.gov.tw/api/datasets/E09B3532-60D6-4547-BE9A-60C1F7AA0B0A/json", headers=headers, timeout=15).json()
         for r in n_res:
@@ -106,16 +107,16 @@ def get_addr_pro(lat, lon):
         addr = res.get('address', {})
         dist = addr.get('suburb') or addr.get('city_district') or addr.get('town') or ""
         road = addr.get('road') or ""
-        return f"{dist} {road}".strip() if (dist or road) else "校準中"
+        return f"{dist} {road}".strip() if (dist or road) else "定位校準中"
     except: return None
 
-# --- 3. 側邊欄：Logo 與控制項 ---
+# --- 3. 側邊欄控制 ---
 with st.sidebar:
     st.image("https://upload.wikimedia.org/wikipedia/commons/c/cc/Uber_logo_2018.png", width=110)
     st.markdown("### [ SYSTEM CONTROL ]")
-    show_rain = st.toggle("疊加雨雲雷達", value=True)
+    show_rain = st.toggle("疊加即時雨雲", value=True)
     show_heatmap = st.toggle("需求紅區著色", value=True)
-    zoom_val = st.slider("地圖縮放", 10, 18, 14)
+    zoom_val = st.slider("地圖初始縮放", 10, 18, 14)
     if st.button("RUN SYSTEM UPDATE"):
         st.cache_data.clear()
         st.rerun()
@@ -125,7 +126,7 @@ with st.sidebar:
     st.markdown('<p style="color:#FFAA00;">● POTENTIAL (75-89%)</p>', unsafe_allow_html=True)
     st.markdown('<p style="color:#28A745;">● NORMAL (< 75%)</p>', unsafe_allow_html=True)
 
-# --- 4. 數據渲染 ---
+# --- 4. 數據準備與 UI 渲染 ---
 st.title("🛡️ UBER TACTICAL RADAR")
 df = fetch_data()
 
@@ -135,20 +136,20 @@ red_counts.columns = ['行政區', '紅區數']
 top_3 = red_counts.head(3)['行政區'].tolist()
 
 if 'gps' not in st.session_state: st.session_state['gps'] = (24.9669, 121.5451)
-if 'addr' not in st.session_state: st.session_state['addr'] = "定位中..."
+if 'addr' not in st.session_state: st.session_state['addr'] = "定位校準中..."
 
 curr = get_geolocation()
 if curr and 'coords' in curr:
     n_lat, n_lon = round(curr['coords']['latitude'], 4), round(curr['coords']['longitude'], 4)
-    if abs(n_lat - st.session_state['gps'][0]) > 0.0005:
+    if abs(n_lat - st.session_state['gps'][0]) > 0.0005 or st.session_state['addr'] == "定位校準中...":
         st.session_state['gps'] = (n_lat, n_lon)
         st.session_state['addr'] = get_addr_pro(n_lat, n_lon)
 
-# 指標卡片
+# 頂部四格戰術卡片
 m1, m2, m3, m4 = st.columns(4)
-m1.metric("TP STATIONS", f"{len(df[df['縣市'] == '台北']) if not df.empty else 0}")
-m2.metric("NTP STATIONS", f"{len(df[df['縣市'] == '新北']) if not df.empty else 0}")
-m3.metric("RED ZONES", f"{len(red_zones)}")
+m1.metric("TP SECTOR", f"{len(df[df['縣市'] == '台北']) if not df.empty else 0}")
+m2.metric("NTP SECTOR", f"{len(df[df['縣市'] == '新北']) if not df.empty else 0}")
+m3.metric("DEMAND RED", f"{len(red_zones)}")
 m4.metric("LOC SECTOR", st.session_state['addr'])
 
 st.divider()
@@ -156,7 +157,7 @@ st.divider()
 col_map, col_list = st.columns([2.8, 1.2])
 
 with col_map:
-    # 保持明亮底圖
+    # 保持最清晰的 Google 明亮瓦片
     m = folium.Map(location=st.session_state['gps'], zoom_start=zoom_val, 
                    tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", attr="Google Maps")
     
@@ -173,12 +174,15 @@ with col_map:
         rain_url = f"https://www.cwa.gov.tw/Data/radar/CV1_3600_EL.png?v={int(time.time()/300)}"
         folium.raster_layers.ImageOverlay(image=rain_url, bounds=[[21.7, 118.0], [25.5, 122.5]], opacity=0.3).add_to(m)
 
-    for _, row in df.iterrows():
-        c = '#FF0000' if row['佔_用%'] >= 90 else ('#FFA500' if row['佔_用%'] >= 75 else '#28A745')
-        folium.CircleMarker(location=[row['lat'], row['lon']], radius=6, color=c, fill=True, fill_opacity=0.7, weight=1).add_to(m)
+    # 繪製點位 (修正後的關鍵迴圈)
+    if not df.empty:
+        for _, row in df.iterrows():
+            # 這裡修正了 Key 錯誤：row['佔用%']
+            c = '#FF0000' if row['佔用%'] >= 90 else ('#FFA500' if row['佔用%'] >= 75 else '#28A745')
+            folium.CircleMarker(location=[row['lat'], row['lon']], radius=6, color=c, fill=True, fill_opacity=0.7, weight=1).add_to(m)
     
     folium.Marker(st.session_state['gps'], icon=folium.Icon(color='orange', icon='car', prefix='fa')).add_to(m)
-    st_folium(m, width="100%", height=600, key="industrial_map")
+    st_folium(m, width="100%", height=600, key="fixed_industrial_map")
 
 with col_list:
     st.markdown("### 📈 SECTOR RANKING")
