@@ -22,7 +22,7 @@ st.markdown("""
         html, body, [data-testid="stAppViewContainer"] {
             overflow: hidden !important; 
             background-color: #1A1A1A !important;
-            color: #FFFFFF !important; 
+            color: #FFFFFF !important; /* 全域文字調為白色 */
             font-family: 'Inter', -apple-system, sans-serif !important;
         }
         
@@ -31,8 +31,12 @@ st.markdown("""
             background-color: #111111 !important; 
             border-right: 1px solid #333333 !important; 
         }
-        [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 { color: #FFFFFF !important; }
-        [data-testid="stSidebar"] p, [data-testid="stSidebar"] label { color: #E0E0E0 !important; }
+        [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 {
+            color: #FFFFFF !important; /* 側邊欄標題改為純白 */
+        }
+        [data-testid="stSidebar"] p, [data-testid="stSidebar"] label {
+            color: #E0E0E0 !important; /* 側邊欄一般文字改為亮銀 */
+        }
 
         /* 戰術開關文字強制加亮 */
         div[data-testid="stWidgetLabel"] p { 
@@ -41,9 +45,19 @@ st.markdown("""
             white-space: nowrap !important;
         }
         
-        /* Toggle 開關顏色邏輯 */
-        div[data-testid="stToggle"] div[role="switch"] { background-color: #444444 !important; }
-        div[data-testid="stToggle"] div[aria-checked="true"] { background-color: #276EF1 !important; }
+        /* --- 核心修正：Toggle 開關變色邏輯 --- */
+        /* 預設狀態 (OFF) */
+        div[data-testid="stToggle"] div[role="switch"] {
+            background-color: #444444 !important;
+        }
+        /* 開啟狀態 (ON) - 使用更精準的選擇器確保背景切換 */
+        div[data-testid="stToggle"] div[aria-checked="true"] {
+            background-color: #276EF1 !important;
+        }
+        /* 針對特定版本 Streamlit 的內層 div 顯色 */
+        div[data-testid="stToggle"] div[aria-checked="true"] > div {
+            background-color: #276EF1 !important;
+        }
 
         /* 數據卡片 (Metric) 顯色調整 */
         div[data-testid="stMetric"] {
@@ -56,8 +70,18 @@ st.markdown("""
         [data-testid="stMetricValue"] { color: #FFFFFF !important; font-size: 26px !important; font-weight: 700 !important; }
         [data-testid="stMetricLabel"] { color: #B0B0B0 !important; font-size: 14px !important; font-weight: 500 !important; }
 
+        /* 排行榜標題加亮 */
+        h1, h2, h3 { color: #FFFFFF !important; }
+
+        /* 地圖邊框 */
         .leaflet-container { border: 2px solid #000000 !important; border-radius: 8px !important; background-color: #1A1A1A !important; }
-        #MainMenu, footer, header {visibility: hidden;}
+        
+        /* 隱藏裝飾 */
+        #MainMenu {visibility: hidden;}
+        footer {visibility: hidden;}
+        header {visibility: hidden;}
+        
+        /* 修正表格文字顏色 */
         [data-testid="stDataFrame"] { background-color: #242424 !important; }
     </style>
 """, unsafe_allow_html=True)
@@ -73,8 +97,7 @@ def get_address_pro(lat, lon):
         addr = res.get('address', {})
         dist = addr.get('suburb') or addr.get('city_district') or addr.get('town') or ""
         road = addr.get('road') or ""
-        final_addr = f"{dist} {road}".strip()
-        return final_addr if final_addr else f"座標: {lat}, {lon}"
+        return f"{dist} {road}".strip() if (dist or road) else f"{lat}, {lon}"
     except: return f"座標: {lat}, {lon}"
 
 @st.cache_data(ttl=1800)
@@ -129,7 +152,7 @@ with st.sidebar:
     with c1: show_rain = st.toggle("🌧️ 雷達雨圖", value=False)
     with c2: show_heatmap = st.toggle("🔥 熱區光罩", value=False)
     zoom_val = st.slider("地圖縮放級別", 10, 18, 14)
-    if st.button("🔄 手動強制更新", use_container_width=True):
+    if st.button("🔄 同步數據庫", use_container_width=True):
         st.cache_data.clear()
         st.rerun()
     st.divider()
@@ -186,7 +209,6 @@ with col_map:
     
     if not df.empty:
         for _, r in df.iterrows():
-            # 【關鍵修復】拔掉欄位名稱中間的底線
             c = '#FF0000' if r['佔用%'] >= 90 else ('#FFA500' if r['佔用%'] >= 75 else '#28A745')
             folium.CircleMarker(location=[r['lat'], r['lon']], radius=6, color=c, fill=True, fill_opacity=0.7, weight=1).add_to(m)
     
