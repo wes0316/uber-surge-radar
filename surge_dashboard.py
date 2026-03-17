@@ -13,21 +13,39 @@ import base64
 # --- 隱藏 SSL 憑證警告 ---
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# --- 1. Uber 旗艦科技視覺系統 ---
+# --- 1. Uber 旗艦科技視覺系統 (高對比無捲軸版) ---
 st.set_page_config(page_title="Uber 運輸需求預測", page_icon="🚕", layout="wide")
 
 st.markdown("""
     <style>
+        /* 強制移除整頁捲軸並優化空間 */
         html, body, [data-testid="stAppViewContainer"] {
             overflow: hidden !important; 
             background-color: #1A1A1A !important;
             color: #FFFFFF !important; 
             font-family: 'Inter', -apple-system, sans-serif !important;
         }
-        [data-testid="stSidebar"] { background-color: #111111 !important; border-right: 1px solid #333333 !important; }
-        div[data-testid="stWidgetLabel"] p { color: #FFFFFF !important; font-weight: 500 !important; white-space: nowrap !important; }
+        
+        /* 側邊欄文字亮度調整 */
+        [data-testid="stSidebar"] { 
+            background-color: #111111 !important; 
+            border-right: 1px solid #333333 !important; 
+        }
+        [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 { color: #FFFFFF !important; }
+        [data-testid="stSidebar"] p, [data-testid="stSidebar"] label { color: #E0E0E0 !important; }
+
+        /* 戰術開關文字強制加亮 */
+        div[data-testid="stWidgetLabel"] p { 
+            color: #FFFFFF !important; 
+            font-weight: 500 !important;
+            white-space: nowrap !important;
+        }
+        
+        /* Toggle 開關顏色邏輯 */
         div[data-testid="stToggle"] div[role="switch"] { background-color: #444444 !important; }
         div[data-testid="stToggle"] div[aria-checked="true"] { background-color: #276EF1 !important; }
+
+        /* 數據卡片 (Metric) 顯色調整 */
         div[data-testid="stMetric"] {
             background-color: #242424 !important;
             border: 1px solid #444444 !important;
@@ -37,8 +55,10 @@ st.markdown("""
         }
         [data-testid="stMetricValue"] { color: #FFFFFF !important; font-size: 26px !important; font-weight: 700 !important; }
         [data-testid="stMetricLabel"] { color: #B0B0B0 !important; font-size: 14px !important; font-weight: 500 !important; }
+
         .leaflet-container { border: 2px solid #000000 !important; border-radius: 8px !important; background-color: #1A1A1A !important; }
         #MainMenu, footer, header {visibility: hidden;}
+        [data-testid="stDataFrame"] { background-color: #242424 !important; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -46,26 +66,16 @@ st.markdown("""
 transformer = Transformer.from_crs("epsg:3826", "epsg:4326")
 
 def get_address_pro(lat, lon):
-    """ 強度強化的地址反查函式 """
     try:
-        # 使用隨機時間戳避免快取阻擋
-        headers = {'User-Agent': f'Mozilla/5.0 (UberRadar_DriverApp_{int(time.time())})'}
+        headers = {'User-Agent': f'UberRadar_Ayan_{int(time.time())}'}
         url = f"https://nominatim.openstreetmap.org/reverse?format=json&lat={lat}&lon={lon}&addressdetails=1&accept-language=zh-TW"
-        res = requests.get(url, headers=headers, timeout=5)
-        
-        if res.status_code == 200:
-            data = res.json()
-            addr = data.get('address', {})
-            # 優先提取行政區與道路
-            dist = addr.get('suburb') or addr.get('city_district') or addr.get('town') or addr.get('county', "")
-            road = addr.get('road') or addr.get('pedestrian', "")
-            
-            final_addr = f"{dist} {road}".strip()
-            return final_addr if final_addr else f"座標: {lat}, {lon}"
-        else:
-            return f"座標: {lat}, {lon} (API忙碌中)"
-    except Exception as e:
-        return f"座標: {lat}, {lon}"
+        res = requests.get(url, headers=headers, timeout=5).json()
+        addr = res.get('address', {})
+        dist = addr.get('suburb') or addr.get('city_district') or addr.get('town') or ""
+        road = addr.get('road') or ""
+        final_addr = f"{dist} {road}".strip()
+        return final_addr if final_addr else f"座標: {lat}, {lon}"
+    except: return f"座標: {lat}, {lon}"
 
 @st.cache_data(ttl=1800)
 def get_radar_base64():
@@ -122,6 +132,9 @@ with st.sidebar:
     if st.button("🔄 手動強制更新", use_container_width=True):
         st.cache_data.clear()
         st.rerun()
+    st.divider()
+    st.markdown("### 📍 圖例說明")
+    st.markdown("""<div style='color:#FF0000; font-weight:bold;'>● <span style='color:#FFFFFF'>爆滿紅區 (>= 90%)</span></div>""", unsafe_allow_html=True)
 
 # --- 4. 狀態與定位處理 ---
 if 'gps_pos' not in st.session_state: st.session_state['gps_pos'] = (24.9669, 121.5451)
@@ -130,17 +143,17 @@ if 'addr_label' not in st.session_state: st.session_state['addr_label'] = "正�
 curr = get_geolocation()
 if curr and 'coords' in curr:
     n_lat, n_lon = round(curr['coords']['latitude'], 4), round(curr['coords']['longitude'], 4)
-    # 只要拿到座標且目前的標籤是初始狀態，就強制更新地址
     if st.session_state['addr_label'] == "正在定位..." or abs(n_lat - st.session_state['gps_pos'][0]) > 0.0005:
         st.session_state['gps_pos'] = (n_lat, n_lon)
         st.session_state['addr_label'] = get_address_pro(n_lat, n_lon)
 
-# 顯示數據
+# 數據加載
 df = fetch_complete_data()
 red_zones = df[df['佔用%'] >= 90] if not df.empty else pd.DataFrame()
 red_counts = red_zones['行政區'].value_counts().reset_index()
 red_counts.columns = ['行政區', '紅區數']
 
+# 指標列
 m1, m2, m3, m4 = st.columns(4)
 m1.metric("台北站點", f"{len(df[df['縣市']=='台北']) if not df.empty else 0}")
 m2.metric("新北站點", f"{len(df[df['縣市']=='新北']) if not df.empty else 0}")
@@ -148,12 +161,15 @@ m3.metric("雙北紅區", f"{len(red_zones)}")
 m4.metric("目前位置", st.session_state['addr_label'])
 
 st.divider()
+
 col_map, col_list = st.columns([2.8, 1.2])
 
 with col_map:
     folium.Marker._icon_image_url = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png"
     folium.Marker._shadow_image_url = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png"
-    m = folium.Map(location=st.session_state['gps_pos'], zoom_start=zoom_val, tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", attr="Google Maps")
+
+    m = folium.Map(location=st.session_state['gps_pos'], zoom_start=zoom_val, 
+                   tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", attr="Google Maps")
     
     if show_rain:
         rain_b64 = get_radar_base64()
@@ -170,10 +186,12 @@ with col_map:
     
     if not df.empty:
         for _, r in df.iterrows():
-            c = '#FF0000' if r['佔_用%'] >= 90 else ('#FFA500' if r['佔用%'] >= 75 else '#28A745')
+            # 【關鍵修復】拔掉欄位名稱中間的底線
+            c = '#FF0000' if r['佔用%'] >= 90 else ('#FFA500' if r['佔用%'] >= 75 else '#28A745')
             folium.CircleMarker(location=[r['lat'], r['lon']], radius=6, color=c, fill=True, fill_opacity=0.7, weight=1).add_to(m)
     
     folium.Marker(st.session_state['gps_pos'], icon=folium.Icon(color='blue', icon='car', prefix='fa')).add_to(m)
+    
     st_folium(m, width="100%", height=650, key=f"map_{show_rain}_{show_heatmap}_{zoom_val}")
 
 with col_list:
