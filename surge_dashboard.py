@@ -204,7 +204,8 @@ with col_map:
     # 站點繪製
     if not df.empty:
         for _, r in df.iterrows():
-            c = '#FF0000' if r['佔用%'] >= 90 else ('#FFA500' if r['佔_用%'] >= 75 else '#28A745')
+           # 修正後的程式碼
+            c = '#FF0000' if r['佔用%'] >= 90 else ('#FFA500' if r['佔用%'] >= 75 else '#28A745')
             folium.CircleMarker(location=[r['lat'], r['lon']], radius=5, color=c, fill=True, fill_opacity=0.7, weight=1).add_to(m)
     
     # 目前位置標記
