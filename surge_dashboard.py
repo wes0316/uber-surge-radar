@@ -13,7 +13,7 @@ import base64
 # --- 隱藏 SSL 憑證警告 ---
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# --- 1. Uber 旗艦科技視覺系統 (高對比無捲軸版) ---
+# --- 1. Uber 旗艦科技視覺系統 (強化 Toggle 辨識版) ---
 st.set_page_config(page_title="Uber 運輸需求預測", page_icon="🚕", layout="wide")
 
 st.markdown("""
@@ -26,26 +26,29 @@ st.markdown("""
             font-family: 'Inter', -apple-system, sans-serif !important;
         }
         
-        /* 側邊欄文字亮度調整 */
+        /* 側邊欄樣式 */
         [data-testid="stSidebar"] { 
             background-color: #111111 !important; 
             border-right: 1px solid #333333 !important; 
         }
-        [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 { color: #FFFFFF !important; }
-        [data-testid="stSidebar"] p, [data-testid="stSidebar"] label { color: #E0E0E0 !important; }
 
-        /* 戰術開關文字強制加亮 */
-        div[data-testid="stWidgetLabel"] p { 
-            color: #FFFFFF !important; 
-            font-weight: 500 !important;
-            white-space: nowrap !important;
+        /* --- 【關鍵修正：Toggle 開關視覺邏輯】 --- */
+        /* 1. 尚未開啟時的底色 (深灰) */
+        div[data-testid="stToggle"] div[role="switch"] {
+            background-color: #444444 !important;
+            border: 1px solid #666666 !important;
+        }
+        /* 2. 開啟後的底色 (Uber 科技藍) */
+        div[data-testid="stToggle"] div[aria-checked="true"] {
+            background-color: #276EF1 !important;
+            border: 1px solid #276EF1 !important;
+        }
+        /* 3. 開關圓鈕顏色 */
+        div[data-testid="stToggle"] div[role="switch"] > div {
+            background-color: white !important;
         }
         
-        /* Toggle 開關顏色邏輯 */
-        div[data-testid="stToggle"] div[role="switch"] { background-color: #444444 !important; }
-        div[data-testid="stToggle"] div[aria-checked="true"] { background-color: #276EF1 !important; }
-
-        /* 數據卡片 (Metric) 顯色調整 */
+        /* 數據卡片 (Metric) */
         div[data-testid="stMetric"] {
             background-color: #242424 !important;
             border: 1px solid #444444 !important;
@@ -59,6 +62,9 @@ st.markdown("""
         .leaflet-container { border: 2px solid #000000 !important; border-radius: 8px !important; background-color: #1A1A1A !important; }
         #MainMenu, footer, header {visibility: hidden;}
         [data-testid="stDataFrame"] { background-color: #242424 !important; }
+        
+        /* 文字強制加白 */
+        div[data-testid="stWidgetLabel"] p { color: #FFFFFF !important; font-weight: 500 !important; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -123,27 +129,35 @@ def fetch_complete_data():
 
 # --- 3. 側邊欄 ---
 with st.sidebar:
-    st.image("logo.png", width=220)
+    st.markdown("<h2 style='color:white;'>🚕 Uber Radar</h2>", unsafe_allow_html=True)
     st.markdown("### 🛠️ 運輸需求因子圖層")
-    c1, c2 = st.columns(2)
-    with c1: show_rain = st.toggle("🌧️ 雷達雨圖", value=False)
-    with c2: show_heatmap = st.toggle("🔥 熱區光罩", value=False)
+    
+    # 這裡的開關現在會隨狀態變色了
+    show_rain = st.toggle("🌧️ 雷達回波圖 (全台)", value=False)
+    show_heatmap = st.toggle("🔥 需求熱區光罩", value=False)
+    
     zoom_val = st.slider("地圖縮放級別", 10, 18, 14)
-    if st.button("🔄 手動強制更新", use_container_width=True):
+    if st.button("🔄 手動強制更新數據", use_container_width=True):
         st.cache_data.clear()
         st.rerun()
     st.divider()
     st.markdown("### 📍 圖例說明")
-    st.markdown("""<div style='color:#FF0000; font-weight:bold;'>● <span style='color:#FFFFFF'>爆滿紅區 (>= 90%)</span></div>""", unsafe_allow_html=True)
+    st.markdown("""
+        <div style='line-height:1.8;'>
+            <span style='color:#FF0000;'>●</span> 爆滿紅區 (>= 90%)<br>
+            <span style='color:#FFA500;'>●</span> 繁忙橘區 (75-89%)<br>
+            <span style='color:#28A745;'>●</span> 正常綠區 (< 75%)
+        </div>
+    """, unsafe_allow_html=True)
 
 # --- 4. 狀態與定位處理 ---
-if 'gps_pos' not in st.session_state: st.session_state['gps_pos'] = (24.9669, 121.5451)
-if 'addr_label' not in st.session_state: st.session_state['addr_label'] = "正在定位..."
+if 'gps_pos' not in st.session_state: st.session_state['gps_pos'] = (25.0330, 121.5654)
+if 'addr_label' not in st.session_state: st.session_state['addr_label'] = "定位中..."
 
 curr = get_geolocation()
 if curr and 'coords' in curr:
     n_lat, n_lon = round(curr['coords']['latitude'], 4), round(curr['coords']['longitude'], 4)
-    if st.session_state['addr_label'] == "正在定位..." or abs(n_lat - st.session_state['gps_pos'][0]) > 0.0005:
+    if st.session_state['addr_label'] == "定位中..." or abs(n_lat - st.session_state['gps_pos'][0]) > 0.0005:
         st.session_state['gps_pos'] = (n_lat, n_lon)
         st.session_state['addr_label'] = get_address_pro(n_lat, n_lon)
 
@@ -157,46 +171,50 @@ red_counts.columns = ['行政區', '紅區數']
 m1, m2, m3, m4 = st.columns(4)
 m1.metric("台北站點", f"{len(df[df['縣市']=='台北']) if not df.empty else 0}")
 m2.metric("新北站點", f"{len(df[df['縣市']=='新北']) if not df.empty else 0}")
-m3.metric("雙北紅區", f"{len(red_zones)}")
-m4.metric("目前位置", st.session_state['addr_label'])
+m3.metric("目前紅區", f"{len(red_zones)}")
+m4.metric("當前定位", st.session_state['addr_label'])
 
 st.divider()
 
 col_map, col_list = st.columns([2.8, 1.2])
 
 with col_map:
+    # 確保 Marker 圖標正常顯示
     folium.Marker._icon_image_url = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png"
     folium.Marker._shadow_image_url = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png"
 
     m = folium.Map(location=st.session_state['gps_pos'], zoom_start=zoom_val, 
                    tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", attr="Google Maps")
     
+    # 降雨圖層
     if show_rain:
         rain_b64 = get_radar_base64()
         if rain_b64:
             folium.raster_layers.ImageOverlay(image=rain_b64, bounds=[[21.8, 120.0], [25.4, 122.2]], opacity=0.45, zindex=1).add_to(m)
 
+    # 熱區光罩
     if show_heatmap and not red_zones.empty:
         centers = red_zones.groupby('行政區')[['lat', 'lon']].median().to_dict('index')
         for i, row in red_counts.head(3).iterrows():
             t = row['行政區']
             if t in centers:
                 color = '#FF0000' if i==0 else ('#FF3D00' if i==1 else '#FF9100')
-                folium.Circle(location=[centers[t]['lat'], centers[t]['lon']], radius=2000, color=color, weight=3, fill=True, fill_opacity=0.35).add_to(m)
+                folium.Circle(location=[centers[t]['lat'], centers[t]['lon']], radius=1800, color=color, weight=2, fill=True, fill_opacity=0.3).add_to(m)
     
+    # 站點繪製
     if not df.empty:
         for _, r in df.iterrows():
-            # 【關鍵修復】拔掉欄位名稱中間的底線
-            c = '#FF0000' if r['佔用%'] >= 90 else ('#FFA500' if r['佔用%'] >= 75 else '#28A745')
-            folium.CircleMarker(location=[r['lat'], r['lon']], radius=6, color=c, fill=True, fill_opacity=0.7, weight=1).add_to(m)
+            c = '#FF0000' if r['佔用%'] >= 90 else ('#FFA500' if r['佔_用%'] >= 75 else '#28A745')
+            folium.CircleMarker(location=[r['lat'], r['lon']], radius=5, color=c, fill=True, fill_opacity=0.7, weight=1).add_to(m)
     
-    folium.Marker(st.session_state['gps_pos'], icon=folium.Icon(color='blue', icon='car', prefix='fa')).add_to(m)
+    # 目前位置標記
+    folium.Marker(st.session_state['gps_pos'], popup="您的位置", icon=folium.Icon(color='blue', icon='car', prefix='fa')).add_to(m)
     
     st_folium(m, width="100%", height=650, key=f"map_{show_rain}_{show_heatmap}_{zoom_val}")
 
 with col_list:
-    st.markdown("### 📈 紅區排行 TOP 10")
+    st.markdown("### 📈 爆滿行政區 TOP 10")
     if not red_counts.empty:
         st.dataframe(red_counts.head(10), hide_index=True, use_container_width=True, height=650)
     else:
-        st.info("目前無需求紅區")
+        st.info("目前全區需求平穩，無紅區。")
