@@ -13,43 +13,26 @@ import base64
 # --- 隱藏 SSL 憑證警告 ---
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# --- 1. Uber 旗艦科技視覺系統 (高對比無捲軸版) ---
+# --- 1. Uber 旗艦科技視覺系統 ---
 st.set_page_config(page_title="Uber 運輸需求預測", page_icon="🚕", layout="wide")
 
 st.markdown("""
     <style>
-        /* 強制移除整頁捲軸並優化空間 */
         html, body, [data-testid="stAppViewContainer"] {
             overflow: hidden !important; 
             background-color: #1A1A1A !important;
-            color: #FFFFFF !important; /* 全域文字調為白色 */
+            color: #FFFFFF !important; 
             font-family: 'Inter', -apple-system, sans-serif !important;
         }
-        
-        /* 側邊欄文字亮度調整 */
         [data-testid="stSidebar"] { 
             background-color: #111111 !important; 
             border-right: 1px solid #333333 !important; 
         }
-        [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 {
-            color: #FFFFFF !important; /* 側邊欄標題改為純白 */
-        }
-        [data-testid="stSidebar"] p, [data-testid="stSidebar"] label {
-            color: #E0E0E0 !important; /* 側邊欄一般文字改為亮銀 */
-        }
-
-        /* 戰術開關文字強制加亮 */
-        div[data-testid="stWidgetLabel"] p { 
-            color: #FFFFFF !important; 
-            font-weight: 500 !important;
-            white-space: nowrap !important;
-        }
-        
-        /* Toggle 開關顏色邏輯 */
+        [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 { color: #FFFFFF !important; }
+        [data-testid="stSidebar"] p, [data-testid="stSidebar"] label { color: #E0E0E0 !important; }
+        div[data-testid="stWidgetLabel"] p { color: #FFFFFF !important; font-weight: 500 !important; white-space: nowrap !important; }
         div[data-testid="stToggle"] div[role="switch"] { background-color: #444444 !important; }
         div[data-testid="stToggle"] div[aria-checked="true"] { background-color: #276EF1 !important; }
-
-        /* 數據卡片 (Metric) 顯色調整 */
         div[data-testid="stMetric"] {
             background-color: #242424 !important;
             border: 1px solid #444444 !important;
@@ -59,19 +42,10 @@ st.markdown("""
         }
         [data-testid="stMetricValue"] { color: #FFFFFF !important; font-size: 26px !important; font-weight: 700 !important; }
         [data-testid="stMetricLabel"] { color: #B0B0B0 !important; font-size: 14px !important; font-weight: 500 !important; }
-
-        /* 排行榜標題加亮 */
-        h1, h2, h3 { color: #FFFFFF !important; }
-
-        /* 地圖邊框 */
         .leaflet-container { border: 2px solid #000000 !important; border-radius: 8px !important; background-color: #1A1A1A !important; }
-        
-        /* 隱藏裝飾 */
         #MainMenu {visibility: hidden;}
         footer {visibility: hidden;}
         header {visibility: hidden;}
-        
-        /* 修正表格文字顏色 */
         [data-testid="stDataFrame"] { background-color: #242424 !important; }
     </style>
 """, unsafe_allow_html=True)
@@ -90,7 +64,7 @@ def get_address_pro(lat, lon):
         return f"{dist} {road}".strip() if (dist or road) else f"{lat}, {lon}"
     except: return f"{lat}, {lon}"
 
-@st.cache_data(ttl=300)
+@st.cache_data(ttl=1800) # 雷達圖也改為 30 分鐘更新一次
 def get_radar_base64():
     headers = {'User-Agent': 'Mozilla/5.0 Chrome/122.0.0.0', 'Referer': 'https://www.cwa.gov.tw/'}
     urls = [f"https://www.cwa.gov.tw/Data/radar/CV1_3600_EL.png?v={int(time.time()/300)}", 
@@ -103,7 +77,7 @@ def get_radar_base64():
         except: continue
     return None
 
-@st.cache_data(ttl=60)
+@st.cache_data(ttl=1800) # 【關鍵修改】停車場 API 改為 1800 秒 (30 分鐘) 撈一次
 def fetch_complete_data():
     all_data = []
     # 台北市
@@ -142,7 +116,7 @@ with st.sidebar:
     with c1: show_rain = st.toggle("🌧️ 雷達雨圖", value=False)
     with c2: show_heatmap = st.toggle("🔥 熱區光罩", value=False)
     zoom_val = st.slider("地圖縮放級別", 10, 18, 14)
-    if st.button("🔄 同步數據庫", use_container_width=True):
+    if st.button("🔄 手動強制更新", use_container_width=True):
         st.cache_data.clear()
         st.rerun()
     st.divider()
@@ -165,7 +139,6 @@ if curr and 'coords' in curr:
         st.session_state['gps_pos'] = (n_lat, n_lon)
         st.session_state['addr_label'] = get_address_pro(n_lat, n_lon)
 
-# 指標列 (加亮版)
 m1, m2, m3, m4 = st.columns(4)
 m1.metric("台北站點", f"{len(df[df['縣市']=='台北']) if not df.empty else 0}")
 m2.metric("新北站點", f"{len(df[df['縣市']=='新北']) if not df.empty else 0}")
@@ -173,15 +146,12 @@ m3.metric("雙北紅區", f"{len(red_zones)}")
 m4.metric("目前位置", st.session_state['addr_label'])
 
 st.divider()
-
 col_map, col_list = st.columns([2.8, 1.2])
 
 with col_map:
     folium.Marker._icon_image_url = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png"
     folium.Marker._shadow_image_url = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png"
-
-    m = folium.Map(location=st.session_state['gps_pos'], zoom_start=zoom_val, 
-                   tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", attr="Google Maps")
+    m = folium.Map(location=st.session_state['gps_pos'], zoom_start=zoom_val, tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", attr="Google Maps")
     
     if show_rain:
         rain_b64 = get_radar_base64()
@@ -202,7 +172,6 @@ with col_map:
             folium.CircleMarker(location=[r['lat'], r['lon']], radius=6, color=c, fill=True, fill_opacity=0.7, weight=1).add_to(m)
     
     folium.Marker(st.session_state['gps_pos'], icon=folium.Icon(color='blue', icon='car', prefix='fa')).add_to(m)
-    
     st_folium(m, width="100%", height=650, key=f"map_{show_rain}_{show_heatmap}_{zoom_val}")
 
 with col_list:
