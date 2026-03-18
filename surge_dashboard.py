@@ -28,34 +28,33 @@ st.markdown("""
         /* --- 🎯 戰術開關 (Toggle) --- */
         div[data-testid="stToggle"] label > div:first-child {
             width: 85px !important; height: 48px !important;
-            background-color: #2D1B1B !important; /* OFF 深紅 */
+            background-color: #2D1B1B !important; 
             border: 2px solid #8B4513 !important;
             border-radius: 24px !important;
         }
         div[data-testid="stToggle"] input:checked + div {
-            background-color: #00D4FF !important; /* ON 亮藍 */
+            background-color: #00D4FF !important; 
             border-color: #00D4FF !important;
             box-shadow: 0 0 20px rgba(0, 212, 255, 0.8) !important;
         }
         div[data-testid="stToggle"] label > div:first-child > div {
             width: 36px !important; height: 36px !important;
             top: 4px !important; left: 4px !important;
-            background-color: #FF6B6B !important; /* OFF 紅滑塊 */
+            background-color: #FF6B6B !important; 
         }
         div[data-testid="stToggle"] input:checked + div > div {
             transform: translateX(37px) !important;
-            background-color: #00FF88 !important; /* ON 綠滑塊 */
+            background-color: #00FF88 !important;
         }
 
-        /* --- 🎯 立即重新整理按鈕：80% 寬度、置中 --- */
+        /* --- 🎯 立即重新整理按鈕：精確 80% 寬度、置中 --- */
         [data-testid="stSidebar"] div.stButton {
             display: flex !important;
             justify-content: center !important;
             width: 100% !important;
-            margin-top: 20px !important;
         }
         [data-testid="stSidebar"] div.stButton > button {
-            width: 80% !important; /* 側邊欄 80% 寬 */
+            width: 80% !important; 
             height: 90px !important;
             font-size: 28px !important;
             font-weight: 800 !important;
@@ -64,6 +63,7 @@ st.markdown("""
             border: 2px solid #00D4FF !important;
             border-radius: 18px !important;
             box-shadow: 0 6px 20px rgba(0, 212, 255, 0.4) !important;
+            margin: 0 auto !important;
         }
 
         /* --- 🎯 指標區域 --- */
@@ -80,14 +80,12 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 3. 數據邏輯 (Debug 強化版) ---
+# --- 3. 數據與定位邏輯 ---
 transformer = Transformer.from_crs("epsg:3826", "epsg:4326")
 
 @st.cache_data(ttl=300)
 def get_radar_image():
-    """雷達圖抓取：增加時間戳避免快取舊圖"""
-    ts = int(time.time() / 300)
-    url = f"https://www.cwa.gov.tw/Data/radar/CV1_3600_EL.png?v={ts}"
+    url = f"https://www.cwa.gov.tw/Data/radar/CV1_3600_EL.png?v={int(time.time()/300)}"
     headers = {'User-Agent': 'Mozilla/5.0'}
     try:
         res = requests.get(url, headers=headers, timeout=5, verify=False)
@@ -95,31 +93,38 @@ def get_radar_image():
             return f"data:image/png;base64,{base64.b64encode(res.content).decode('utf-8')}"
     except: return None
 
-def fetch_parking_data():
-    """獲取停車佔用資料作為需求指標"""
+def fetch_top_3_district_centers():
+    """核心修復：僅回傳前三名行政區中心點"""
     try:
         res = requests.get("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_allavailable.json", timeout=5).json()
         desc = requests.get("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_alldesc.json", timeout=5).json()
-        df_avail = pd.DataFrame(res['data']['park'])
-        df_desc = pd.DataFrame(desc['data']['park'])
-        df = pd.merge(df_desc, df_avail, on='id')
+        df = pd.merge(pd.DataFrame(desc['data']['park']), pd.DataFrame(res['data']['park']), on='id')
         
         all_data = []
         for _, r in df.iterrows():
-            total = float(r.get('totalcar', 0))
-            avail = float(r.get('availablecar', 0))
-            if total > 0:
+            total, avail = float(r.get('totalcar', 0)), float(r.get('availablecar', 0))
+            if total > 0 and (total-avail)/total >= 0.9: # 僅篩選 90% 以上紅區
                 lat, lon = transformer.transform(float(r['tw97x']), float(r['tw97y']))
-                all_data.append({
-                    'lat': lat, 'lon': lon, 
-                    'percent': (total-avail)/total*100, 
-                    'area': r.get('area', '未知')
-                })
-        return pd.DataFrame(all_data)
-    except:
-        return pd.DataFrame()
+                all_data.append({'lat': lat, 'lon': lon, 'area': r.get('area', '未知')})
+        
+        full_df = pd.DataFrame(all_data)
+        if full_df.empty: return [], 0
+        
+        # 算排行前三
+        counts = full_df['area'].value_counts().head(3)
+        top_3 = []
+        for area in counts.index:
+            dist_subset = full_df[full_df['area'] == area]
+            top_3.append({
+                'area': area,
+                'lat': dist_subset['lat'].mean(),
+                'lon': dist_subset['lon'].mean(),
+                'count': counts[area]
+            })
+        return top_3, len(full_df)
+    except: return [], 0
 
-# --- 4. 定位與自動縮放 ---
+# --- 4. 定位處理 ---
 if 'gps_pos' not in st.session_state: st.session_state['gps_pos'] = (24.9669, 121.5451)
 curr = get_geolocation()
 speed_kmh = 0
@@ -138,35 +143,21 @@ with st.sidebar:
         st.cache_data.clear()
         st.rerun()
 
-# 數據處理：計算前三名行政區中心
-df = fetch_parking_data()
-red_zones = df[df['percent'] >= 90] if not df.empty else pd.DataFrame()
-top_3_districts = []
-
-if not red_zones.empty:
-    # 算排行前三
-    rank = red_zones['area'].value_counts().head(3)
-    for dist_name in rank.index:
-        dist_data = red_zones[red_zones['area'] == dist_name]
-        # 幾何中心點
-        c_lat = dist_data['lat'].mean()
-        c_lon = dist_data['lon'].mean()
-        top_3_districts.append({'area': dist_name, 'lat': c_lat, 'lon': c_lon, 'count': rank[dist_name]})
+# 獲取前三名中心資料
+top_3_centers, total_red_zones = fetch_top_3_district_centers()
 
 # --- 6. 主畫面指標 ---
 m1, m2 = st.columns(2)
-m1.metric("🔥 雙北紅區", f"{len(red_zones)} 處")
+m1.metric("🔥 雙北紅區", f"{total_red_zones} 處")
 m2.metric("📍 所在區域", "新店區")
 st.divider()
 
-# --- 7. 地圖核心 (前三名紅區中心圓) ---
+# --- 7. 地圖核心 (僅顯示前三名大圓) ---
 col_map, col_list = st.columns([2.6, 1.4])
 
 with col_map:
-    calc_zoom = 15 if speed_kmh < 20 else (14 if speed_kmh < 60 else 12)
-    final_zoom = calc_zoom if auto_zoom else 14
-    
-    m = folium.Map(location=st.session_state['gps_pos'], zoom_start=final_zoom, 
+    zoom = (15 if speed_kmh < 20 else (14 if speed_kmh < 60 else 12)) if auto_zoom else 14
+    m = folium.Map(location=st.session_state['gps_pos'], zoom_start=zoom, 
                    tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", attr="Google")
 
     # 雷達回波圖層
@@ -177,41 +168,41 @@ with col_map:
                 image=radar_b64, bounds=[[21.8, 120.0], [25.4, 122.2]], opacity=0.45, zindex=1
             ).add_to(m)
 
-    # 需求熱區：僅顯示前三名中心圓
-    if show_heatmap and top_3_districts:
-        for dist in top_3_districts:
-            # 繪製半徑 1500m 的圓
+    # 需求熱區：【嚴格修正】僅對 top_3_centers 進行循環
+    if show_heatmap and top_3_centers:
+        for dist in top_3_centers:
+            # 繪製半徑 1500m 的大圓
             folium.Circle(
                 location=[dist['lat'], dist['lon']],
                 radius=1500,
                 color='#FF0000',
                 fill=True,
-                fill_opacity=0.4,
-                weight=3,
-                tooltip=f"<b style='font-size:18px;'>{dist['area']} 熱區中心</b><br>紅區數：{dist['count']} 處",
+                fill_opacity=0.5,
+                weight=4,
+                tooltip=f"<b style='font-size:20px;'>{dist['area']}</b><br>爆滿站點：{dist['count']} 處",
                 zindex=10
             ).add_to(m)
-            # 圓心點標記
+            # 在中心點加一個小的亮點
             folium.CircleMarker(
                 location=[dist['lat'], dist['lon']],
-                radius=5, color='white', fill=True, fill_color='red'
+                radius=6, color='white', fill=True, fill_color='red', weight=2
             ).add_to(m)
 
     folium.Marker(st.session_state['gps_pos'], icon=folium.Icon(color='blue', icon='car', prefix='fa')).add_to(m)
 
-    # 強制重繪 Key
-    st_folium(m, width="100%", height=580, key=f"v5_{show_rain}_{show_heatmap}_{final_zoom}_{len(top_3_districts)}")
+    # 強制重繪
+    st_folium(m, width="100%", height=580, key=f"v6_{show_rain}_{show_heatmap}_{zoom}")
 
 with col_list:
-    st.markdown("<h3 style='font-size: 28px; color:#00D4FF;'>📈 前三名熱區排行</h3>", unsafe_allow_html=True)
-    if top_3_districts:
-        table_html = "<table style='width:100%; color:white; font-size:26px; border-collapse:collapse;'>"
-        for dist in top_3_districts:
-            table_html += f"<tr style='border-bottom:1px solid #444;'><td style='padding:20px;'>{dist['area']}</td><td style='color:#FF4B4B; font-weight:bold; text-align:right;'>{dist['count']}</td></tr>"
-        table_html += "</table>"
-        st.markdown(table_html, unsafe_allow_html=True)
+    st.markdown("<h3 style='font-size: 28px; color:#00D4FF;'>📈 戰略目標排行</h3>", unsafe_allow_html=True)
+    if top_3_centers:
+        html = "<table style='width:100%; color:white; font-size:28px; border-collapse:collapse;'>"
+        for dist in top_3_centers:
+            html += f"<tr style='border-bottom:1px solid #444;'><td style='padding:22px;'>{dist['area']}</td><td style='color:#FF4B4B; font-weight:bold; text-align:right;'>{dist['count']}</td></tr>"
+        html += "</table>"
+        st.markdown(html, unsafe_allow_html=True)
     else:
-        st.write("目前無爆滿熱區")
+        st.write("目前無熱區資料")
 
 time.sleep(15)
 st.rerun()
