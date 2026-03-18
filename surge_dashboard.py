@@ -78,10 +78,10 @@ st.markdown("""
         }
 
         /* --- 🎯 主畫面指標區域 --- */
-        [data-testid="stMetricValue"] { color: #FFFFFF !important; font-size: 68px !important; font-weight: 900 !important; }
-        [data-testid="stMetricLabel"] { color: #FFFFFF !important; font-size: 32px !important; font-weight: 900 !important; }
+        [data-testid="stMetricValue"] { color: #FFFFFF !important; font-size: 68px !important; font-weight: 900 !important; text-align: center !important; }
+        [data-testid="stMetricLabel"] { color: #FFFFFF !important; font-size: 32px !important; font-weight: 900 !important; text-align: center !important; }
         
-        /* 超級強制保護指標數值 - 確保 68px + 白色 */
+        /* 超級強制保護指標數值 - 確保 68px + 白色 + 中央對齊 */
         html body [data-testid="stMetricValue"],
         html body div[data-testid="stMetric"] [data-testid="stMetricValue"],
         html body div.stMetric [data-testid="stMetricValue"],
@@ -97,9 +97,12 @@ st.markdown("""
             font-size: 68px !important; 
             font-weight: 900 !important;
             line-height: 1.1 !important;
+            text-align: center !important;
+            justify-content: center !important;
+            align-items: center !important;
         }
         
-        /* 超級強制覆蓋指標標籤 - 白色 - 最高權限 */
+        /* 超級強制覆蓋指標標籤 - 白色 - 最高權限 + 中央對齊 */
         html body [data-testid="stMetricLabel"],
         html body div[data-testid="stMetric"] [data-testid="stMetricLabel"],
         html body div.stMetric [data-testid="stMetricLabel"],
@@ -116,6 +119,21 @@ st.markdown("""
             font-size: 32px !important; 
             font-weight: 900 !important;
             background: transparent !important;
+            text-align: center !important;
+            justify-content: center !important;
+            align-items: center !important;
+        }
+        
+        /* 指標容器中央對齊 */
+        div[data-testid="stMetric"] {
+            background: rgba(45, 45, 45, 0.9) !important; 
+            border-left: 12px solid #00D4FF !important; 
+            border-radius: 15px !important; 
+            text-align: center !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+            align-items: center !important;
         }
         
         /* 終極字型大小保護 - 防止任何縮小 */
@@ -127,13 +145,13 @@ st.markdown("""
         
         html body div[data-testid="stMetric"] *:first-child {
             font-size: 32px !important;
+            text-align: center !important;
         }
         
         html body div[data-testid="stMetric"] *:last-child {
             font-size: 68px !important;
+            text-align: center !important;
         }
-        
-        div[data-testid="stMetric"] { background: rgba(45, 45, 45, 0.9) !important; border-left: 12px solid #00D4FF !important; border-radius: 15px !important; }
         [data-testid="stSidebar"] { background-color: #111111 !important; border-right: 1px solid #333333 !important; padding-top: 2rem !important; }
         #MainMenu, footer, header {visibility: hidden;}
     </style>
