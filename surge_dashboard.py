@@ -187,10 +187,10 @@ st.markdown("""
         }
         
         function fixMetricLabels() {
-            console.log('修正指標標籤和數值 - 白色 + 字型大小 + 中央對齊（僅指標）');
+            console.log('修正指標標籤和數值 - 使用獨立 div id');
             
-            // 超級強制修正指標標籤 - 白色 + 32px + 中央對齊
-            const metricLabels = document.querySelectorAll('[data-testid="stMetricLabel"]');
+            // 超級強制修正指標標籤 - 使用 #metric-labels
+            const metricLabels = document.querySelectorAll('#metric-labels [data-testid="stMetricLabel"]');
             metricLabels.forEach(elem => {
                 elem.style.fontSize = '32px !important';
                 elem.style.fontWeight = '900 !important';
@@ -204,8 +204,8 @@ st.markdown("""
                 console.log('指標標籤已修正為白色 32px 中央對齊:', elem.textContent);
             });
             
-            // 超級強制修正指標數值 - 白色 + 68px + 中央對齊
-            const metricValues = document.querySelectorAll('[data-testid="stMetricValue"]');
+            // 超級強制修正指標數值 - 使用 #metric-values
+            const metricValues = document.querySelectorAll('#metric-values [data-testid="stMetricValue"]');
             metricValues.forEach(elem => {
                 elem.style.fontSize = '68px !important';
                 elem.style.fontWeight = '900 !important';
@@ -218,8 +218,8 @@ st.markdown("""
                 console.log('指標數值已修正為白色 68px 中央對齊:', elem.textContent);
             });
             
-            // 修正指標容器 - 中央對齊（只影響指標容器）
-            const metricContainers = document.querySelectorAll('div[data-testid="stMetric"]');
+            // 修正指標容器 - 使用 #metric-container
+            const metricContainers = document.querySelectorAll('#metric-container div[data-testid="stMetric"]');
             metricContainers.forEach(elem => {
                 elem.style.textAlign = 'center !important';
                 elem.style.display = 'flex !important';
@@ -230,8 +230,8 @@ st.markdown("""
                 console.log('指標容器已修正為中央對齊');
             });
             
-            // 只修正指標容器內的元素 - 不影響其他文字
-            const allMetricElements = document.querySelectorAll('div[data-testid="stMetric"] *');
+            // 只修正指標容器內的元素 - 使用獨立 div id
+            const allMetricElements = document.querySelectorAll('#metric-container div[data-testid="stMetric"] *');
             allMetricElements.forEach(elem => {
                 const text = elem.textContent || '';
                 const isFirstChild = elem.parentElement && elem.parentElement.firstChild === elem;
