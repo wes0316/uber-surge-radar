@@ -34,6 +34,22 @@ body {
     padding-top: 1rem !important;
     width: 100% !important;
     max-width: 100% !important;
+    position: relative !important;
+    z-index: 999 !important;
+    display: block !important;
+    visibility: visible !important;
+}
+
+/* 強制顯示側邊欄 */
+.css-1d391kg {
+    display: block !important;
+    visibility: visible !important;
+}
+
+/* 手機版側邊欄內容 */
+[data-testid="stSidebar"] > div {
+    display: block !important;
+    visibility: visible !important;
 }
 
 [data-testid="stSidebar"] [data-testid="stWidgetLabel"] p {
@@ -51,6 +67,11 @@ body {
     color: #FFFFFF !important;
     white-space: nowrap !important;
     margin: 0 !important;
+}
+
+/* 手機版主內容區域 */
+[data-testid="stMainBlockContainer"] {
+    padding-top: 1rem !important;
 }
 
 /* --- 手機版主畫面指標區域 --- */
@@ -143,6 +164,15 @@ body {
 
 /* --- 手機版響應式設計 --- */
 @media (max-width: 768px) {
+    /* 確保手機版側邊欄顯示 */
+    [data-testid="stSidebar"] {
+        display: block !important;
+        visibility: visible !important;
+        position: relative !important;
+        width: 100% !important;
+        min-width: 300px !important;
+    }
+    
     .mobile-metric-container {
         padding: 12px !important;
         margin-bottom: 8px !important;
@@ -160,6 +190,34 @@ body {
 /* --- 隱藏 Streamlit 預設元素 --- */
 #MainMenu, footer, header {
     visibility: hidden;
+}
+
+/* --- 強制顯示側邊欄的額外樣式 --- */
+.st-emotion-cache-1k3db3e {
+    display: block !important;
+}
+
+[data-testid="stSidebarNav"] {
+    display: block !important;
+    visibility: visible !important;
+}
+
+/* 確保側邊欄在所有設備上都顯示 */
+@media screen and (max-width: 640px) {
+    [data-testid="stSidebar"] {
+        display: block !important;
+        visibility: visible !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 280px !important;
+        height: 100vh !important;
+        z-index: 999999 !important;
+    }
+    
+    [data-testid="stMainBlockContainer"] {
+        margin-left: 280px !important;
+    }
 }
 </style>
 """, unsafe_allow_html=True)
