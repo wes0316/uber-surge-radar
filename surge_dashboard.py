@@ -80,6 +80,60 @@ st.markdown("""
         [data-testid="stSidebar"] { background-color: #111111 !important; border-right: 1px solid #333333 !important; }
         #MainMenu, footer, header {visibility: hidden;}
     </style>
+    
+    <script>
+        // 強制覆蓋開關樣式的 JavaScript
+        function overrideToggleStyles() {
+            const toggles = document.querySelectorAll('[data-testid="stToggle"]');
+            toggles.forEach(toggle => {
+                const divs = toggle.querySelectorAll('div');
+                divs.forEach((div, index) => {
+                    if (index === 0) {
+                        // 底座
+                        div.style.backgroundColor = '#2D1B1B';
+                        div.style.border = '2px solid #8B4513';
+                    } else if (index === 1) {
+                        // 滑塊
+                        div.style.backgroundColor = '#FF4444';
+                        div.style.border = '2px solid #CC0000';
+                    }
+                });
+                
+                // 監聽開關狀態變化
+                const input = toggle.querySelector('input');
+                if (input) {
+                    const updateStyles = () => {
+                        const divs = toggle.querySelectorAll('div');
+                        if (input.checked) {
+                            divs[0].style.backgroundColor = '#00D4FF';
+                            divs[0].style.border = '2px solid #00D4FF';
+                            divs[0].style.boxShadow = '0 0 30px rgba(0, 212, 255, 1)';
+                            divs[1].style.backgroundColor = '#00FF88';
+                            divs[1].style.border = '2px solid #00CC66';
+                        } else {
+                            divs[0].style.backgroundColor = '#2D1B1B';
+                            divs[0].style.border = '2px solid #8B4513';
+                            divs[0].style.boxShadow = 'none';
+                            divs[1].style.backgroundColor = '#FF4444';
+                            divs[1].style.border = '2px solid #CC0000';
+                        }
+                    };
+                    
+                    input.addEventListener('change', updateStyles);
+                    updateStyles(); // 初始化
+                }
+            });
+        }
+        
+        // 頁面載入完成後執行
+        setTimeout(overrideToggleStyles, 100);
+        
+        // 監聽 DOM 變化
+        const observer = new MutationObserver(() => {
+            overrideToggleStyles();
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+    </script>
 """, unsafe_allow_html=True)
 
 # --- 3. 數據與定位邏輯 ---
