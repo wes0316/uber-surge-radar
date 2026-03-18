@@ -114,36 +114,39 @@ st.markdown("""
         div[data-testid="stMetric"] { background: rgba(45, 45, 45, 0.9) !important; border-left: 12px solid #00D4FF !important; border-radius: 15px !important; }
         [data-testid="stSidebar"] { background-color: #111111 !important; border-right: 1px solid #333333 !important; padding-top: 2rem !important; }
         
-        /* 🎯 開關底色終極修正 - 使用最高權限選擇器 */
-        * [data-testid="stToggle"] div,
-        * [data-testid="stToggle"] label div,
-        * [data-testid="stToggle"] div div,
-        div[class*="st-"] div[class*="st-"] {
+        /* 🎯 開關底色終極修正 - 精確針對開關組件 */
+        [data-testid="stToggle"] > div,
+        [data-testid="stToggle"] > label > div,
+        [data-testid="stToggle"] div[style*="background"],
+        [data-testid="stToggle"] .st-ek {
             background-color: #2D1B1B !important;
             background: #2D1B1B !important;
             border: 3px solid #8B4513 !important;
         }
         
-        * [data-testid="stToggle"] input:checked + div,
-        * [data-testid="stToggle"] input:checked + label div,
-        * [data-testid="stToggle"] input:checked + div div {
+        [data-testid="stToggle"] input:checked + div,
+        [data-testid="stToggle"] input:checked + label > div,
+        [data-testid="stToggle"] input:checked + div[style*="background"],
+        [data-testid="stToggle"] input:checked + .st-ek {
             background-color: #00D4FF !important;
             background: #00D4FF !important;
             border: 3px solid #00D4FF !important;
             box-shadow: 0 0 30px rgba(0, 212, 255, 1) !important;
         }
         
-        * [data-testid="stToggle"] div div,
-        * [data-testid="stToggle"] label div div,
-        div[class*="st-"] div[class*="st-"] div {
+        [data-testid="stToggle"] > div > div,
+        [data-testid="stToggle"] > label > div > div,
+        [data-testid="stToggle"] div[style*="background"] > div,
+        [data-testid="stToggle"] .st-ek > div {
             background-color: #FF4444 !important;
             background: #FF4444 !important;
             border: 2px solid #CC0000 !important;
         }
         
-        * [data-testid="stToggle"] input:checked + div div,
-        * [data-testid="stToggle"] input:checked + label div div,
-        * [data-testid="stToggle"] input:checked + div div div {
+        [data-testid="stToggle"] input:checked + div > div,
+        [data-testid="stToggle"] input:checked + label > div > div,
+        [data-testid="stToggle"] input:checked + div[style*="background"] > div,
+        [data-testid="stToggle"] input:checked + .st-ek > div {
             background-color: #00FF88 !important;
             background: #00FF88 !important;
             border: 2px solid #00CC66 !important;
