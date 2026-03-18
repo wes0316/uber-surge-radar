@@ -16,7 +16,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # --- 1. 介面基礎配置 ---
 st.set_page_config(page_title="Uber 運輸需求預測", page_icon="🚕", layout="wide")
 
-# --- 2. 核心 CSS 樣式：嚴格鎖定按鈕寬度與不換行 ---
+# --- 2. 核心 CSS 樣式：按鈕防溢出修正 ---
 st.markdown("""
     <style>
         html, body, [data-testid="stAppViewContainer"] {
@@ -58,45 +58,43 @@ st.markdown("""
         }
 
         /* ========================================= */
-        /* 🎯 立即重新整理按鈕：嚴格 80% 寬度、絕對不換行 */
+        /* 🎯 立即重新整理按鈕：精確防溢出修正版 */
         /* ========================================= */
         
-        /* 1. 解除外部容器限制並置中 */
+        /* 1. 外層容器置中 */
         [data-testid="stSidebar"] div.stButton {
             display: flex !important;
             justify-content: center !important;
             width: 100% !important;
             margin-top: 30px !important; 
-            padding: 0 !important;
         }
         
-        /* 2. 強制按鈕本體為 80% 寬度 */
+        /* 2. 按鈕本體：限制 80% 寬度、加入隱藏溢出 */
         [data-testid="stSidebar"] div.stButton > button {
             width: 80% !important; 
-            min-width: 80% !important; /* 強制最小寬度 */
-            max-width: 80% !important; /* 強制最大寬度 */
-            height: 100px !important; 
+            height: 90px !important; 
             background: linear-gradient(135deg, #0052D4 0%, #4364F7 50%, #6FB1FC 100%) !important;
             border: 2px solid #00D4FF !important;
-            border-radius: 20px !important;
+            border-radius: 18px !important;
             box-shadow: 0 6px 20px rgba(0, 212, 255, 0.4) !important;
-            margin: 0 auto !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
-            padding: 0 10px !important; /* 避免文字貼邊 */
+            padding: 0 !important;
+            overflow: hidden !important; /* 確保內容不會衝出背景 */
         }
         
-        /* 3. 嚴格鎖定內部文字：超大字體且不換行 */
-        [data-testid="stSidebar"] div.stButton > button p, 
-        [data-testid="stSidebar"] div.stButton > button div {
-            white-space: nowrap !important; /* 絕對不換行 */
-            font-size: 32px !important; /* 維持超大字體 */
+        /* 3. 按鈕內部文字：調整字級至 26px 以適應 80% 寬度 */
+        [data-testid="stSidebar"] div.stButton > button div[data-testid="stMarkdownContainer"],
+        [data-testid="stSidebar"] div.stButton > button p {
+            width: 100% !important;
+            text-align: center !important;
+            font-size: 26px !important; /* 從 32px 縮減至 26px，確保塞得進 80% 寬度 */
             font-weight: 900 !important;
             color: #FFFFFF !important;
+            white-space: nowrap !important; /* 絕對不換行 */
             margin: 0 !important;
             padding: 0 !important;
-            letter-spacing: 1px !important;
         }
 
         /* --- 🎯 主畫面指標區域 --- */
@@ -108,7 +106,6 @@ st.markdown("""
     </style>
     
     <script>
-        // JS 強制覆蓋開關紅綠燈樣式
         function overrideToggleStyles() {
             const toggles = document.querySelectorAll('[data-testid="stToggle"]');
             toggles.forEach(toggle => {
@@ -202,7 +199,6 @@ with st.sidebar:
     
     st.markdown("<br><hr style='border-color: #444;'>", unsafe_allow_html=True)
     
-    # 點擊按鈕清除快取，觸發重新抓取資料
     if st.button("🔄 立即重新整理"):
         st.cache_data.clear()
 
@@ -234,7 +230,7 @@ with col_map:
             folium.CircleMarker(location=[dist['lat'], dist['lon']], radius=6, color='white', fill=True, fill_color='red').add_to(m)
 
     folium.Marker(st.session_state['gps_pos'], icon=folium.Icon(color='blue', icon='car', prefix='fa')).add_to(m)
-    st_folium(m, width="100%", height=580, key=f"v10_{show_rain}_{show_heatmap}_{zoom}")
+    st_folium(m, width="100%", height=580, key=f"v11_{show_rain}_{show_heatmap}_{zoom}")
 
 with col_list:
     st.markdown("<h3 style='font-size: 28px; color:#00D4FF;'>📈 紅區排行 TOP 10</h3>", unsafe_allow_html=True)
