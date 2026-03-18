@@ -82,6 +82,18 @@ st.markdown("""
         [data-testid="stMetricLabel"] { color: #00D4FF !important; font-size: 32px !important; font-weight: 900 !important; }
         div[data-testid="stMetric"] { background: rgba(45, 45, 45, 0.9) !important; border-left: 12px solid #00D4FF !important; border-radius: 15px !important; padding: 30px !important; }
         
+        /* 強制確保指標數值保持 68px - 最高權限 */
+        [data-testid="stMetricValue"],
+        div[data-testid="stMetric"] [data-testid="stMetricValue"],
+        div.stMetric [data-testid="stMetricValue"],
+        div[data-testid="stMetric"] > div > div:last-child,
+        div.stMetric > div > div:last-child,
+        div[data-testid="stMetric"] div:last-child {
+            font-size: 68px !important;
+            font-weight: 900 !important;
+            color: #FFFFFF !important;
+        }
+        
         /* 強制覆蓋所有可能的指標標籤樣式 - 終極版 */
         div[data-testid="stMetric"] > div > div:first-child,
         div[data-testid="stMetric"] div:first-child,
