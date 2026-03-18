@@ -158,22 +158,27 @@ st.markdown("""
     <script>
         function overrideToggleStyles() {
             const toggles = document.querySelectorAll('[data-testid="stToggle"]');
-            toggles.forEach(toggle => {
+            console.log('找到開關數量:', toggles.length);
+            
+            toggles.forEach((toggle, index) => {
+                console.log(`處理開關 ${index}:`, toggle);
                 const divs = toggle.querySelectorAll('div');
                 const input = toggle.querySelector('input');
+                console.log(`開關 ${index} 的 div 數量:`, divs.length);
+                
                 if (input && divs.length >= 2) {
                     const update = () => {
-                        // 直接設定內聯樣式，繞過所有 CSS 權限問題
-                        if (input.checked) {
-                            // ON 狀態
-                            divs[0].style.cssText = 'width: 100px !important; height: 56px !important; background-color: #00D4FF !important; background: #00D4FF !important; border: 3px solid #00D4FF !important; border-radius: 30px !important; box-shadow: 0 0 30px rgba(0, 212, 255, 1) !important; background-image: none !important;';
-                            divs[1].style.cssText = 'width: 44px !important; height: 44px !important; top: 4px !important; left: 4px !important; background-color: #00FF88 !important; background: #00FF88 !important; border: 2px solid #00CC66 !important; transform: translateX(44px) !important; background-image: none !important;';
-                        } else {
-                            // OFF 狀態
-                            divs[0].style.cssText = 'width: 100px !important; height: 56px !important; background-color: #2D1B1B !important; background: #2D1B1B !important; border: 3px solid #8B4513 !important; border-radius: 30px !important; box-shadow: none !important; background-image: none !important;';
-                            divs[1].style.cssText = 'width: 44px !important; height: 44px !important; top: 4px !important; left: 4px !important; background-color: #FF4444 !important; background: #FF4444 !important; border: 2px solid #CC0000 !important; transform: translateX(0px) !important; background-image: none !important;';
-                        }
+                        console.log(`更新開關 ${index} 狀態:`, input.checked);
+                        
+                        // 強制設定底座樣式
+                        divs[0].setAttribute('style', 'width: 100px !important; height: 56px !important; background-color: ' + (input.checked ? '#00D4FF' : '#2D1B1B') + ' !important; background: ' + (input.checked ? '#00D4FF' : '#2D1B1B') + ' !important; border: 3px solid ' + (input.checked ? '#00D4FF' : '#8B4513') + ' !important; border-radius: 30px !important; box-shadow: ' + (input.checked ? '0 0 30px rgba(0, 212, 255, 1)' : 'none') + ' !important; background-image: none !important;');
+                        
+                        // 強制設定滑塊樣式
+                        divs[1].setAttribute('style', 'width: 44px !important; height: 44px !important; top: 4px !important; left: 4px !important; background-color: ' + (input.checked ? '#00FF88' : '#FF4444') + ' !important; background: ' + (input.checked ? '#00FF88' : '#FF4444') + ' !important; border: 2px solid ' + (input.checked ? '#00CC66' : '#CC0000') + ' !important; transform: translateX(' + (input.checked ? '44px' : '0px') + ') !important; background-image: none !important;');
+                        
+                        console.log(`開關 ${index} 樣式已更新`);
                     };
+                    
                     input.removeEventListener('change', update);
                     input.addEventListener('change', update);
                     update();
@@ -181,14 +186,19 @@ st.markdown("""
             });
         }
         
-        // 多重時間點執行，確保覆蓋成功
-        setTimeout(overrideToggleStyles, 100);
+        // 立即執行並多次重試
+        overrideToggleStyles();
+        setTimeout(overrideToggleStyles, 200);
         setTimeout(overrideToggleStyles, 500);
         setTimeout(overrideToggleStyles, 1000);
         setTimeout(overrideToggleStyles, 2000);
+        setTimeout(overrideToggleStyles, 5000);
         
         // 監聽 DOM 變化
-        new MutationObserver(overrideToggleStyles).observe(document.body, { childList: true, subtree: true });
+        new MutationObserver(() => {
+            console.log('DOM 變化，重新執行樣式覆蓋');
+            overrideToggleStyles();
+        }).observe(document.body, { childList: true, subtree: true });
     </script>""", unsafe_allow_html=True)
 
 # --- 3. 數據與定位邏輯 ---
