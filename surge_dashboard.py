@@ -1,40 +1,3 @@
-
-
-開始免費試用
-
-分享
-pasted_content.txt
-文字 · 25.22 KB
-開關底色沒有變更，請修正
-收到，讓我先查看附件內容，了解問題所在。
-已讀取程式碼，問題可能出在開關底色切換邏輯未正確設定，下一步將分析相關樣式與切換控制，找出根因。
-
-分析樣式與切換邏輯，尚未發現明顯錯誤。下一步將檢查相關控制變數與切換事件，確定底色變化是否有正確觸發。
-
-我已經為您修正了程式碼中關於 Streamlit 開關（Toggle）底色切換的邏輯。
-主要修改內容：
-在原有的 overrideToggleStyles() 函數中，我們改進了尋找 DOM 元素的方式。原本透過 querySelectorAll('div') 抓取前兩個 div 來設定樣式，這種方式容易因為 Streamlit 內部結構變化而失效。
-現在改為：
-先找到 input 元素。
-透過 input.nextElementSibling 精確找到開關的背景層 (toggleBg)。
-再從背景層中尋找 div 作為開關的按鈕 (toggleKnob)。
-使用 style.setProperty('...', '...', 'important') 確保樣式具有最高優先級，正確覆蓋預設樣式。
-這樣一來，無論開關處於開啟或關閉狀態，底色和按鈕顏色都能正確且穩定地切換了。
-請下載附件中的 pasted_content.txt 查看並使用修正後的完整程式碼。如果您在運行時還有遇到其他問題，歡迎隨時告訴我！
-pasted_content.txt
-文字 · 25.90 KB
-查看此任務中的所有檔案
-任務已完成
-這個結果怎麼樣？
-您剛剛為此訊息獲得了一個免費的 Manus 1.6 試用！開始免費試用以繼續接收最精煉、高品質的回應。
-
-
-開始免費試用
-建議追問
-
-
-
-pasted_content.txt
 import streamlit as st
 import streamlit.components.v1 as components
 import folium
@@ -221,26 +184,20 @@ st.markdown("""
         function overrideToggleStyles() {
             const toggles = document.querySelectorAll('[data-testid="stToggle"]');
             toggles.forEach(toggle => {
+                const divs = toggle.querySelectorAll('div');
                 const input = toggle.querySelector('input');
-                // The toggle background is usually the next sibling of the input
-                const toggleBg = input ? input.nextElementSibling : null;
-                // The toggle knob is inside the background
-                const toggleKnob = toggleBg ? toggleBg.querySelector('div') : null;
-                
-                if (input && toggleBg && toggleKnob) {
+                if (input && divs.length >= 2) {
                     const update = () => {
                         if (input.checked) {
-                            toggleBg.style.setProperty('background-color', '#00D4FF', 'important');
-                            toggleBg.style.setProperty('border', '3px solid #00D4FF', 'important');
-                            toggleBg.style.setProperty('box-shadow', '0 0 30px rgba(0, 212, 255, 1)', 'important');
-                            toggleKnob.style.setProperty('background-color', '#00FF88', 'important');
-                            toggleKnob.style.setProperty('border', '2px solid #00CC66', 'important');
+                            divs[0].style.backgroundColor = '#00D4FF';
+                            divs[0].style.border = '3px solid #00D4FF';
+                            divs[0].style.boxShadow = '0 0 30px rgba(0, 212, 255, 1)';
+                            divs[1].style.backgroundColor = '#00FF88';
                         } else {
-                            toggleBg.style.setProperty('background-color', '#2D1B1B', 'important');
-                            toggleBg.style.setProperty('border', '3px solid #8B4513', 'important');
-                            toggleBg.style.setProperty('box-shadow', 'none', 'important');
-                            toggleKnob.style.setProperty('background-color', '#FF4444', 'important');
-                            toggleKnob.style.setProperty('border', '2px solid #CC0000', 'important');
+                            divs[0].style.backgroundColor = '#2D1B1B';
+                            divs[0].style.border = '3px solid #8B4513';
+                            divs[0].style.boxShadow = 'none';
+                            divs[1].style.backgroundColor = '#FF4444';
                         }
                     };
                     input.removeEventListener('change', update);
