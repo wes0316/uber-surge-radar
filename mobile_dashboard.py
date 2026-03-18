@@ -163,6 +163,7 @@ body {
 }
 
 /* --- 手機版響應式設計 --- */
+/* 平板和小螢幕電腦 */
 @media (max-width: 768px) {
     /* 確保手機版側邊欄顯示 */
     [data-testid="stSidebar"] {
@@ -187,23 +188,8 @@ body {
     }
 }
 
-/* --- 隱藏 Streamlit 預設元素 --- */
-#MainMenu, footer, header {
-    visibility: hidden;
-}
-
-/* --- 強制顯示側邊欄的額外樣式 --- */
-.st-emotion-cache-1k3db3e {
-    display: block !important;
-}
-
-[data-testid="stSidebarNav"] {
-    display: block !important;
-    visibility: visible !important;
-}
-
-/* 確保側邊欄在所有設備上都顯示 */
-@media screen and (max-width: 640px) {
+/* 手機直向 */
+@media screen and (max-width: 640px) and (orientation: portrait) {
     [data-testid="stSidebar"] {
         display: block !important;
         visibility: visible !important;
@@ -218,6 +204,160 @@ body {
     [data-testid="stMainBlockContainer"] {
         margin-left: 280px !important;
     }
+    
+    .mobile-map-container {
+        height: 200px !important;
+    }
+    
+    .mobile-metric-title {
+        font-size: 18px !important;
+    }
+    
+    .mobile-metric-value {
+        font-size: 24px !important;
+    }
+    
+    .mobile-header {
+        font-size: 18px !important;
+    }
+}
+
+/* 手機橫向 - 完整顯示 */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+    [data-testid="stSidebar"] {
+        display: block !important;
+        visibility: visible !important;
+        position: relative !important;
+        width: 100% !important;
+        height: auto !important;
+        top: auto !important;
+        left: auto !important;
+        z-index: 999 !important;
+        padding: 10px !important;
+    }
+    
+    [data-testid="stMainBlockContainer"] {
+        margin-left: 0 !important;
+        padding: 10px !important;
+    }
+    
+    /* 橫向版佈局 */
+    .landscape-layout {
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 20px !important;
+        align-items: flex-start !important;
+    }
+    
+    .landscape-sidebar {
+        flex: 0 0 250px !important;
+        min-width: 250px !important;
+    }
+    
+    .landscape-main {
+        flex: 1 !important;
+        min-width: 0 !important;
+    }
+    
+    /* 橫向版指標 */
+    .landscape-metrics {
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 15px !important;
+        margin-bottom: 20px !important;
+    }
+    
+    .landscape-metric-container {
+        flex: 1 !important;
+        margin-bottom: 0 !important;
+    }
+    
+    /* 橫向版地圖和排行 */
+    .landscape-content {
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 20px !important;
+        height: 350px !important;
+    }
+    
+    .landscape-map {
+        flex: 2 !important;
+        min-width: 0 !important;
+    }
+    
+    .landscape-list {
+        flex: 1 !important;
+        min-width: 0 !important;
+        overflow-y: auto !important;
+    }
+    
+    .mobile-map-container {
+        height: 350px !important;
+        margin-bottom: 0 !important;
+    }
+    
+    .mobile-list-title {
+        font-size: 16px !important;
+        margin-bottom: 8px !important;
+    }
+    
+    .mobile-table {
+        font-size: 12px !important;
+    }
+    
+    .mobile-table td {
+        padding: 6px !important;
+    }
+    
+    .mobile-header {
+        font-size: 20px !important;
+        margin-bottom: 15px !important;
+    }
+    
+    .mobile-metric-title {
+        font-size: 16px !important;
+        margin-bottom: 6px !important;
+    }
+    
+    .mobile-metric-value {
+        font-size: 22px !important;
+    }
+}
+
+/* 極小螢幕橫向 */
+@media screen and (max-width: 480px) and (orientation: landscape) {
+    .landscape-metrics {
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+    
+    .landscape-content {
+        flex-direction: column !important;
+        height: auto !important;
+    }
+    
+    .landscape-map {
+        height: 250px !important;
+    }
+    
+    .mobile-map-container {
+        height: 250px !important;
+    }
+}
+
+/* --- 隱藏 Streamlit 預設元素 --- */
+#MainMenu, footer, header {
+    visibility: hidden;
+}
+
+/* --- 強制顯示側邊欄的額外樣式 --- */
+.st-emotion-cache-1k3db3e {
+    display: block !important;
+}
+
+[data-testid="stSidebarNav"] {
+    display: block !important;
+    visibility: visible !important;
 }
 </style>
 """, unsafe_allow_html=True)
