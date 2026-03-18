@@ -26,8 +26,13 @@ st.markdown("""
             font-family: 'Inter', -apple-system, sans-serif !important;
         }
 
-        /* 🎯 側邊欄開關文字 */
-        [data-testid="stSidebar"] [data-testid="stWidgetLabel"] p {
+        /* 🎯 側邊欄開關文字 - 強制放大 */
+        [data-testid="stSidebar"] [data-testid="stWidgetLabel"] p,
+        div[data-testid="stSidebar"] [data-testid="stWidgetLabel"] p,
+        div.stSidebar [data-testid="stWidgetLabel"] p,
+        div[class*="stSidebar"] [data-testid="stWidgetLabel"] p,
+        div[data-testid="stSidebar"] div[data-testid="stWidgetLabel"] p,
+        div.stSidebar div[data-testid="stWidgetLabel"] p {
             font-size: 40px !important; 
             font-weight: 900 !important;
             color: #FFFFFF !important;
