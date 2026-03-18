@@ -376,28 +376,8 @@ top_3_centers, top_10_list, total_count = fetch_analysis_data()
 
 # --- 6. 主畫面指標 ---
 m1, m2 = st.columns(2)
-# 使用獨立的 div id 來避免樣式干擾
-m1.markdown(f"""
-<div id="metric-container">
-    <div id="metric-labels">
-        <div style="font-size: 32px !important; font-weight: 900 !important; color: #FFFFFF !important; text-align: center !important; margin-bottom: 10px;">🔥 雙北紅區</div>
-    </div>
-    <div id="metric-values">
-        <div style="font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important; text-align: center !important; line-height: 1.1 !important;">{total_count} 處</div>
-    </div>
-</div>
-""", unsafe_allow_html=True)
-
-m2.markdown(f"""
-<div id="metric-container">
-    <div id="metric-labels">
-        <div style="font-size: 32px !important; font-weight: 900 !important; color: #FFFFFF !important; text-align: center !important; margin-bottom: 10px;">📍 所在區域</div>
-    </div>
-    <div id="metric-values">
-        <div style="font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important; text-align: center !important; line-height: 1.1 !important;">新店區</div>
-    </div>
-</div>
-""", unsafe_allow_html=True)
+m1.metric("🔥 雙北紅區", f"{total_count} 處")
+m2.metric("📍 所在區域", "新店區")
 st.divider()
 
 # --- 7. 地圖與排行 ---
