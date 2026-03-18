@@ -78,21 +78,24 @@ st.markdown("""
         }
 
         /* --- 🎯 主畫面指標區域 --- */
-        [data-testid="stMetricValue"] { color: #FFFFFF !important; font-size: 68px !important; font-weight: 900 !important; text-align: center !important; }
-        [data-testid="stMetricLabel"] { color: #FFFFFF !important; font-size: 32px !important; font-weight: 900 !important; text-align: center !important; }
+        /* 指標標籤 - 獨立 div id */
+        #metric-labels [data-testid="stMetricLabel"] { color: #FFFFFF !important; font-size: 32px !important; font-weight: 900 !important; text-align: center !important; }
+        
+        /* 指標數值 - 獨立 div id */
+        #metric-values [data-testid="stMetricValue"] { color: #FFFFFF !important; font-size: 68px !important; font-weight: 900 !important; text-align: center !important; }
         
         /* 超級強制保護指標數值 - 確保 68px + 白色 + 中央對齊 */
-        html body [data-testid="stMetricValue"],
-        html body div[data-testid="stMetric"] [data-testid="stMetricValue"],
-        html body div.stMetric [data-testid="stMetricValue"],
-        html body div[data-testid="stMetric"] > div > div:last-child,
-        html body div.stMetric > div > div:last-child,
-        html body div[data-testid="stMetric"] div:last-child,
-        html body div.stMetric div:last-child,
-        html body div[data-testid="stMetric"] *,
-        html body div.stMetric *:last-child,
-        html body div[class*="stMetric"] [data-testid="stMetricValue"],
-        html body div[class*="stMetric"] div:last-child {
+        #metric-values [data-testid="stMetricValue"],
+        #metric-values div[data-testid="stMetric"] [data-testid="stMetricValue"],
+        #metric-values div.stMetric [data-testid="stMetricValue"],
+        #metric-values div[data-testid="stMetric"] > div > div:last-child,
+        #metric-values div.stMetric > div > div:last-child,
+        #metric-values div[data-testid="stMetric"] div:last-child,
+        #metric-values div.stMetric div:last-child,
+        #metric-values div[data-testid="stMetric"] *,
+        #metric-values div.stMetric *:last-child,
+        #metric-values div[class*="stMetric"] [data-testid="stMetricValue"],
+        #metric-values div[class*="stMetric"] div:last-child {
             color: #FFFFFF !important; 
             font-size: 68px !important; 
             font-weight: 900 !important;
@@ -103,18 +106,18 @@ st.markdown("""
         }
         
         /* 超級強制覆蓋指標標籤 - 白色 - 最高權限 + 中央對齊 */
-        html body [data-testid="stMetricLabel"],
-        html body div[data-testid="stMetric"] [data-testid="stMetricLabel"],
-        html body div.stMetric [data-testid="stMetricLabel"],
-        html body div[data-testid="stMetric"] > div > div:first-child,
-        html body div.stMetric > div > div:first-child,
-        html body div[data-testid="stMetric"] div:first-child,
-        html body div.stMetric div:first-child,
-        html body div[class*="stMetric"] [data-testid="stMetricLabel"],
-        html body div[class*="stMetric"] div:first-child,
-        html body div[data-testid="stMetric"] *,
-        html body div.stMetric *:first-child,
-        html body div[class*="stMetric"] *:first-child {
+        #metric-labels [data-testid="stMetricLabel"],
+        #metric-labels div[data-testid="stMetric"] [data-testid="stMetricLabel"],
+        #metric-labels div.stMetric [data-testid="stMetricLabel"],
+        #metric-labels div[data-testid="stMetric"] > div > div:first-child,
+        #metric-labels div.stMetric > div > div:first-child,
+        #metric-labels div[data-testid="stMetric"] div:first-child,
+        #metric-labels div.stMetric div:first-child,
+        #metric-labels div[class*="stMetric"] [data-testid="stMetricLabel"],
+        #metric-labels div[class*="stMetric"] div:first-child,
+        #metric-labels div[data-testid="stMetric"] *,
+        #metric-labels div.stMetric *:first-child,
+        #metric-labels div[class*="stMetric"] *:first-child {
             color: #FFFFFF !important; 
             font-size: 32px !important; 
             font-weight: 900 !important;
@@ -125,7 +128,7 @@ st.markdown("""
         }
         
         /* 指標容器中央對齊 - 只影響指標容器 */
-        div[data-testid="stMetric"] {
+        #metric-container div[data-testid="stMetric"] {
             background: rgba(45, 45, 45, 0.9) !important; 
             border-left: 12px solid #00D4FF !important; 
             border-radius: 15px !important; 
@@ -137,18 +140,18 @@ st.markdown("""
         }
         
         /* 終極字型大小保護 - 防止任何縮小 */
-        html body div[data-testid="stMetric"] *,
-        html body div.stMetric *,
-        html body div[class*="stMetric"] * {
+        #metric-container div[data-testid="stMetric"] *,
+        #metric-container div.stMetric *,
+        #metric-container div[class*="stMetric"] * {
             font-size: inherit !important;
         }
         
-        html body div[data-testid="stMetric"] *:first-child {
+        #metric-container div[data-testid="stMetric"] *:first-child {
             font-size: 32px !important;
             text-align: center !important;
         }
         
-        html body div[data-testid="stMetric"] *:last-child {
+        #metric-container div[data-testid="stMetric"] *:last-child {
             font-size: 68px !important;
             text-align: center !important;
         }
