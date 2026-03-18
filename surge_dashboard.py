@@ -404,8 +404,37 @@ top_3_centers, top_10_list, total_count = fetch_analysis_data()
 
 # --- 6. 主畫面指標 ---
 m1, m2 = st.columns(2)
-m1.metric("🔥 雙北紅區", f"{total_count} 處")
-m2.metric("📍 所在區域", "新店區")
+
+# 使用內聯樣式強制設定標題顏色為淺藍色
+m1.markdown(f"""
+<style>
+.metric-title {{
+    color: #87CEEB !important;
+    font-size: 32px !important;
+    font-weight: 900 !important;
+    text-align: center !important;
+    line-height: 1.2 !important;
+}}
+.metric-value {{
+    color: #FFFFFF !important;
+    font-size: 68px !important;
+    font-weight: 900 !important;
+    text-align: center !important;
+    line-height: 1.1 !important;
+}}
+</style>
+<div style="background: rgba(45, 45, 45, 0.9) !important; border-left: 12px solid #00D4FF !important; border-radius: 15px !important; padding: 20px; text-align: center;">
+    <div class="metric-title">🔥 雙北紅區</div>
+    <div class="metric-value">{total_count} 處</div>
+</div>
+""", unsafe_allow_html=True)
+
+m2.markdown(f"""
+<div style="background: rgba(45, 45, 45, 0.9) !important; border-left: 12px solid #00D4FF !important; border-radius: 15px !important; padding: 20px; text-align: center;">
+    <div class="metric-title">📍 所在區域</div>
+    <div class="metric-value">新店區</div>
+</div>
+""", unsafe_allow_html=True)
 st.divider()
 
 # --- 7. 地圖與排行 ---
