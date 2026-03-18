@@ -124,8 +124,39 @@ st.markdown("""
                 }
             });
         }
+        
+        function fixMetricLabels() {
+            console.log('修正指標標籤');
+            const metricLabels = document.querySelectorAll('[data-testid="stMetricLabel"]');
+            metricLabels.forEach(elem => {
+                elem.style.fontSize = '32px !important';
+                elem.style.fontWeight = '900 !important';
+                elem.style.color = '#00D4FF !important';
+                console.log('指標標籤已修正:', elem.textContent);
+            });
+            
+            // 嘗試其他可能的選擇器
+            const otherLabels = document.querySelectorAll('div[data-testid="stMetric"] > div > div:first-child');
+            otherLabels.forEach(elem => {
+                if (elem.textContent && elem.textContent.includes('雙北紅區') || elem.textContent.includes('所在區域')) {
+                    elem.style.fontSize = '32px !important';
+                    elem.style.fontWeight = '900 !important';
+                    elem.style.color = '#00D4FF !important';
+                    console.log('其他指標標籤已修正:', elem.textContent);
+                }
+            });
+        }
+        
         setTimeout(overrideToggleStyles, 200);
-        new MutationObserver(overrideToggleStyles).observe(document.body, { childList: true, subtree: true });
+        setTimeout(fixMetricLabels, 200);
+        setTimeout(fixMetricLabels, 500);
+        setTimeout(fixMetricLabels, 1000);
+        setTimeout(fixMetricLabels, 2000);
+        
+        new MutationObserver(() => {
+            overrideToggleStyles();
+            fixMetricLabels();
+        }).observe(document.body, { childList: true, subtree: true });
     </script>
 """, unsafe_allow_html=True)
 
