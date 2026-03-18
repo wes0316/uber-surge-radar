@@ -317,14 +317,14 @@ top_3_centers, top_10_list, total_count = fetch_analysis_data()
 m1, m2 = st.columns(2)
 # 使用內聯樣式強制設定數值大小
 m1.markdown(f"""
-<div style="background: rgba(45, 45, 45, 0.9) !important; border-left: 12px solid #00D4FF !important; border-radius: 15px !important; padding: 30px !important; text-align: center;">
+<div style="background-color: rgba(45, 45, 45, 0.9) !important; background: rgba(45, 45, 45, 0.9) !important; border-left: 12px solid #00D4FF !important; border-radius: 15px !important; padding: 30px !important; text-align: center; min-height: 120px;">
     <div style="font-size: 32px !important; font-weight: 900 !important; color: #00D4FF !important; margin-bottom: 10px;">🔥 雙北紅區</div>
     <div style="font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important; line-height: 1.1 !important;">{total_count} 處</div>
 </div>
 """, unsafe_allow_html=True)
 
 m2.markdown(f"""
-<div style="background: rgba(45, 45, 45, 0.9) !important; border-left: 12px solid #00D4FF !important; border-radius: 15px !important; padding: 30px !important; text-align: center;">
+<div style="background-color: rgba(45, 45, 45, 0.9) !important; background: rgba(45, 45, 45, 0.9) !important; border-left: 12px solid #00D4FF !important; border-radius: 15px !important; padding: 30px !important; text-align: center; min-height: 120px;">
     <div style="font-size: 32px !important; font-weight: 900 !important; color: #00D4FF !important; margin-bottom: 10px;">📍 所在區域</div>
     <div style="font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important; line-height: 1.1 !important;">新店區</div>
 </div>
