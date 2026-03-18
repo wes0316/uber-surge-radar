@@ -79,7 +79,7 @@ st.markdown("""
 
         /* --- 🎯 主畫面指標區域 --- */
         [data-testid="stMetricValue"] { color: #FFFFFF !important; font-size: 68px !important; font-weight: 900 !important; text-align: center !important; }
-        [data-testid="stMetricLabel"] { color: #FFFFFF !important; font-size: 32px !important; font-weight: 900 !important; text-align: center !important; }
+        [data-testid="stMetricLabel"] { color: #87CEEB !important; font-size: 32px !important; font-weight: 900 !important; text-align: center !important; }
         
         /* 超級強制保護指標數值 - 確保 68px + 白色 + 中央對齊 */
         html body [data-testid="stMetricValue"],
@@ -102,7 +102,7 @@ st.markdown("""
             align-items: center !important;
         }
         
-        /* 超級強制覆蓋指標標籤 - 白色 - 最高權限 + 中央對齊 */
+        /* 超級強制覆蓋指標標籤 - 淺藍色 - 最高權限 + 中央對齊 */
         html body [data-testid="stMetricLabel"],
         html body div[data-testid="stMetric"] [data-testid="stMetricLabel"],
         html body div.stMetric [data-testid="stMetricLabel"],
@@ -115,7 +115,7 @@ st.markdown("""
         html body div[data-testid="stMetric"] *,
         html body div.stMetric *:first-child,
         html body div[class*="stMetric"] *:first-child {
-            color: #FFFFFF !important; 
+            color: #87CEEB !important; 
             font-size: 32px !important; 
             font-weight: 900 !important;
             background: transparent !important;
@@ -143,14 +143,18 @@ st.markdown("""
             font-size: inherit !important;
         }
         
+        /* 特別保護第一個子元素（標題）- 淺藍色 */
         html body div[data-testid="stMetric"] *:first-child {
             font-size: 32px !important;
             text-align: center !important;
+            color: #87CEEB !important;
         }
         
+        /* 特別保護最後一個子元素（數值）- 白色 */
         html body div[data-testid="stMetric"] *:last-child {
             font-size: 68px !important;
             text-align: center !important;
+            color: #FFFFFF !important;
         }
         [data-testid="stSidebar"] { background-color: #111111 !important; border-right: 1px solid #333333 !important; padding-top: 2rem !important; }
         #MainMenu, footer, header {visibility: hidden;}
