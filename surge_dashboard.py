@@ -25,25 +25,58 @@ st.markdown("""
             font-family: 'Inter', -apple-system, sans-serif !important;
         }
 
-        /* --- 🎯 戰術開關 (Toggle) 高對比 --- */
-        div[data-testid="stToggle"] label > div:first-child {
-            width: 85px !important; height: 48px !important;
-            background-color: #2D1B1B !important; 
-            border: 2px solid #8B4513 !important;
+        /* --- 🎯 戰術開關 (Toggle) 高對比 - 強制權限覆蓋 --- */
+        
+        /* 1. OFF 狀態底座 - 使用多重選擇器確保權限 */
+        div[data-testid="stToggle"] label > div:first-child,
+        div[data-testid="stToggle"] .st-eb,
+        div[data-testid="stToggle"] div[role="switch"] {
+            width: 85px !important; 
+            height: 48px !important;
+            background-color: #2D1B1B !important; /* 深灰紅色 */
+            border: 2px solid #8B4513 !important; /* 棕紅色邊框 */
             border-radius: 24px !important;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5) !important;
+            transition: all 0.3s ease !important;
         }
-        div[data-testid="stToggle"] input:checked + div {
-            background-color: #00D4FF !important; 
-            box-shadow: 0 0 20px rgba(0, 212, 255, 0.8) !important;
+        
+        /* 2. ON 狀態底座 - 強制覆蓋 */
+        div[data-testid="stToggle"] input:checked + div,
+        div[data-testid="stToggle"] input:checked + .st-eb,
+        div[data-testid="stToggle"] input:checked + div[role="switch"] {
+            background-color: #00D4FF !important; /* 亮藍色 */
+            border-color: #00D4FF !important;
+            box-shadow: 0 0 25px rgba(0, 212, 255, 1.0) !important; /* 超強發光 */
+            border: 2px solid #00D4FF !important;
         }
-        div[data-testid="stToggle"] label > div:first-child > div {
-            width: 36px !important; height: 36px !important;
-            top: 4px !important; left: 4px !important;
-            background-color: #FF6B6B !important; 
+        
+        /* 3. OFF 狀態滑塊 - 強制白色改為紅色 */
+        div[data-testid="stToggle"] label > div:first-child > div,
+        div[data-testid="stToggle"] .st-eb > div,
+        div[data-testid="stToggle"] div[role="switch"] > div {
+            width: 36px !important; 
+            height: 36px !important;
+            top: 4px !important; 
+            left: 4px !important;
+            background-color: #FF4444 !important; /* 鮮紅色滑塊 */
+            border: 2px solid #CC0000 !important; /* 深紅色邊框 */
+            box-shadow: 0 2px 8px rgba(255, 68, 68, 0.8) !important;
         }
-        div[data-testid="stToggle"] input:checked + div > div {
+        
+        /* 4. ON 狀態滑塊 - 強制綠色 */
+        div[data-testid="stToggle"] input:checked + div > div,
+        div[data-testid="stToggle"] input:checked + .st-eb > div,
+        div[data-testid="stToggle"] input:checked + div[role="switch"] > div {
             transform: translateX(37px) !important;
-            background-color: #00FF88 !important;
+            background-color: #00FF88 !important; /* 亮綠色 */
+            border: 2px solid #00CC66 !important; /* 深綠色邊框 */
+            box-shadow: 0 2px 10px rgba(0, 255, 136, 1.0) !important;
+        }
+        
+        /* 5. 強制移除任何可能的背景圖片 */
+        div[data-testid="stToggle"] label > div:first-child > div,
+        div[data-testid="stToggle"] input:checked + div > div {
+            background-image: none !important;
         }
 
         /* --- 🎯 立即重新整理按鈕：精確 80% 寬度、置中 --- */
