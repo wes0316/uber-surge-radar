@@ -70,7 +70,7 @@ st.markdown("""
         }
         
         [data-testid="stSidebar"] div.stButton > button p {
-            font-size: 26px !important; 
+            font-size: 32px !important; 
             font-weight: 900 !important;
             color: #FFFFFF !important;
             white-space: nowrap !important; /* 絕對不換行 */
@@ -78,9 +78,9 @@ st.markdown("""
         }
 
         /* --- 🎯 主畫面指標區域 --- */
-        [data-testid="stMetricValue"] { color: #FFFFFF !important; font-size: 68px !important; font-weight: 900 !important; }
-        [data-testid="stMetricLabel"] { color: #00D4FF !important; font-size: 28px !important; }
-        div[data-testid="stMetric"] { background: rgba(45, 45, 45, 0.9) !important; border-left: 12px solid #00D4FF !important; border-radius: 15px !important; }
+        [data-testid="stMetricValue"] { color: #FFFFFF !important; font-size: 75px !important; font-weight: 900 !important; }
+        [data-testid="stMetricLabel"] { color: #00D4FF !important; font-size: 32px !important; font-weight: 900 !important; }
+        div[data-testid="stMetric"] { background: rgba(45, 45, 45, 0.9) !important; border-left: 12px solid #00D4FF !important; border-radius: 15px !important; padding: 30px !important; }
         [data-testid="stSidebar"] { background-color: #111111 !important; border-right: 1px solid #333333 !important; padding-top: 2rem !important; }
         #MainMenu, footer, header {visibility: hidden;}
     </style>
