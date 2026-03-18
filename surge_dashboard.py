@@ -35,37 +35,27 @@ st.markdown("""
             margin-left: 10px !important;
             white-space: nowrap !important; 
         }
-
         /* 🎯 戰術開關 (Toggle) 本體 */
-        /* 未選中狀態 */
-        [data-testid="stToggle"] label > div:first-child {
-            width: 100px !important; height: 56px !important;
-            background-color: #2D1B1B !important;
-            border: 3px solid #8B4513 !important;
-            border-radius: 30px !important;
+        [data-testid="stToggle"] label > div:first-child { 
+            width: 100px !important; height: 56px !important; 
+            background-color: #2D1B1B !important; 
+            border: 3px solid #8B4513 !important; border-radius: 30px !important;
             transition: background-color 0.3s, border 0.3s, box-shadow 0.3s;
         }
-        /* 選中狀態 */
-        [data-testid="stToggle"] input:checked + label > div:first-child {
-            background-color: #00D4FF !important;
-            border: 3px solid #00D4FF !important;
-            box-shadow: 0 0 30px rgba(0, 212, 255, 1) !important;
+        [data-testid="stToggle"] input:checked + label > div:first-child { 
+            background-color: #00D4FF !important; 
+            border: 3px solid #00D4FF !important; 
+            box-shadow: 0 0 30px rgba(0, 212, 255, 1) !important; 
         }
-
-        /* 🎯 戰術開關 (Toggle) 內部圓點 */
-        /* 未選中狀態 */
-        [data-testid="stToggle"] label > div:first-child > div {
-            width: 44px !important; height: 44px !important;
-            top: 4px !important; left: 4px !important;
-            background-color: #FF4444 !important;
-            border: 2px solid #CC0000 !important;
+        [data-testid="stToggle"] label > div:first-child > div { 
+            width: 44px !important; height: 44px !important; 
+            top: 4px !important; left: 4px !important; 
+            background-color: #FF4444 !important; border: 2px solid #CC0000 !important;
             transition: transform 0.3s, background-color 0.3s, border 0.3s;
         }
-        /* 選中狀態 */
-        [data-testid="stToggle"] input:checked + label > div:first-child > div {
-            transform: translateX(44px) !important;
-            background-color: #00FF88 !important;
-            border: 2px solid #00CC66 !important;
+        [data-testid="stToggle"] input:checked + div > div { 
+            transform: translateX(44px) !important; 
+            background-color: #00FF88 !important; border: 2px solid #00CC66 !important;
         }
 
         /* ========================================= */
@@ -195,6 +185,540 @@ st.markdown("""
 
         
         function fixMetricLabels() {
+            console.log("修正指標標籤和數值 - 標題淺藍色 + 數值白色 + 中央對齊 - 終極強化");
+            
+            // 終極強制修正指標標籤 - 淺藍色 + 32px + 中央對齊 - 多重選擇器
+            const metricLabels = document.querySelectorAll("[data-testid=\"stMetricLabel\"]");
+            metricLabels.forEach(elem => {
+                elem.style.fontSize = "32px !important";
+                elem.style.fontWeight = "900 !important";
+                elem.style.color = "#87CEEB !important";
+                elem.style.background = "transparent !important";
+                elem.style.lineHeight = "1.2 !important";
+                elem.style.textAlign = "center !important";
+                elem.style.justifyContent = "center !important";
+                elem.style.alignItems = "center !important";
+                elem.setAttribute("style", elem.getAttribute("style") + "; font-size: 32px !important; font-weight: 900 !important; color: #87CEEB !important; background: transparent !important; line-height: 1.2 !important; text-align: center !important; justify-content: center !important; align-items: center !important;");
+                console.log("指標標籤已修正為淺藍色 32px 中央對齊:", elem.textContent);
+            });
+            
+            // 終極強制修正指標數值 - 白色 + 68px + 中央對齊 - 多重選擇器
+            const metricValues = document.querySelectorAll("[data-testid=\"stMetricValue\"]");
+            metricValues.forEach(elem => {
+                elem.style.fontSize = "68px !important";
+                elem.style.fontWeight = "900 !important";
+                elem.style.color = "#FFFFFF !important";
+                elem.style.lineHeight = "1.1 !important";
+                elem.style.textAlign = "center !important";
+                elem.style.justifyContent = "center !important";
+                elem.style.alignItems = "center !important";
+                elem.setAttribute("style", elem.getAttribute("style") + "; font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important; line-height: 1.1 !important; text-align: center !important; justify-content: center !important; align-items: center !important;");
+                console.log("指標數值已修正為白色 68px 中央對齊:", elem.textContent);
+            });
+            
+            // 修正指標容器 - 中央對齊（只影響指標容器）
+            const metricContainers = document.querySelectorAll("div[data-testid=\"stMetric\"]");
+            metricContainers.forEach(elem => {
+                elem.style.textAlign = "center !important";
+                elem.style.display = "flex !important";
+                elem.style.flexDirection = "column !important";
+                elem.style.justifyContent = "center !important";
+                elem.style.alignItems = "center !important";
+                elem.setAttribute("style", elem.getAttribute("style") + "; text-align: center !important; display: flex !important; flex-direction: column !important; justify-content: center !important; align-items: center !important;");
+                console.log("指標容器已修正為中央對齊");
+            });
+            
+            // 終極強制修正所有可能的標題元素 - 淺藍色
+            const allTitleSelectors = [
+                "div[data-testid=\"stMetric\"] > div > div:first-child",
+                "div.stMetric > div > div:first-child",
+                "div[class*=\"stMetric\"] > div > div:first-child",
+                "div[data-testid=\"stMetric\"] > div > div:first-child *",
+                "div.stMetric > div > div:first-child *",
+                "div[class*=\"stMetric\"] > div > div:first-child *",
+                "div[data-testid=\"stMetric\"] *:first-child",
+                "div.stMetric *:first-child",
+                "div[class*=\"stMetric\"] *:first-child"
+            ];
+            
+            allTitleSelectors.forEach(selector => {
+                const elements = document.querySelectorAll(selector);
+                elements.forEach(elem => {
+                    const text = elem.textContent || "";
+                    if (text && (text.includes("雙北紅區") || text.includes("所在區域") || text.includes("🔥") || text.includes("📍"))) {
+                        elem.style.fontSize = "32px !important";
+                        elem.style.fontWeight = "900 !important";
+                        elem.style.color = "#87CEEB !important";
+                        elem.style.background = "transparent !important";
+                        elem.style.lineHeight = "1.2 !important";
+                        elem.style.textAlign = "center !important";
+                        elem.style.justifyContent = "center !important";
+                        elem.style.alignItems = "center !important";
+                        elem.setAttribute("style", elem.getAttribute("style") + "; font-size: 32px !important; font-weight: 900 !important; color: #87CEEB !important; background: transparent !important; line-height: 1.2 !important; text-align: center !important; justify-content: center !important; align-items: center !important;");
+                        console.log("終極強制修正標題為淺藍色:", text);
+                    }
+                });
+            });
+            
+            // 終極強制修正所有可能的數值元素 - 白色
+            const allValueSelectors = [
+                "div[data-testid=\"stMetric\"] > div > div:last-child",
+                "div.stMetric > div > div:last-child",
+                "div[class*=\"stMetric\"] > div > div:last-child",
+                "div[data-testid=\"stMetric\"] > div > div:last-child *",
+                "div.stMetric > div > div:last-child *",
+                "div[class*=\"stMetric\"] > div > div:last-child *",
+                "div[data-testid=\"stMetric\"] *:last-child",
+                "div.stMetric *:last-child",
+                "div[class*=\"stMetric\"] *:last-child"
+            ];
+            
+            allValueSelectors.forEach(selector => {
+                const elements = document.querySelectorAll(selector);
+                elements.forEach(elem => {
+                    const text = elem.textContent || "";
+                    if (text.match(/^\\d+.*處$/) || text === "新店區" || text.match(/^\\d+$/) || text.includes("處")) {
+                        elem.style.fontSize = "68px !important";
+                        elem.style.fontWeight = "900 !important";
+                        elem.style.color = "#FFFFFF !important";
+                        elem.style.lineHeight = "1.1 !important";
+                        elem.style.textAlign = "center !important";
+                        elem.style.justifyContent = "center !important";
+                        elem.style.alignItems = "center !important";
+                        elem.setAttribute("style", elem.getAttribute("style") + "; font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important; line-height: 1.1 !important; text-align: center !important; justify-content: center !important; align-items: center !important;");
+                        console.log("終極強制修正數值為白色:", text);
+                    }
+                });
+            });
+        }
+
+        function overrideToggleStyles() {
+            const applyStyles = (toggle) => {
+                const input = toggle.querySelector("input");
+                const toggleBg = input ? input.nextElementSibling : null;
+                const toggleKnob = toggleBg ? toggleBg.querySelector("div") : null;
+                
+                if (input && toggleBg && toggleKnob) {
+                    const update = () => {
+                        if (input.checked) {
+                            toggleBg.style.setProperty("background-color", "#00D4FF", "important");
+                            toggleBg.style.setProperty("border", "3px solid #00D4FF", "important");
+                            toggleBg.style.setProperty("box-shadow", "0 0 30px rgba(0, 212, 255, 1)", "important");
+                            toggleKnob.style.setProperty("background-color", "#00FF88", "important");
+                            toggleKnob.style.setProperty("border", "2px solid #00CC66", "important");
+                        } else {
+                            toggleBg.style.setProperty("background-color", "#2D1B1B", "important");
+                            toggleBg.style.setProperty("border", "3px solid #8B4513", "important");
+                            toggleBg.style.setProperty("box-shadow", "none", "important");
+                            toggleKnob.style.setProperty("background-color", "#FF4444", "important");
+                            toggleKnob.style.setProperty("border", "2px solid #CC0000", "important");
+                        }
+                    };
+                    input.removeEventListener("change", update);
+                    input.addEventListener("change", update);
+                    update();
+                }
+            };
+
+            const toggles = document.querySelectorAll("[data-testid=\"stToggle\"]");
+            toggles.forEach(applyStyles);
+        }
+
+        // Initial application and re-application on DOM changes
+        const observer = new MutationObserver((mutationsList, observer) => {
+            for (const mutation of mutationsList) {
+                if (mutation.type === "childList" && mutation.addedNodes.length > 0) {
+                    mutation.addedNodes.forEach(node => {
+                        if (node.nodeType === 1 && node.querySelector("[data-testid=\"stToggle\"]")) {
+                            overrideToggleStyles();
+                            fixMetricLabels();
+                        }
+                    });
+                }
+            }
+            overrideToggleStyles(); // Ensure styles are applied even if no new toggle is added but existing ones are modified
+            fixMetricLabels();
+        });
+
+        observer.observe(document.body, { childList: true, subtree: true });
+
+        // Also run on initial load and after a short delay for good measure
+        setTimeout(overrideToggleStyles, 100);
+        setTimeout(fixMetricLabels, 100);
+        setTimeout(overrideToggleStyles, 500);
+        setTimeout(fixMetricLabels, 500);
+        setTimeout(overrideToggleStyles, 1000);
+        setTimeout(fixMetricLabels, 1000);
+        setTimeout(overrideToggleStyles, 2000);
+        setTimeout(fixMetricLabels, 2000);
+        setTimeout(overrideToggleStyles, 5000);
+        setTimeout(fixMetricLabels, 5000);
+        setTimeout(overrideToggleStyles, 10000);
+        setTimeout(fixMetricLabels, 10000);
+        setTimeout(overrideToggleStyles, 15000);
+        setTimeout(fixMetricLabels, 15000);
+        setTimeout(overrideToggleStyles, 20000);
+        setTimeout(fixMetricLabels, 20000);
+        setTimeout(overrideToggleStyles, 30000);
+        setTimeout(fixMetricLabels, 30000);
+
+        
+            console.log("修正指標標籤和數值 - 標題淺藍色 + 數值白色 + 中央對齊 - 終極強化");
+            
+            // 終極強制修正指標標籤 - 淺藍色 + 32px + 中央對齊 - 多重選擇器
+            const metricLabels = document.querySelectorAll("[data-testid=\"stMetricLabel\"]");
+            metricLabels.forEach(elem => {
+                elem.style.fontSize = "32px !important";
+                elem.style.fontWeight = "900 !important";
+                elem.style.color = "#87CEEB !important";
+                elem.style.background = "transparent !important";
+                elem.style.lineHeight = "1.2 !important";
+                elem.style.textAlign = "center !important";
+                elem.style.justifyContent = "center !important";
+                elem.style.alignItems = "center !important";
+                elem.setAttribute("style", elem.getAttribute("style") + "; font-size: 32px !important; font-weight: 900 !important; color: #87CEEB !important; background: transparent !important; line-height: 1.2 !important; text-align: center !important; justify-content: center !important; align-items: center !important;");
+                console.log("指標標籤已修正為淺藍色 32px 中央對齊:", elem.textContent);
+            });
+            
+            // 終極強制修正指標數值 - 白色 + 68px + 中央對齊 - 多重選擇器
+            const metricValues = document.querySelectorAll("[data-testid=\"stMetricValue\"]");
+            metricValues.forEach(elem => {
+                elem.style.fontSize = "68px !important";
+                elem.style.fontWeight = "900 !important";
+                elem.style.color = "#FFFFFF !important";
+                elem.style.lineHeight = "1.1 !important";
+                elem.style.textAlign = "center !important";
+                elem.style.justifyContent = "center !important";
+                elem.style.alignItems = "center !important";
+                elem.setAttribute("style", elem.getAttribute("style") + "; font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important; line-height: 1.1 !important; text-align: center !important; justify-content: center !important; align-items: center !important;");
+                console.log("指標數值已修正為白色 68px 中央對齊:", elem.textContent);
+            });
+            
+            // 修正指標容器 - 中央對齊（只影響指標容器）
+            const metricContainers = document.querySelectorAll("div[data-testid=\"stMetric\"]");
+            metricContainers.forEach(elem => {
+                elem.style.textAlign = "center !important";
+                elem.style.display = "flex !important";
+                elem.style.flexDirection = "column !important";
+                elem.style.justifyContent = "center !important";
+                elem.style.alignItems = "center !important";
+                elem.setAttribute("style", elem.getAttribute("style") + "; text-align: center !important; display: flex !important; flex-direction: column !important; justify-content: center !important; align-items: center !important;");
+                console.log("指標容器已修正為中央對齊");
+            });
+            
+            // 終極強制修正所有可能的標題元素 - 淺藍色
+            const allTitleSelectors = [
+                "div[data-testid=\"stMetric\"] > div > div:first-child",
+                "div.stMetric > div > div:first-child",
+                "div[class*=\"stMetric\"] > div > div:first-child",
+                "div[data-testid=\"stMetric\"] > div > div:first-child *",
+                "div.stMetric > div > div:first-child *",
+                "div[class*=\"stMetric\"] > div > div:first-child *",
+                "div[data-testid=\"stMetric\"] *:first-child",
+                "div.stMetric *:first-child",
+                "div[class*=\"stMetric\"] *:first-child"
+            ];
+            
+            allTitleSelectors.forEach(selector => {
+                const elements = document.querySelectorAll(selector);
+                elements.forEach(elem => {
+                    const text = elem.textContent || "";
+                    if (text && (text.includes("雙北紅區") || text.includes("所在區域") || text.includes("🔥") || text.includes("📍"))) {
+                        elem.style.fontSize = "32px !important";
+                        elem.style.fontWeight = "900 !important";
+                        elem.style.color = "#87CEEB !important";
+                        elem.style.background = "transparent !important";
+                        elem.style.lineHeight = "1.2 !important";
+                        elem.style.textAlign = "center !important";
+                        elem.style.justifyContent = "center !important";
+                        elem.style.alignItems = "center !important";
+                        elem.setAttribute("style", elem.getAttribute("style") + "; font-size: 32px !important; font-weight: 900 !important; color: #87CEEB !important; background: transparent !important; line-height: 1.2 !important; text-align: center !important; justify-content: center !important; align-items: center !important;");
+                        console.log("終極強制修正標題為淺藍色:", text);
+                    }
+                });
+            });
+            
+            // 終極強制修正所有可能的數值元素 - 白色
+            const allValueSelectors = [
+                "div[data-testid=\"stMetric\"] > div > div:last-child",
+                "div.stMetric > div > div:last-child",
+                "div[class*=\"stMetric\"] > div > div:last-child",
+                "div[data-testid=\"stMetric\"] > div > div:last-child *",
+                "div.stMetric > div > div:last-child *",
+                "div[class*=\"stMetric\"] > div > div:last-child *",
+                "div[data-testid=\"stMetric\"] *:last-child",
+                "div.stMetric *:last-child",
+                "div[class*=\"stMetric\"] *:last-child"
+            ];
+            
+            allValueSelectors.forEach(selector => {
+                const elements = document.querySelectorAll(selector);
+                elements.forEach(elem => {
+                    const text = elem.textContent || "";
+                    if (text.match(/^\\d+.*處$/) || text === "新店區" || text.match(/^\\d+$/) || text.includes("處")) {
+                        elem.style.fontSize = "68px !important";
+                        elem.style.fontWeight = "900 !important";
+                        elem.style.color = "#FFFFFF !important";
+                        elem.style.lineHeight = "1.1 !important";
+                        elem.style.textAlign = "center !important";
+                        elem.style.justifyContent = "center !important";
+                        elem.style.alignItems = "center !important";
+                        elem.setAttribute("style", elem.getAttribute("style") + "; font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important; line-height: 1.1 !important; text-align: center !important; justify-content: center !important; align-items: center !important;");
+                        console.log("終極強制修正數值為白色:", text);
+                    }
+                });
+            });
+        }
+
+        function overrideToggleStyles() {
+            const applyStyles = (toggle) => {
+                const input = toggle.querySelector("input");
+                const toggleBg = input ? input.nextElementSibling : null;
+                const toggleKnob = toggleBg ? toggleBg.querySelector("div") : null;
+                
+                if (input && toggleBg && toggleKnob) {
+                    const update = () => {
+                        if (input.checked) {
+                            toggleBg.style.setProperty("background-color", "#00D4FF", "important");
+                            toggleBg.style.setProperty("border", "3px solid #00D4FF", "important");
+                            toggleBg.style.setProperty("box-shadow", "0 0 30px rgba(0, 212, 255, 1)", "important");
+                            toggleKnob.style.setProperty("background-color", "#00FF88", "important");
+                            toggleKnob.style.setProperty("border", "2px solid #00CC66", "important");
+                        } else {
+                            toggleBg.style.setProperty("background-color", "#2D1B1B", "important");
+                            toggleBg.style.setProperty("border", "3px solid #8B4513", "important");
+                            toggleBg.style.setProperty("box-shadow", "none", "important");
+                            toggleKnob.style.setProperty("background-color", "#FF4444", "important");
+                            toggleKnob.style.setProperty("border", "2px solid #CC0000", "important");
+                        }
+                    };
+                    input.removeEventListener("change", update);
+                    input.addEventListener("change", update);
+                    update();
+                }
+            };
+
+            const toggles = document.querySelectorAll("[data-testid=\"stToggle\"]");
+            toggles.forEach(applyStyles);
+        }
+
+        // Initial application and re-application on DOM changes
+        const observer = new MutationObserver((mutationsList, observer) => {
+            for (const mutation of mutationsList) {
+                if (mutation.type === "childList" && mutation.addedNodes.length > 0) {
+                    mutation.addedNodes.forEach(node => {
+                        if (node.nodeType === 1 && node.querySelector("[data-testid=\"stToggle\"]")) {
+                            overrideToggleStyles();
+                            fixMetricLabels();
+                        }
+                    });
+                }
+            }
+            overrideToggleStyles(); // Ensure styles are applied even if no new toggle is added but existing ones are modified
+            fixMetricLabels();
+        });
+
+        observer.observe(document.body, { childList: true, subtree: true });
+
+        // Also run on initial load and after a short delay for good measure
+        setTimeout(overrideToggleStyles, 100);
+        setTimeout(fixMetricLabels, 100);
+        setTimeout(overrideToggleStyles, 500);
+        setTimeout(fixMetricLabels, 500);
+        setTimeout(overrideToggleStyles, 1000);
+        setTimeout(fixMetricLabels, 1000);
+        setTimeout(overrideToggleStyles, 2000);
+        setTimeout(fixMetricLabels, 2000);
+        setTimeout(overrideToggleStyles, 5000);
+        setTimeout(fixMetricLabels, 5000);
+        setTimeout(overrideToggleStyles, 10000);
+        setTimeout(fixMetricLabels, 10000);
+        setTimeout(overrideToggleStyles, 15000);
+        setTimeout(fixMetricLabels, 15000);
+        setTimeout(overrideToggleStyles, 20000);
+        setTimeout(fixMetricLabels, 20000);
+        setTimeout(overrideToggleStyles, 30000);
+        setTimeout(fixMetricLabels, 30000);
+
+        
+            console.log("修正指標標籤和數值 - 標題淺藍色 + 數值白色 + 中央對齊 - 終極強化");
+            
+            // 終極強制修正指標標籤 - 淺藍色 + 32px + 中央對齊 - 多重選擇器
+            const metricLabels = document.querySelectorAll("[data-testid=\"stMetricLabel\"]");
+            metricLabels.forEach(elem => {
+                elem.style.fontSize = "32px !important";
+                elem.style.fontWeight = "900 !important";
+                elem.style.color = "#87CEEB !important";
+                elem.style.background = "transparent !important";
+                elem.style.lineHeight = "1.2 !important";
+                elem.style.textAlign = "center !important";
+                elem.style.justifyContent = "center !important";
+                elem.style.alignItems = "center !important";
+                elem.setAttribute("style", elem.getAttribute("style") + "; font-size: 32px !important; font-weight: 900 !important; color: #87CEEB !important; background: transparent !important; line-height: 1.2 !important; text-align: center !important; justify-content: center !important; align-items: center !important;");
+                console.log("指標標籤已修正為淺藍色 32px 中央對齊:", elem.textContent);
+            });
+            
+            // 終極強制修正指標數值 - 白色 + 68px + 中央對齊 - 多重選擇器
+            const metricValues = document.querySelectorAll("[data-testid=\"stMetricValue\"]");
+            metricValues.forEach(elem => {
+                elem.style.fontSize = "68px !important";
+                elem.style.fontWeight = "900 !important";
+                elem.style.color = "#FFFFFF !important";
+                elem.style.lineHeight = "1.1 !important";
+                elem.style.textAlign = "center !important";
+                elem.style.justifyContent = "center !important";
+                elem.style.alignItems = "center !important";
+                elem.setAttribute("style", elem.getAttribute("style") + "; font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important; line-height: 1.1 !important; text-align: center !important; justify-content: center !important; align-items: center !important;");
+                console.log("指標數值已修正為白色 68px 中央對齊:", elem.textContent);
+            });
+            
+            // 修正指標容器 - 中央對齊（只影響指標容器）
+            const metricContainers = document.querySelectorAll("div[data-testid=\"stMetric\"]");
+            metricContainers.forEach(elem => {
+                elem.style.textAlign = "center !important";
+                elem.style.display = "flex !important";
+                elem.style.flexDirection = "column !important";
+                elem.style.justifyContent = "center !important";
+                elem.style.alignItems = "center !important";
+                elem.setAttribute("style", elem.getAttribute("style") + "; text-align: center !important; display: flex !important; flex-direction: column !important; justify-content: center !important; align-items: center !important;");
+                console.log("指標容器已修正為中央對齊");
+            });
+            
+            // 終極強制修正所有可能的標題元素 - 淺藍色
+            const allTitleSelectors = [
+                "div[data-testid=\"stMetric\"] > div > div:first-child",
+                "div.stMetric > div > div:first-child",
+                "div[class*=\"stMetric\"] > div > div:first-child",
+                "div[data-testid=\"stMetric\"] > div > div:first-child *",
+                "div.stMetric > div > div:first-child *",
+                "div[class*=\"stMetric\"] > div > div:first-child *",
+                "div[data-testid=\"stMetric\"] *:first-child",
+                "div.stMetric *:first-child",
+                "div[class*=\"stMetric\"] *:first-child"
+            ];
+            
+            allTitleSelectors.forEach(selector => {
+                const elements = document.querySelectorAll(selector);
+                elements.forEach(elem => {
+                    const text = elem.textContent || "";
+                    if (text && (text.includes("雙北紅區") || text.includes("所在區域") || text.includes("🔥") || text.includes("📍"))) {
+                        elem.style.fontSize = "32px !important";
+                        elem.style.fontWeight = "900 !important";
+                        elem.style.color = "#87CEEB !important";
+                        elem.style.background = "transparent !important";
+                        elem.style.lineHeight = "1.2 !important";
+                        elem.style.textAlign = "center !important";
+                        elem.style.justifyContent = "center !important";
+                        elem.style.alignItems = "center !important";
+                        elem.setAttribute("style", elem.getAttribute("style") + "; font-size: 32px !important; font-weight: 900 !important; color: #87CEEB !important; background: transparent !important; line-height: 1.2 !important; text-align: center !important; justify-content: center !important; align-items: center !important;");
+                        console.log("終極強制修正標題為淺藍色:", text);
+                    }
+                });
+            });
+            
+            // 終極強制修正所有可能的數值元素 - 白色
+            const allValueSelectors = [
+                "div[data-testid=\"stMetric\"] > div > div:last-child",
+                "div.stMetric > div > div:last-child",
+                "div[class*=\"stMetric\"] > div > div:last-child",
+                "div[data-testid=\"stMetric\"] > div > div:last-child *",
+                "div.stMetric > div > div:last-child *",
+                "div[class*=\"stMetric\"] > div > div:last-child *",
+                "div[data-testid=\"stMetric\"] *:last-child",
+                "div.stMetric *:last-child",
+                "div[class*=\"stMetric\"] *:last-child"
+            ];
+            
+            allValueSelectors.forEach(selector => {
+                const elements = document.querySelectorAll(selector);
+                elements.forEach(elem => {
+                    const text = elem.textContent || "";
+                    if (text.match(/^\\d+.*處$/) || text === "新店區" || text.match(/^\\d+$/) || text.includes("處")) {
+                        elem.style.fontSize = "68px !important";
+                        elem.style.fontWeight = "900 !important";
+                        elem.style.color = "#FFFFFF !important";
+                        elem.style.lineHeight = "1.1 !important";
+                        elem.style.textAlign = "center !important";
+                        elem.style.justifyContent = "center !important";
+                        elem.style.alignItems = "center !important";
+                        elem.setAttribute("style", elem.getAttribute("style") + "; font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important; line-height: 1.1 !important; text-align: center !important; justify-content: center !important; align-items: center !important;");
+                        console.log("終極強制修正數值為白色:", text);
+                    }
+                });
+            });
+        }
+
+        function overrideToggleStyles() {
+            const applyStyles = (toggle) => {
+                const input = toggle.querySelector("input");
+                const toggleBg = input ? input.nextElementSibling : null;
+                const toggleKnob = toggleBg ? toggleBg.querySelector("div") : null;
+                
+                if (input && toggleBg && toggleKnob) {
+                    const update = () => {
+                        if (input.checked) {
+                            toggleBg.style.setProperty("background-color", "#00D4FF", "important");
+                            toggleBg.style.setProperty("border", "3px solid #00D4FF", "important");
+                            toggleBg.style.setProperty("box-shadow", "0 0 30px rgba(0, 212, 255, 1)", "important");
+                            toggleKnob.style.setProperty("background-color", "#00FF88", "important");
+                            toggleKnob.style.setProperty("border", "2px solid #00CC66", "important");
+                        } else {
+                            toggleBg.style.setProperty("background-color", "#2D1B1B", "important");
+                            toggleBg.style.setProperty("border", "3px solid #8B4513", "important");
+                            toggleBg.style.setProperty("box-shadow", "none", "important");
+                            toggleKnob.style.setProperty("background-color", "#FF4444", "important");
+                            toggleKnob.style.setProperty("border", "2px solid #CC0000", "important");
+                        }
+                    };
+                    input.removeEventListener("change", update);
+                    input.addEventListener("change", update);
+                    update();
+                }
+            };
+
+            const toggles = document.querySelectorAll("[data-testid=\"stToggle\"]");
+            toggles.forEach(applyStyles);
+        }
+
+        // Initial application and re-application on DOM changes
+        const observer = new MutationObserver((mutationsList, observer) => {
+            for (const mutation of mutationsList) {
+                if (mutation.type === "childList" && mutation.addedNodes.length > 0) {
+                    mutation.addedNodes.forEach(node => {
+                        if (node.nodeType === 1 && node.querySelector("[data-testid=\"stToggle\"]")) {
+                            overrideToggleStyles();
+                            fixMetricLabels();
+                        }
+                    });
+                }
+            }
+            overrideToggleStyles(); // Ensure styles are applied even if no new toggle is added but existing ones are modified
+            fixMetricLabels();
+        });
+
+        observer.observe(document.body, { childList: true, subtree: true });
+
+        // Also run on initial load and after a short delay for good measure
+        setTimeout(overrideToggleStyles, 100);
+        setTimeout(fixMetricLabels, 100);
+        setTimeout(overrideToggleStyles, 500);
+        setTimeout(fixMetricLabels, 500);
+        setTimeout(overrideToggleStyles, 1000);
+        setTimeout(fixMetricLabels, 1000);
+        setTimeout(overrideToggleStyles, 2000);
+        setTimeout(fixMetricLabels, 2000);
+        setTimeout(overrideToggleStyles, 5000);
+        setTimeout(fixMetricLabels, 5000);
+        setTimeout(overrideToggleStyles, 10000);
+        setTimeout(fixMetricLabels, 10000);
+        setTimeout(overrideToggleStyles, 15000);
+        setTimeout(fixMetricLabels, 15000);
+        setTimeout(overrideToggleStyles, 20000);
+        setTimeout(fixMetricLabels, 20000);
+        setTimeout(overrideToggleStyles, 30000);
+        setTimeout(fixMetricLabels, 30000);
+
+        
             console.log('修正指標標籤和數值 - 標題淺藍色 + 數值白色 + 中央對齊 - 終極強化');
             
             // 終極強制修正指標標籤 - 淺藍色 + 32px + 中央對齊 - 多重選擇器
@@ -303,15 +827,7 @@ st.markdown("""
         }
         
 
-        setTimeout(fixMetricLabels, 200);
-        setTimeout(fixMetricLabels, 500);
-        setTimeout(fixMetricLabels, 1000);
-        setTimeout(fixMetricLabels, 2000);
-        
-        new MutationObserver(() => {
 
-            fixMetricLabels();
-        }).observe(document.body, { childList: true, subtree: true });
     </script>
 """, unsafe_allow_html=True)
 
