@@ -124,8 +124,45 @@ st.markdown("""
                 }
             });
         }
+        
+        function forceTextSize() {
+            console.log('強制修正文字大小');
+            
+            // 強制修正側邊欄開關文字
+            const sidebarLabels = document.querySelectorAll('[data-testid="stSidebar"] [data-testid="stWidgetLabel"] p');
+            sidebarLabels.forEach(elem => {
+                elem.style.fontSize = '40px !important';
+                elem.style.fontWeight = '900 !important';
+                console.log('側邊欄開關文字已修正');
+            });
+            
+            // 強制修正按鈕文字
+            const buttonTexts = document.querySelectorAll('[data-testid="stSidebar"] div.stButton > button p');
+            buttonTexts.forEach(elem => {
+                elem.style.fontSize = '32px !important';
+                elem.style.fontWeight = '900 !important';
+                console.log('按鈕文字已修正');
+            });
+            
+            // 強制修正指標標籤
+            const metricLabels = document.querySelectorAll('[data-testid="stMetricLabel"]');
+            metricLabels.forEach(elem => {
+                elem.style.fontSize = '32px !important';
+                elem.style.fontWeight = '900 !important';
+                console.log('指標標籤已修正');
+            });
+        }
+        
         setTimeout(overrideToggleStyles, 200);
-        new MutationObserver(overrideToggleStyles).observe(document.body, { childList: true, subtree: true });
+        setTimeout(forceTextSize, 200);
+        setTimeout(forceTextSize, 500);
+        setTimeout(forceTextSize, 1000);
+        setTimeout(forceTextSize, 2000);
+        
+        new MutationObserver(() => {
+            overrideToggleStyles();
+            forceTextSize();
+        }).observe(document.body, { childList: true, subtree: true });
     </script>
 """, unsafe_allow_html=True)
 
