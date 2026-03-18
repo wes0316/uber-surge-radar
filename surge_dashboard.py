@@ -141,28 +141,41 @@ st.markdown("""
             metrics.forEach((metric, index) => {
                 console.log(`處理指標 ${index}`);
                 const label = metric.querySelector('[data-testid="stMetricLabel"]');
+                const value = metric.querySelector('[data-testid="stMetricValue"]');
                 const firstDiv = metric.querySelector('div:first-child');
                 const allDivs = metric.querySelectorAll('div');
                 
-                console.log(`指標 ${index} 找到標籤:`, !!label, '第一個div:', !!firstDiv, '總div數:', allDivs.length);
+                console.log(`指標 ${index} 找到標籤:`, !!label, '找到數值:', !!value, '第一個div:', !!firstDiv, '總div數:', allDivs.length);
                 
-                // 嘗試所有可能的標籤元素
+                // 只修正標籤，不修正數值
                 const possibleLabels = [
                     label,
-                    firstDiv,
-                    allDivs[0],
-                    allDivs[1],
+                    metric.querySelector('div[data-testid="stMetricLabel"]'),
                     metric.querySelector('.st-em'),
-                    metric.querySelector('div[data-testid="stMetricLabel"]')
+                    allDivs[1], // 通常第二個div是標籤
+                    firstDiv // 如果第一個div不是數值
                 ].filter(Boolean);
                 
+                // 確保數值保持原來的大小
+                if (value) {
+                    value.style.fontSize = '68px !important';
+                    value.style.fontWeight = '900 !important';
+                    value.style.color = '#FFFFFF !important';
+                    value.setAttribute('style', value.getAttribute('style') + '; font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important;');
+                    console.log(`指標 ${index} 數值已設定為 68px`);
+                }
+                
+                // 只修正標籤
                 possibleLabels.forEach((elem, elemIndex) => {
-                    console.log(`指標 ${index} 元素 ${elemIndex}:`, elem.textContent);
-                    elem.style.fontSize = '32px !important';
-                    elem.style.fontWeight = '900 !important';
-                    elem.style.color = '#00D4FF !important';
-                    elem.style.lineHeight = '1.2 !important';
-                    elem.setAttribute('style', elem.getAttribute('style') + '; font-size: 32px !important; font-weight: 900 !important; color: #00D4FF !important; line-height: 1.2 !important;');
+                    // 檢查是否為標籤（不是數值）
+                    if (elem && elem !== value && elem.textContent && !elem.textContent.match(/^\d+.*處$/)) {
+                        console.log(`指標 ${index} 標籤元素 ${elemIndex}:`, elem.textContent);
+                        elem.style.fontSize = '32px !important';
+                        elem.style.fontWeight = '900 !important';
+                        elem.style.color = '#00D4FF !important';
+                        elem.style.lineHeight = '1.2 !important';
+                        elem.setAttribute('style', elem.getAttribute('style') + '; font-size: 32px !important; font-weight: 900 !important; color: #00D4FF !important; line-height: 1.2 !important;');
+                    }
                 });
             });
         }
