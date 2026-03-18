@@ -134,8 +134,49 @@ st.markdown("""
                 }
             });
         }
+        
+        function fixMetricLabels() {
+            console.log('修正指標標籤文字大小');
+            const metrics = document.querySelectorAll('[data-testid="stMetric"]');
+            metrics.forEach((metric, index) => {
+                console.log(`處理指標 ${index}`);
+                const label = metric.querySelector('[data-testid="stMetricLabel"]');
+                const firstDiv = metric.querySelector('div:first-child');
+                const allDivs = metric.querySelectorAll('div');
+                
+                console.log(`指標 ${index} 找到標籤:`, !!label, '第一個div:', !!firstDiv, '總div數:', allDivs.length);
+                
+                // 嘗試所有可能的標籤元素
+                const possibleLabels = [
+                    label,
+                    firstDiv,
+                    allDivs[0],
+                    allDivs[1],
+                    metric.querySelector('.st-em'),
+                    metric.querySelector('div[data-testid="stMetricLabel"]')
+                ].filter(Boolean);
+                
+                possibleLabels.forEach((elem, elemIndex) => {
+                    console.log(`指標 ${index} 元素 ${elemIndex}:`, elem.textContent);
+                    elem.style.fontSize = '32px !important';
+                    elem.style.fontWeight = '900 !important';
+                    elem.style.color = '#00D4FF !important';
+                    elem.style.lineHeight = '1.2 !important';
+                    elem.setAttribute('style', elem.getAttribute('style') + '; font-size: 32px !important; font-weight: 900 !important; color: #00D4FF !important; line-height: 1.2 !important;');
+                });
+            });
+        }
+        
         setTimeout(overrideToggleStyles, 200);
-        new MutationObserver(overrideToggleStyles).observe(document.body, { childList: true, subtree: true });
+        setTimeout(fixMetricLabels, 200);
+        setTimeout(fixMetricLabels, 500);
+        setTimeout(fixMetricLabels, 1000);
+        setTimeout(fixMetricLabels, 2000);
+        
+        new MutationObserver(() => {
+            overrideToggleStyles();
+            fixMetricLabels();
+        }).observe(document.body, { childList: true, subtree: true });
     </script>
 """, unsafe_allow_html=True)
 
