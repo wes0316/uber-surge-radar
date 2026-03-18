@@ -144,6 +144,51 @@ st.markdown("""
     </style>
     
     <script>
+        function fixMetricLabels() {
+            console.log('修正指標標籤文字大小');
+            const metrics = document.querySelectorAll('[data-testid="stMetric"]');
+            metrics.forEach((metric, index) => {
+                console.log(`處理指標 ${index}`);
+                const label = metric.querySelector('[data-testid="stMetricLabel"]');
+                const value = metric.querySelector('[data-testid="stMetricValue"]');
+                const allDivs = metric.querySelectorAll('div');
+                
+                console.log(`指標 ${index} 找到標籤:`, !!label, '找到數值:`, !!value, '總div數:', allDivs.length);
+                
+                // 強制設定數值為 68px - 使用多種方法
+                if (value) {
+                    value.style.cssText = 'font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important; line-height: 1.1 !important;';
+                    value.setAttribute('style', 'font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important; line-height: 1.1 !important;');
+                    console.log(`指標 ${index} 數值已強制設定為 68px`);
+                }
+                
+                // 檢查所有 div 元素，根據內容設定樣式
+                allDivs.forEach((div, divIndex) => {
+                    const text = div.textContent || '';
+                    console.log(`指標 ${index} div ${divIndex} 內容: "${text}"`);
+                    
+                    // 如果是數值內容，強制設定為 68px
+                    if (text.match(/^\d+.*處$/) || text.match(/^\d+$/) || text === '207 處' || text === '新店區') {
+                        div.style.cssText = 'font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important; line-height: 1.1 !important;';
+                        div.setAttribute('style', 'font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important; line-height: 1.1 !important;');
+                        console.log(`指標 ${index} div ${divIndex} 已設定為數值樣式 68px: "${text}"`);
+                    }
+                    // 如果是標籤內容，設定為 32px
+                    else if (text && text.trim() !== '') {
+                        div.style.cssText = 'font-size: 32px !important; font-weight: 900 !important; color: #00D4FF !important; line-height: 1.2 !important;';
+                        div.setAttribute('style', 'font-size: 32px !important; font-weight: 900 !important; color: #00D4FF !important; line-height: 1.2 !important;');
+                        console.log(`指標 ${index} div ${divIndex} 已設定為標籤樣式 32px: "${text}"`);
+                    }
+                });
+            });
+        }
+        
+        // 持續監控函數
+        function continuousFix() {
+            console.log('持續監控和修正指標樣式');
+            fixMetricLabels();
+        }
+        
         function overrideToggleStyles() {
             const toggles = document.querySelectorAll('[data-testid="stToggle"]');
             toggles.forEach(toggle => {
@@ -167,60 +212,6 @@ st.markdown("""
                     input.addEventListener('change', update);
                     update();
                 }
-            });
-        }
-        
-        function fixMetricLabels() {
-            console.log('修正指標標籤文字大小');
-            const metrics = document.querySelectorAll('[data-testid="stMetric"]');
-            metrics.forEach((metric, index) => {
-                console.log(`處理指標 ${index}`);
-                const label = metric.querySelector('[data-testid="stMetricLabel"]');
-                const value = metric.querySelector('[data-testid="stMetricValue"]');
-                const allDivs = metric.querySelectorAll('div');
-                
-                console.log(`指標 ${index} 找到標籤:`, !!label, '找到數值:', !!value, '總div數:', allDivs.length);
-                
-                // 強制設定數值為 68px
-                if (value) {
-                    value.style.cssText = 'font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important; line-height: 1.1 !important;';
-                    console.log(`指標 ${index} 數值已強制設定為 68px`);
-                }
-                
-                // 強制設定所有可能的數值元素為 68px
-                const possibleValues = [
-                    metric.querySelector('[data-testid="stMetricValue"]'),
-                    allDivs[allDivs.length - 1], // 最後一個div通常是數值
-                    metric.querySelector('div:last-child'),
-                    allDivs[0] // 第一個div也可能是數值
-                ].filter(Boolean);
-                
-                possibleValues.forEach((elem, elemIndex) => {
-                    const text = elem.textContent || '';
-                    // 檢查是否為數值（包含數字和"處"）
-                    if (text.match(/^\d+.*處$/) || text.match(/^\d+$/) || text === '207 處' || text === '新店區') {
-                        elem.style.cssText = 'font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important; line-height: 1.1 !important;';
-                        console.log(`指標 ${index} 數值元素 ${elemIndex} 已設定為 68px:`, text);
-                    }
-                });
-                
-                // 強制設定標籤為 32px
-                const possibleLabels = [
-                    label,
-                    metric.querySelector('div[data-testid="stMetricLabel"]'),
-                    metric.querySelector('.st-em'),
-                    allDivs[1], // 第二個div通常是標籤
-                    allDivs[0]  // 第一個div也可能是標籤
-                ].filter(Boolean);
-                
-                possibleLabels.forEach((elem, elemIndex) => {
-                    const text = elem.textContent || '';
-                    // 檢查是否為標籤（不是數值）
-                    if (!text.match(/^\d+.*處$/) && !text.match(/^\d+$/) && text !== '207 處' && text !== '新店區') {
-                        elem.style.cssText = 'font-size: 32px !important; font-weight: 900 !important; color: #00D4FF !important; line-height: 1.2 !important;';
-                        console.log(`指標 ${index} 標籤元素 ${elemIndex} 已設定為 32px:`, text);
-                    }
-                });
             });
         }
         
