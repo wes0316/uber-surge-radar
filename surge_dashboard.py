@@ -36,25 +36,56 @@ st.markdown("""
             white-space: nowrap !important; 
         }
 
-        /* 🎯 戰術開關 (Toggle) 本體 */
-        [data-testid="stToggle"] label > div:first-child { 
+        /* 🎯 戰術開關 (Toggle) 本體 - 終極強制覆蓋 */
+        
+        /* 使用所有可能的選擇器強制覆蓋 OFF 狀態 */
+        [data-testid="stToggle"] label > div:first-child,
+        [data-testid="stToggle"] .st-ek,
+        [data-testid="stToggle"] div[style*="background"],
+        [data-testid="stToggle"] label div,
+        div[data-testid="stToggle"] > label > div,
+        div.st-ae > div > label > div {
             width: 100px !important; height: 56px !important; 
             background-color: #2D1B1B !important; 
-            border: 3px solid #8B4513 !important; border-radius: 30px !important;
+            border: 3px solid #8B4513 !important; 
+            border-radius: 30px !important;
+            background-image: none !important;
+            box-shadow: none !important;
         }
-        [data-testid="stToggle"] input:checked + div { 
+        
+        /* 強制覆蓋 ON 狀態 */
+        [data-testid="stToggle"] input:checked + div,
+        [data-testid="stToggle"] input:checked + .st-ek,
+        [data-testid="stToggle"] input:checked + div[style*="background"],
+        div[data-testid="stToggle"] > input:checked + label > div {
             background-color: #00D4FF !important; 
             border: 3px solid #00D4FF !important; 
-            box-shadow: 0 0 30px rgba(0, 212, 255, 1) !important; 
+            box-shadow: 0 0 30px rgba(0, 212, 255, 1) !important;
+            background-image: none !important;
         }
-        [data-testid="stToggle"] label > div:first-child > div { 
+        
+        /* 強制覆蓋 OFF 狀態滑塊 */
+        [data-testid="stToggle"] label > div:first-child > div,
+        [data-testid="stToggle"] .st-ek > div,
+        [data-testid="stToggle"] div[style*="background"] > div,
+        [data-testid="stToggle"] label div > div,
+        div[data-testid="stToggle"] > label > div > div {
             width: 44px !important; height: 44px !important; 
             top: 4px !important; left: 4px !important; 
-            background-color: #FF4444 !important; border: 2px solid #CC0000 !important;
+            background-color: #FF4444 !important; 
+            border: 2px solid #CC0000 !important;
+            background-image: none !important;
         }
-        [data-testid="stToggle"] input:checked + div > div { 
+        
+        /* 強制覆蓋 ON 狀態滑塊 */
+        [data-testid="stToggle"] input:checked + div > div,
+        [data-testid="stToggle"] input:checked + .st-ek > div,
+        [data-testid="stToggle"] input:checked + div[style*="background"] > div,
+        div[data-testid="stToggle"] > input:checked + label > div > div {
             transform: translateX(44px) !important; 
-            background-color: #00FF88 !important; border: 2px solid #00CC66 !important;
+            background-color: #00FF88 !important; 
+            border: 2px solid #00CC66 !important;
+            background-image: none !important;
         }
 
         /* ========================================= */
