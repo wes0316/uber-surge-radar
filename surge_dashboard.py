@@ -199,7 +199,7 @@ with st.sidebar:
     
     st.markdown("<br><hr style='border-color: #444;'>", unsafe_allow_html=True)
     
-    if st.button("🔄 立即重新整理"):
+    if st.button("🔄 即時刷新"):
         st.cache_data.clear()
 
 # 獲取分析資料
