@@ -167,7 +167,7 @@ if curr and 'coords' in curr:
 
 # --- 5. 側邊欄控制區 ---
 with st.sidebar:
-    st.markdown("<h2 style='color:#00D4FF; text-align:center; font-size: 42px; font-weight: 900; margin-bottom: 20px;'>⚒️ 戰術圖層</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='color:#00D4FF; text-align:center; font-size: 48px; font-weight: 900; margin-bottom: 20px;'>⚒️ 戰術圖層</h2>", unsafe_allow_html=True)
     
     show_rain = st.toggle("🌧️ 雷達回波", value=False)
     st.markdown("<div style='margin-bottom: 15px;'></div>", unsafe_allow_html=True)
