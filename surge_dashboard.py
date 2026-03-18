@@ -81,7 +81,7 @@ st.markdown("""
         [data-testid="stMetricValue"] { color: #FFFFFF !important; font-size: 68px !important; font-weight: 900 !important; text-align: center !important; }
         [data-testid="stMetricLabel"] { color: #87CEEB !important; font-size: 32px !important; font-weight: 900 !important; text-align: center !important; }
         
-        /* 超級強制保護指標數值 - 確保 68px + 白色 + 中央對齊 */
+        /* 超級強制保護指標數值 - 確保 68px + 白色 + 中央對齊 - 絕對保護 */
         html body [data-testid="stMetricValue"],
         html body div[data-testid="stMetric"] [data-testid="stMetricValue"],
         html body div.stMetric [data-testid="stMetricValue"],
@@ -102,7 +102,7 @@ st.markdown("""
             align-items: center !important;
         }
         
-        /* 超級強制覆蓋指標標籤 - 淺藍色 - 最高權限 + 中央對齊 */
+        /* 超級強制覆蓋指標標籤 - 淺藍色 - 最高權限 + 中央對齊 - 絕對覆蓋 */
         html body [data-testid="stMetricLabel"],
         html body div[data-testid="stMetric"] [data-testid="stMetricLabel"],
         html body div.stMetric [data-testid="stMetricLabel"],
@@ -124,6 +124,26 @@ st.markdown("""
             align-items: center !important;
         }
         
+        /* 終極強制 - 標題淺藍色 - 萬用選擇器 */
+        html body div[data-testid="stMetric"] > div > div:first-child *,
+        html body div.stMetric > div > div:first-child *,
+        html body div[class*="stMetric"] > div > div:first-child * {
+            color: #87CEEB !important;
+            font-size: 32px !important;
+            font-weight: 900 !important;
+            text-align: center !important;
+        }
+        
+        /* 終極強制 - 數值白色 - 萬用選擇器 */
+        html body div[data-testid="stMetric"] > div > div:last-child *,
+        html body div.stMetric > div > div:last-child *,
+        html body div[class*="stMetric"] > div > div:last-child * {
+            color: #FFFFFF !important;
+            font-size: 68px !important;
+            font-weight: 900 !important;
+            text-align: center !important;
+        }
+        
         /* 指標容器中央對齊 - 只影響指標容器 */
         div[data-testid="stMetric"] {
             background: rgba(45, 45, 45, 0.9) !important; 
@@ -143,14 +163,14 @@ st.markdown("""
             font-size: inherit !important;
         }
         
-        /* 特別保護第一個子元素（標題）- 淺藍色 */
+        /* 特別保護第一個子元素（標題）- 淺藍色 - 終極覆蓋 */
         html body div[data-testid="stMetric"] *:first-child {
             font-size: 32px !important;
             text-align: center !important;
             color: #87CEEB !important;
         }
         
-        /* 特別保護最後一個子元素（數值）- 白色 */
+        /* 特別保護最後一個子元素（數值）- 白色 - 終極覆蓋 */
         html body div[data-testid="stMetric"] *:last-child {
             font-size: 68px !important;
             text-align: center !important;
