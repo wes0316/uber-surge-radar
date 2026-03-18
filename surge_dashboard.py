@@ -250,7 +250,7 @@ components.html("""
         setTimeout(function() {
             const buttons = window.parent.document.querySelectorAll('button');
             buttons.forEach(b => {
-                if (b.innerText.includes('立即重新整理')) {
+                if (b.innerText.includes('即時刷新')) {
                     b.click();
                 }
             });
