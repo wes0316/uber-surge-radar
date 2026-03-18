@@ -7,8 +7,9 @@ from pyproj import Transformer
 from streamlit_js_eval import get_geolocation
 import time
 import urllib3
-import copy
 import base64
+import hashlib
+import json
 
 # --- 隱藏 SSL 憑證警告 ---
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -41,19 +42,10 @@ st.markdown("""
             white-space: nowrap !important;
         }
         
-        /* --- 🎯 終極修正：Toggle 開關顏色邏輯 (精準穿透圖層) --- */
-        /* 1. 關閉狀態 (OFF)：鎖定隱藏 input 旁邊的軌道層 */
-        div[data-testid="stToggle"] input[type="checkbox"] + div { 
-            background-color: #444444 !important; 
-        }
-        /* 2. 開啟狀態 (ON)：當 input 被勾選時，軌道層強制變為 Uber 藍 */
-        div[data-testid="stToggle"] input[type="checkbox"]:checked + div { 
-            background-color: #276EF1 !important; 
-        }
-        /* 3. 確保中間的圓形滑塊是白色的，避免被背景色污染 */
-        div[data-testid="stToggle"] input[type="checkbox"] + div > div { 
-            background-color: #FFFFFF !important; 
-        }
+        /* Toggle 開關顏色邏輯 */
+        div[data-testid="stToggle"] input[type="checkbox"] + div { background-color: #444444 !important; }
+        div[data-testid="stToggle"] input[type="checkbox"]:checked + div { background-color: #276EF1 !important; }
+        div[data-testid="stToggle"] input[type="checkbox"] + div > div { background-color: #FFFFFF !important; }
 
         /* 數據卡片 (Metric) 顯色調整 */
         div[data-testid="stMetric"] {
@@ -75,19 +67,18 @@ st.markdown("""
 # --- 2. 核心數據邏輯 ---
 transformer = Transformer.from_crs("epsg:3826", "epsg:4326")
 
-def get_address_pro(lat, lon):
+def get_district_only(lat, lon):
+    """ 只擷取行政區名稱 (不再顯示詳細地址) """
     try:
         headers = {'User-Agent': f'UberRadar_Ayan_{int(time.time())}'}
         url = f"https://nominatim.openstreetmap.org/reverse?format=json&lat={lat}&lon={lon}&addressdetails=1&accept-language=zh-TW"
         res = requests.get(url, headers=headers, timeout=5).json()
         addr = res.get('address', {})
-        dist = addr.get('suburb') or addr.get('city_district') or addr.get('town') or ""
-        road = addr.get('road') or ""
-        final_addr = f"{dist} {road}".strip()
-        return final_addr if final_addr else f"座標: {lat}, {lon}"
-    except: return f"座標: {lat}, {lon}"
+        dist = addr.get('suburb') or addr.get('city_district') or addr.get('town') or addr.get('county') or ""
+        return dist.strip() if dist else "未知行政區"
+    except: return "未知行政區"
 
-@st.cache_data(ttl=1800)
+@st.cache_data(ttl=600) # 雷達圖每10分鐘更新
 def get_radar_base64():
     headers = {'User-Agent': 'Mozilla/5.0 Chrome/122.0.0.0', 'Referer': 'https://www.cwa.gov.tw/'}
     urls = [f"https://www.cwa.gov.tw/Data/radar/CV1_3600_EL.png?v={int(time.time()/300)}", 
@@ -100,36 +91,71 @@ def get_radar_base64():
         except: continue
     return None
 
-@st.cache_data(ttl=1800)
-def fetch_complete_data():
-    all_data = []
-    # 台北市
-    try:
-        t_d = requests.get("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_alldesc.json", timeout=10).json()['data']['park']
-        t_a = requests.get("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_allavailable.json", timeout=10).json()['data']['park']
-        t_df = pd.merge(pd.DataFrame(t_d), pd.DataFrame(t_a), on='id')
-        for _, r in t_df.iterrows():
-            lat, lon = transformer.transform(float(r['tw97x']), float(r['tw97y']))
-            total, avail = float(r.get('totalcar', 0)), float(r.get('availablecar', 0))
-            all_data.append({'場站名稱': r['name'], 'lat': lat, 'lon': lon, '佔用%': round(max(0, min(100, (total-avail)/total*100)), 1) if total>0 else 0, '行政區': str(r.get('area', '')).replace('臺', '台'), '縣市': '台北'})
-    except: pass
-    # 新北市
-    try:
-        s_url, d_url = "https://data.ntpc.gov.tw/api/datasets/B1464EF0-9C7C-4A6F-ABF7-6BDF32847E68/json?page=0&size=2000", "https://data.ntpc.gov.tw/api/datasets/E09B35A5-A738-48CC-B0F5-570B67AD9C78/json?page=0&size=2000"
-        s_res, d_res = requests.get(s_url, timeout=15, verify=False).json(), requests.get(d_url, timeout=15, verify=False).json()
-        dyn_map = {str(item['ID']).strip(): float(item.get('AVAILABLECAR', item.get('AVAILABLE', 0))) for item in d_res if 'ID' in item}
-        for s in s_res:
-            pid = str(s.get('ID', '')).strip()
-            if pid in dyn_map:
-                tw97x, tw97y = s.get('TW97X'), s.get('TW97Y')
-                total, avail = float(s.get('TOTALCAR', s.get('TOTAL', 0))), dyn_map[pid]
-                if tw97x and tw97y and total > 0 and avail >= 0:
-                    try:
-                        lat, lon = transformer.transform(float(tw97x), float(tw97y))
-                        all_data.append({'場站名稱': s.get('NAME', '未知站點'), 'lat': lat, 'lon': lon, '佔用%': round(max(0, min(100, (total-avail)/total*100)), 1), '行政區': str(s.get('AREA', '新北市')).replace('臺', '台'), '縣市': '新北'})
-                    except: pass
-    except: pass
-    return pd.DataFrame(all_data)
+def fetch_parking_data_with_diff():
+    """ 
+    自訂的雙北 API 快取引擎：
+    1. 每 10 分鐘 (600秒) 才對外呼叫一次 API
+    2. 比對 MD5 雜湊值，若資料與上一次完全相同，直接 drop 並沿用舊快取，節省效能
+    """
+    if 'parking_df' not in st.session_state: st.session_state['parking_df'] = pd.DataFrame()
+    if 'last_api_check' not in st.session_state: st.session_state['last_api_check'] = 0
+    if 'api_data_hash' not in st.session_state: st.session_state['api_data_hash'] = ""
+
+    now = time.time()
+    
+    # 若超過 10 分鐘 (600秒) 或是初次啟動，才去向政府 API 要資料
+    if now - st.session_state['last_api_check'] >= 600 or st.session_state['parking_df'].empty:
+        st.session_state['last_api_check'] = now
+        try:
+            # 取得「動態」可用車位資料的純文字 (不耗費效能解析 JSON)
+            t_a_res = requests.get("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_allavailable.json", timeout=10)
+            d_res = requests.get("https://data.ntpc.gov.tw/api/datasets/E09B35A5-A738-48CC-B0F5-570B67AD9C78/json?page=0&size=2000", timeout=15, verify=False)
+            
+            if t_a_res.status_code == 200 and d_res.status_code == 200:
+                # 產生資料指紋 (MD5 Hash)
+                current_hash = hashlib.md5((t_a_res.text + d_res.text).encode('utf-8')).hexdigest()
+                
+                # 【戰術核心】發現回傳的資料跟上一次的資料完全一樣，直接 drop，不執行更新！
+                if st.session_state['api_data_hash'] == current_hash and not st.session_state['parking_df'].empty:
+                    return st.session_state['parking_df']
+                
+                # 如果不一樣，則正式執行更新與座標轉換
+                t_a = t_a_res.json()['data']['park']
+                d_data = d_res.json()
+                
+                # 抓取站點靜態資料
+                t_d = requests.get("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_alldesc.json", timeout=10).json()['data']['park']
+                s_res = requests.get("https://data.ntpc.gov.tw/api/datasets/B1464EF0-9C7C-4A6F-ABF7-6BDF32847E68/json?page=0&size=2000", timeout=15, verify=False).json()
+                
+                all_data = []
+                # 處理台北市
+                t_df = pd.merge(pd.DataFrame(t_d), pd.DataFrame(t_a), on='id')
+                for _, r in t_df.iterrows():
+                    lat, lon = transformer.transform(float(r['tw97x']), float(r['tw97y']))
+                    total, avail = float(r.get('totalcar', 0)), float(r.get('availablecar', 0))
+                    all_data.append({'場站名稱': r['name'], 'lat': lat, 'lon': lon, '佔用%': round(max(0, min(100, (total-avail)/total*100)), 1) if total>0 else 0, '行政區': str(r.get('area', '')).replace('臺', '台'), '縣市': '台北'})
+                
+                # 處理新北市
+                dyn_map = {str(item['ID']).strip(): float(item.get('AVAILABLECAR', item.get('AVAILABLE', 0))) for item in d_data if 'ID' in item}
+                for s in s_res:
+                    pid = str(s.get('ID', '')).strip()
+                    if pid in dyn_map:
+                        tw97x, tw97y = s.get('TW97X'), s.get('TW97Y')
+                        total, avail = float(s.get('TOTALCAR', s.get('TOTAL', 0))), dyn_map[pid]
+                        if tw97x and tw97y and total > 0 and avail >= 0:
+                            try:
+                                lat, lon = transformer.transform(float(tw97x), float(tw97y))
+                                all_data.append({'場站名稱': s.get('NAME', '未知站點'), 'lat': lat, 'lon': lon, '佔用%': round(max(0, min(100, (total-avail)/total*100)), 1), '行政區': str(s.get('AREA', '新北市')).replace('臺', '台'), '縣市': '新北'})
+                            except: pass
+                
+                # 寫入最新快取與指紋
+                st.session_state['parking_df'] = pd.DataFrame(all_data)
+                st.session_state['api_data_hash'] = current_hash
+
+        except Exception as e:
+            pass # 發生連線錯誤時，保留並回傳上一次的舊快取，不讓地圖崩潰
+
+    return st.session_state['parking_df']
 
 # --- 3. 側邊欄 ---
 with st.sidebar:
@@ -140,6 +166,7 @@ with st.sidebar:
     with c2: show_heatmap = st.toggle("🔥 熱區光罩", value=False)
     zoom_val = st.slider("地圖縮放級別", 10, 18, 14)
     if st.button("🔄 手動強制更新", use_container_width=True):
+        st.session_state['last_api_check'] = 0 # 清除計時器，強制觸發更新
         st.cache_data.clear()
         st.rerun()
     st.divider()
@@ -155,20 +182,19 @@ if curr and 'coords' in curr:
     n_lat, n_lon = round(curr['coords']['latitude'], 4), round(curr['coords']['longitude'], 4)
     if st.session_state['addr_label'] == "正在定位..." or abs(n_lat - st.session_state['gps_pos'][0]) > 0.0005:
         st.session_state['gps_pos'] = (n_lat, n_lon)
-        st.session_state['addr_label'] = get_address_pro(n_lat, n_lon)
+        st.session_state['addr_label'] = get_district_only(n_lat, n_lon)
 
-# 數據加載
-df = fetch_complete_data()
+# 數據加載 (採用高效能快取引擎)
+df = fetch_parking_data_with_diff()
 red_zones = df[df['佔用%'] >= 90] if not df.empty else pd.DataFrame()
 red_counts = red_zones['行政區'].value_counts().reset_index()
 red_counts.columns = ['行政區', '紅區數']
 
-# 指標列
+# 指標列 (精簡為 2 個卡片，其餘留空維持排版寬度)
 m1, m2, m3, m4 = st.columns(4)
-m1.metric("台北站點", f"{len(df[df['縣市']=='台北']) if not df.empty else 0}")
-m2.metric("新北站點", f"{len(df[df['縣市']=='新北']) if not df.empty else 0}")
-m3.metric("雙北紅區", f"{len(red_zones)}")
-m4.metric("目前位置", st.session_state['addr_label'])
+m1.metric("🔥 雙北紅區", f"{len(red_zones)} 處")
+m2.metric("📍 所在區域", st.session_state['addr_label'])
+# m3, m4 不放置資料，確保排版不被撐破
 
 st.divider()
 
@@ -209,3 +235,8 @@ with col_list:
         st.dataframe(red_counts.head(10), hide_index=True, use_container_width=True, height=650)
     else:
         st.info("目前無需求紅區")
+
+# --- 5. GPS 每分鐘自動刷新迴圈 ---
+# 確保每一分鐘網頁會重新執行一次，藉此更新地圖上的 GPS 定位 (但不會觸發 10 分鐘才更新的 API)
+time.sleep(60)
+st.rerun()
