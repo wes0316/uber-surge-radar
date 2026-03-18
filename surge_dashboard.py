@@ -81,16 +81,22 @@ st.markdown("""
         [data-testid="stMetricValue"] { color: #FFFFFF !important; font-size: 68px !important; font-weight: 900 !important; }
         [data-testid="stMetricLabel"] { color: #00D4FF !important; font-size: 32px !important; font-weight: 900 !important; }
         
-        /* 強制保護指標數值 - 確保 68px */
-        div[data-testid="stMetric"] [data-testid="stMetricValue"],
-        div.stMetric [data-testid="stMetricValue"],
-        div[data-testid="stMetric"] > div > div:last-child,
-        div.stMetric > div > div:last-child,
-        div[data-testid="stMetric"] div:last-child,
-        div.stMetric div:last-child {
+        /* 超級強制保護指標數值 - 確保 68px */
+        html body [data-testid="stMetricValue"],
+        html body div[data-testid="stMetric"] [data-testid="stMetricValue"],
+        html body div.stMetric [data-testid="stMetricValue"],
+        html body div[data-testid="stMetric"] > div > div:last-child,
+        html body div.stMetric > div > div:last-child,
+        html body div[data-testid="stMetric"] div:last-child,
+        html body div.stMetric div:last-child,
+        html body div[data-testid="stMetric"] *,
+        html body div.stMetric *:last-child,
+        html body div[class*="stMetric"] [data-testid="stMetricValue"],
+        html body div[class*="stMetric"] div:last-child {
             color: #FFFFFF !important; 
             font-size: 68px !important; 
             font-weight: 900 !important;
+            line-height: 1.1 !important;
         }
         
         /* 強制覆蓋指標標籤 - 多重選擇器 */
