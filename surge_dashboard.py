@@ -155,35 +155,42 @@ st.markdown("""
                 console.log('指標標籤已修正:', elem.textContent);
             });
             
-            // 修正指標數值 - 確保 68px
+            // 超級強制修正指標數值 - 確保 68px
             const metricValues = document.querySelectorAll('[data-testid="stMetricValue"]');
             metricValues.forEach(elem => {
                 elem.style.fontSize = '68px !important';
                 elem.style.fontWeight = '900 !important';
                 elem.style.color = '#FFFFFF !important';
+                elem.style.lineHeight = '1.1 !important';
+                elem.setAttribute('style', elem.getAttribute('style') + '; font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important; line-height: 1.1 !important;');
                 console.log('指標數值已修正:', elem.textContent);
             });
             
-            // 嘗試其他可能的選擇器
+            // 嘗試其他可能的標籤選擇器
             const otherLabels = document.querySelectorAll('div[data-testid="stMetric"] > div > div:first-child');
             otherLabels.forEach(elem => {
-                if (elem.textContent && (elem.textContent.includes('雙北紅區') || elem.textContent.includes('所在區域'))) {
+                const text = elem.textContent || '';
+                if (text && (text.includes('雙北紅區') || text.includes('所在區域'))) {
                     elem.style.fontSize = '32px !important';
                     elem.style.fontWeight = '900 !important';
                     elem.style.color = '#00D4FF !important';
-                    console.log('其他指標標籤已修正:', elem.textContent);
+                    elem.setAttribute('style', elem.getAttribute('style') + '; font-size: 32px !important; font-weight: 900 !important; color: #00D4FF !important;');
+                    console.log('其他指標標籤已修正:', text);
                 }
             });
             
-            // 嘗試其他可能的數值選擇器
-            const otherValues = document.querySelectorAll('div[data-testid="stMetric"] > div > div:last-child');
-            otherValues.forEach(elem => {
+            // 超級強制修正其他可能的數值選擇器
+            const allMetricDivs = document.querySelectorAll('div[data-testid="stMetric"] div');
+            allMetricDivs.forEach(elem => {
                 const text = elem.textContent || '';
-                if (text.match(/^\d+.*處$/) || text === '新店區' || text.match(/^\d+$/)) {
+                // 檢查是否為數值內容
+                if (text.match(/^\d+.*處$/) || text === '新店區' || text.match(/^\d+$/) || text.includes('處')) {
                     elem.style.fontSize = '68px !important';
                     elem.style.fontWeight = '900 !important';
                     elem.style.color = '#FFFFFF !important';
-                    console.log('其他指標數值已修正:', text);
+                    elem.style.lineHeight = '1.1 !important';
+                    elem.setAttribute('style', elem.getAttribute('style') + '; font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important; line-height: 1.1 !important;');
+                    console.log('超級強制修正數值:', text);
                 }
             });
         }
