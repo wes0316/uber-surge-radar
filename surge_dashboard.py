@@ -27,35 +27,39 @@ st.markdown("""
 
         /* --- 🎯 戰術開關 (Toggle) 強化版 --- */
         
-        /* 1. 基礎底座 (OFF 狀態) */
+        /* 1. 基礎底座 (OFF 狀態) - 深灰紅色 */
         div[data-testid="stToggle"] label > div:first-child {
             width: 85px !important; 
             height: 48px !important;
-            background-color: #262626 !important; /* 深灰色，代表關閉 */
-            border: 2px solid #555555 !important; /* 增加邊框增加辨識度 */
+            background-color: #2D1B1B !important; /* 深灰紅色，明確代表關閉 */
+            border: 2px solid #8B4513 !important; /* 棕紅色邊框 */
             border-radius: 24px !important;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3) !important;
         }
-
-        /* 2. 當開關被勾選時 (ON 狀態) */
+        
+        /* 2. 當開關被勾選時 (ON 狀態) - 亮藍色 */
         div[data-testid="stToggle"] input:checked + div {
-            background-color: #00D4FF !important; /* 亮藍色，代表開啟 */
+            background-color: #00D4FF !important; /* 亮藍色，明確代表開啟 */
             border-color: #00D4FF !important;
-            box-shadow: 0 0 15px rgba(0, 212, 255, 0.6) !important; /* 增加發光感 */
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.8) !important; /* 強烈發光感 */
+            inset-shadow: none !important;
         }
-
-        /* 3. 圓形滑塊 (Knob) */
+        
+        /* 3. 圓形滑塊 (Knob) - OFF 狀態 */
         div[data-testid="stToggle"] label > div:first-child > div {
             width: 36px !important;
             height: 36px !important;
             top: 4px !important;
             left: 4px !important;
-            background-color: #FFFFFF !important;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.4) !important;
+            background-color: #FF6B6B !important; /* 紅色滑塊，OFF 狀態 */
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4) !important;
         }
-
-        /* 4. 滑塊位移 (ON 狀態位移) */
+        
+        /* 4. 滑塊位移 (ON 狀態) - 變為綠色 */
         div[data-testid="stToggle"] input:checked + div > div {
             transform: translateX(37px) !important;
+            background-color: #00FF88 !important; /* 綠色滑塊，ON 狀態 */
+            box-shadow: 0 2px 8px rgba(0,255,136,0.6) !important;
         }
 
         /* 開關文字放大 */
