@@ -396,7 +396,7 @@ with col_map:
             folium.CircleMarker(location=[dist['lat'], dist['lon']], radius=6, color='white', fill=True, fill_color='red').add_to(m)
 
     folium.Marker(st.session_state['gps_pos'], icon=folium.Icon(color='blue', icon='car', prefix='fa')).add_to(m)
-    st_folium(m, width="100%", height=580, key=f"v12_{show_rain}_{show_heatmap}_{zoom}")
+    st_folium(m, width="100%", height=580, use_container_width=True, key=f"v12_{show_rain}_{show_heatmap}_{zoom}")
 
 with col_list:
     st.markdown("<h3 style='font-size: 36px; color:#00D4FF; font-weight: 900;'>📈 紅區排行 TOP 10</h3>", unsafe_allow_html=True)
