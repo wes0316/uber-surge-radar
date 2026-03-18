@@ -157,33 +157,6 @@ st.markdown("""
     
     <script>
         function overrideToggleStyles() {
-            const toggles = document.querySelectorAll('[data-testid="stToggle"]');
-            toggles.forEach(toggle => {
-                const divs = toggle.querySelectorAll('div');
-                const input = toggle.querySelector('input');
-                if (input && divs.length >= 2) {
-                    const update = () => {
-                        if (input.checked) {
-                            divs[0].style.backgroundColor = '#00D4FF';
-                            divs[0].style.border = '3px solid #00D4FF';
-                            divs[0].style.boxShadow = '0 0 30px rgba(0, 212, 255, 1)';
-                            divs[1].style.backgroundColor = '#00FF88';
-                        } else {
-                            divs[0].style.backgroundColor = '#2D1B1B';
-                            divs[0].style.border = '3px solid #8B4513';
-                            divs[0].style.boxShadow = 'none';
-                            divs[1].style.backgroundColor = '#FF4444';
-                        }
-                    };
-                    input.removeEventListener('change', update);
-                    input.addEventListener('change', update);
-                    update();
-                }
-            });
-        }
-        setTimeout(overrideToggleStyles, 200);
-        new MutationObserver(overrideToggleStyles).observe(document.body, { childList: true, subtree: true });
-    </script>
 """, unsafe_allow_html=True)
 
 # --- 3. 數據與定位邏輯 ---
