@@ -405,7 +405,7 @@ top_3_centers, top_10_list, total_count = fetch_analysis_data()
 # --- 6. 主畫面指標 ---
 m1, m2 = st.columns(2)
 
-# 使用內聯樣式強制設定標題顏色為淺藍色
+# 使用內聯樣式強制設定標題顏色為淺藍色，並確保正確大小
 m1.markdown(f"""
 <style>
 .metric-title {{
@@ -414,6 +414,8 @@ m1.markdown(f"""
     font-weight: 900 !important;
     text-align: center !important;
     line-height: 1.2 !important;
+    display: block !important;
+    margin-bottom: 15px !important;
 }}
 .metric-value {{
     color: #FFFFFF !important;
@@ -421,16 +423,28 @@ m1.markdown(f"""
     font-weight: 900 !important;
     text-align: center !important;
     line-height: 1.1 !important;
+    display: block !important;
+}}
+.metric-container {{
+    background: rgba(45, 45, 45, 0.9) !important; 
+    border-left: 12px solid #00D4FF !important; 
+    border-radius: 15px !important; 
+    padding: 20px !important; 
+    text-align: center !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
 }}
 </style>
-<div style="background: rgba(45, 45, 45, 0.9) !important; border-left: 12px solid #00D4FF !important; border-radius: 15px !important; padding: 20px; text-align: center;">
+<div class="metric-container">
     <div class="metric-title">🔥 雙北紅區</div>
     <div class="metric-value">{total_count} 處</div>
 </div>
 """, unsafe_allow_html=True)
 
 m2.markdown(f"""
-<div style="background: rgba(45, 45, 45, 0.9) !important; border-left: 12px solid #00D4FF !important; border-radius: 15px !important; padding: 20px; text-align: center;">
+<div class="metric-container">
     <div class="metric-title">📍 所在區域</div>
     <div class="metric-value">新店區</div>
 </div>
