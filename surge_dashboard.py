@@ -74,7 +74,10 @@ st.markdown("""
             padding: 0 !important;
         }
         
-        [data-testid="stSidebar"] div.stButton > button p {
+        [data-testid="stSidebar"] div.stButton > button p,
+        div[data-testid="stSidebar"] div.stButton > button p,
+        div.stSidebar div.stButton > button p,
+        div[class*="stSidebar"] div.stButton > button p {
             font-size: 32px !important; 
             font-weight: 900 !important;
             color: #FFFFFF !important;
