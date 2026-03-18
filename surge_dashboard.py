@@ -16,7 +16,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # --- 1. 介面基礎配置 ---
 st.set_page_config(page_title="Uber 運輸需求預測", page_icon="🚕", layout="wide")
 
-# --- 2. 核心 CSS 樣式：側邊欄巨大化、按鈕置中、開關強化 ---
+# --- 2. 核心 CSS 樣式：嚴格鎖定按鈕寬度與不換行 ---
 st.markdown("""
     <style>
         html, body, [data-testid="stAppViewContainer"] {
@@ -26,27 +26,21 @@ st.markdown("""
             font-family: 'Inter', -apple-system, sans-serif !important;
         }
 
-        /* ========================================= */
-        /* 🎯 側邊欄文字與組件全面巨大化 (80cm 視距) */
-        /* ========================================= */
-
-        /* 1. 側邊欄開關文字 (Widget Label) */
+        /* 🎯 側邊欄開關文字 */
         [data-testid="stSidebar"] [data-testid="stWidgetLabel"] p {
-            font-size: 34px !important; /* 從 26px 提升至 34px */
+            font-size: 34px !important; 
             font-weight: 900 !important;
             color: #FFFFFF !important;
             line-height: 1.5 !important;
             margin-left: 10px !important;
-            white-space: nowrap !important; /* 防止字體太大換行 */
+            white-space: nowrap !important; 
         }
 
-        /* 2. 戰術開關 (Toggle) 本體再放大 1.2 倍 */
+        /* 🎯 戰術開關 (Toggle) 本體 */
         [data-testid="stToggle"] label > div:first-child { 
-            width: 100px !important; /* 原 85px */
-            height: 56px !important; /* 原 48px */
+            width: 100px !important; height: 56px !important; 
             background-color: #2D1B1B !important; 
-            border: 3px solid #8B4513 !important; /* 邊框加粗 */
-            border-radius: 30px !important;
+            border: 3px solid #8B4513 !important; border-radius: 30px !important;
         }
         [data-testid="stToggle"] input:checked + div { 
             background-color: #00D4FF !important; 
@@ -54,38 +48,55 @@ st.markdown("""
             box-shadow: 0 0 30px rgba(0, 212, 255, 1) !important; 
         }
         [data-testid="stToggle"] label > div:first-child > div { 
-            width: 44px !important; /* 原 36px */
-            height: 44px !important; /* 原 36px */
-            top: 4px !important; 
-            left: 4px !important; 
-            background-color: #FF4444 !important; 
-            border: 2px solid #CC0000 !important;
+            width: 44px !important; height: 44px !important; 
+            top: 4px !important; left: 4px !important; 
+            background-color: #FF4444 !important; border: 2px solid #CC0000 !important;
         }
         [data-testid="stToggle"] input:checked + div > div { 
-            transform: translateX(44px) !important; /* 位移加長 */
-            background-color: #00FF88 !important; 
-            border: 2px solid #00CC66 !important;
+            transform: translateX(44px) !important; 
+            background-color: #00FF88 !important; border: 2px solid #00CC66 !important;
         }
 
-        /* 3. 立即重新整理按鈕：80% 寬度、置中、文字加大 */
+        /* ========================================= */
+        /* 🎯 立即重新整理按鈕：嚴格 80% 寬度、絕對不換行 */
+        /* ========================================= */
+        
+        /* 1. 解除外部容器限制並置中 */
         [data-testid="stSidebar"] div.stButton {
             display: flex !important;
             justify-content: center !important;
             width: 100% !important;
-            margin-top: 30px !important; /* 與上方開關拉開距離 */
+            margin-top: 30px !important; 
+            padding: 0 !important;
         }
+        
+        /* 2. 強制按鈕本體為 80% 寬度 */
         [data-testid="stSidebar"] div.stButton > button {
             width: 80% !important; 
-            height: 100px !important; /* 按鈕加高 */
-            font-size: 32px !important; /* 字體加大 */
-            font-weight: 900 !important;
-            color: #FFFFFF !important;
+            min-width: 80% !important; /* 強制最小寬度 */
+            max-width: 80% !important; /* 強制最大寬度 */
+            height: 100px !important; 
             background: linear-gradient(135deg, #0052D4 0%, #4364F7 50%, #6FB1FC 100%) !important;
             border: 2px solid #00D4FF !important;
             border-radius: 20px !important;
             box-shadow: 0 6px 20px rgba(0, 212, 255, 0.4) !important;
             margin: 0 auto !important;
-            letter-spacing: 2px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding: 0 10px !important; /* 避免文字貼邊 */
+        }
+        
+        /* 3. 嚴格鎖定內部文字：超大字體且不換行 */
+        [data-testid="stSidebar"] div.stButton > button p, 
+        [data-testid="stSidebar"] div.stButton > button div {
+            white-space: nowrap !important; /* 絕對不換行 */
+            font-size: 32px !important; /* 維持超大字體 */
+            font-weight: 900 !important;
+            color: #FFFFFF !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            letter-spacing: 1px !important;
         }
 
         /* --- 🎯 主畫面指標區域 --- */
@@ -97,7 +108,7 @@ st.markdown("""
     </style>
     
     <script>
-        // JS 強制覆蓋開關紅綠燈樣式 (適應放大後的 DOM)
+        // JS 強制覆蓋開關紅綠燈樣式
         function overrideToggleStyles() {
             const toggles = document.querySelectorAll('[data-testid="stToggle"]');
             toggles.forEach(toggle => {
@@ -177,12 +188,12 @@ if curr and 'coords' in curr:
     st.session_state['gps_pos'] = (curr['coords']['latitude'], curr['coords']['longitude'])
     speed_kmh = (curr['coords'].get('speed') or 0) * 3.6
 
-# --- 5. 側邊欄控制區 (標題巨大化) ---
+# --- 5. 側邊欄控制區 ---
 with st.sidebar:
     st.markdown("<h2 style='color:#00D4FF; text-align:center; font-size: 42px; font-weight: 900; margin-bottom: 20px;'>⚒️ 戰術圖層</h2>", unsafe_allow_html=True)
     
     show_rain = st.toggle("🌧️ 雷達回波", value=False)
-    st.markdown("<div style='margin-bottom: 15px;'></div>", unsafe_allow_html=True) # 增加開關間距
+    st.markdown("<div style='margin-bottom: 15px;'></div>", unsafe_allow_html=True)
     
     show_heatmap = st.toggle("🔥 需求熱區", value=True)
     st.markdown("<div style='margin-bottom: 15px;'></div>", unsafe_allow_html=True)
@@ -191,6 +202,7 @@ with st.sidebar:
     
     st.markdown("<br><hr style='border-color: #444;'>", unsafe_allow_html=True)
     
+    # 點擊按鈕清除快取，觸發重新抓取資料
     if st.button("🔄 立即重新整理"):
         st.cache_data.clear()
 
@@ -222,7 +234,7 @@ with col_map:
             folium.CircleMarker(location=[dist['lat'], dist['lon']], radius=6, color='white', fill=True, fill_color='red').add_to(m)
 
     folium.Marker(st.session_state['gps_pos'], icon=folium.Icon(color='blue', icon='car', prefix='fa')).add_to(m)
-    st_folium(m, width="100%", height=580, key=f"v9_{show_rain}_{show_heatmap}_{zoom}")
+    st_folium(m, width="100%", height=580, key=f"v10_{show_rain}_{show_heatmap}_{zoom}")
 
 with col_list:
     st.markdown("<h3 style='font-size: 28px; color:#00D4FF;'>📈 紅區排行 TOP 10</h3>", unsafe_allow_html=True)
