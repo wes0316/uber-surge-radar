@@ -70,7 +70,7 @@ st.markdown("""
         }
         
         [data-testid="stSidebar"] div.stButton > button p {
-            font-size: 26px !important; 
+            font-size: 32px !important; 
             font-weight: 900 !important;
             color: #FFFFFF !important;
             white-space: nowrap !important; /* 絕對不換行 */
