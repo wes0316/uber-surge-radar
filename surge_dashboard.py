@@ -99,16 +99,23 @@ st.markdown("""
             line-height: 1.1 !important;
         }
         
-        /* 強制覆蓋指標標籤 - 多重選擇器 - 淺藍色 */
-        div[data-testid="stMetric"] [data-testid="stMetricLabel"],
-        div.stMetric [data-testid="stMetricLabel"],
-        div[data-testid="stMetric"] > div > div:first-child,
-        div.stMetric > div > div:first-child,
-        div[data-testid="stMetric"] div:first-child,
-        div.stMetric div:first-child {
+        /* 超級強制覆蓋指標標籤 - 淺藍色 - 最高權限 */
+        html body [data-testid="stMetricLabel"],
+        html body div[data-testid="stMetric"] [data-testid="stMetricLabel"],
+        html body div.stMetric [data-testid="stMetricLabel"],
+        html body div[data-testid="stMetric"] > div > div:first-child,
+        html body div.stMetric > div > div:first-child,
+        html body div[data-testid="stMetric"] div:first-child,
+        html body div.stMetric div:first-child,
+        html body div[class*="stMetric"] [data-testid="stMetricLabel"],
+        html body div[class*="stMetric"] div:first-child,
+        html body div[data-testid="stMetric"] *,
+        html body div.stMetric *:first-child,
+        html body div[class*="stMetric"] *:first-child {
             color: #87CEEB !important; 
             font-size: 32px !important; 
             font-weight: 900 !important;
+            background: transparent !important;
         }
         
         div[data-testid="stMetric"] { background: rgba(45, 45, 45, 0.9) !important; border-left: 12px solid #00D4FF !important; border-radius: 15px !important; }
