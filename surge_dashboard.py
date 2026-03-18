@@ -156,49 +156,64 @@ st.markdown("""
     </style>
     
     <script>
-        function overrideToggleStyles() {
+        console.log('開始執行開關樣式覆蓋');
+        
+        function setToggleStyles() {
             const toggles = document.querySelectorAll('[data-testid="stToggle"]');
             console.log('找到開關數量:', toggles.length);
             
+            if (toggles.length === 0) {
+                console.log('沒有找到開關，等待...');
+                return;
+            }
+            
             toggles.forEach((toggle, index) => {
-                console.log(`處理開關 ${index}:`, toggle);
+                console.log(`處理開關 ${index}`);
                 const divs = toggle.querySelectorAll('div');
                 const input = toggle.querySelector('input');
-                console.log(`開關 ${index} 的 div 數量:`, divs.length);
+                console.log(`開關 ${index} div數量:`, divs.length, 'input存在:', !!input);
                 
                 if (input && divs.length >= 2) {
-                    const update = () => {
-                        console.log(`更新開關 ${index} 狀態:`, input.checked);
-                        
-                        // 強制設定底座樣式
-                        divs[0].setAttribute('style', 'width: 100px !important; height: 56px !important; background-color: ' + (input.checked ? '#00D4FF' : '#2D1B1B') + ' !important; background: ' + (input.checked ? '#00D4FF' : '#2D1B1B') + ' !important; border: 3px solid ' + (input.checked ? '#00D4FF' : '#8B4513') + ' !important; border-radius: 30px !important; box-shadow: ' + (input.checked ? '0 0 30px rgba(0, 212, 255, 1)' : 'none') + ' !important; background-image: none !important;');
-                        
-                        // 強制設定滑塊樣式
-                        divs[1].setAttribute('style', 'width: 44px !important; height: 44px !important; top: 4px !important; left: 4px !important; background-color: ' + (input.checked ? '#00FF88' : '#FF4444') + ' !important; background: ' + (input.checked ? '#00FF88' : '#FF4444') + ' !important; border: 2px solid ' + (input.checked ? '#00CC66' : '#CC0000') + ' !important; transform: translateX(' + (input.checked ? '44px' : '0px') + ') !important; background-image: none !important;');
-                        
-                        console.log(`開關 ${index} 樣式已更新`);
-                    };
+                    console.log(`開關 ${index} 狀態:`, input.checked);
                     
-                    input.removeEventListener('change', update);
-                    input.addEventListener('change', update);
-                    update();
+                    if (input.checked) {
+                        // ON 狀態 - 藍色底座 + 綠色滑塊
+                        divs[0].style.backgroundColor = '#00D4FF';
+                        divs[0].style.border = '3px solid #00D4FF';
+                        divs[0].style.boxShadow = '0 0 30px rgba(0, 212, 255, 1)';
+                        divs[1].style.backgroundColor = '#00FF88';
+                        divs[1].style.border = '2px solid #00CC66';
+                        divs[1].style.transform = 'translateX(44px)';
+                        console.log(`開關 ${index} 設定為 ON 狀態`);
+                    } else {
+                        // OFF 狀態 - 紅色底座 + 紅色滑塊
+                        divs[0].style.backgroundColor = '#2D1B1B';
+                        divs[0].style.border = '3px solid #8B4513';
+                        divs[0].style.boxShadow = 'none';
+                        divs[1].style.backgroundColor = '#FF4444';
+                        divs[1].style.border = '2px solid #CC0000';
+                        divs[1].style.transform = 'translateX(0px)';
+                        console.log(`開關 ${index} 設定為 OFF 狀態`);
+                    }
+                } else {
+                    console.log(`開關 ${index} 結構不符合預期`);
                 }
             });
         }
         
-        // 立即執行並多次重試
-        overrideToggleStyles();
-        setTimeout(overrideToggleStyles, 200);
-        setTimeout(overrideToggleStyles, 500);
-        setTimeout(overrideToggleStyles, 1000);
-        setTimeout(overrideToggleStyles, 2000);
-        setTimeout(overrideToggleStyles, 5000);
+        // 多次嘗試執行
+        setToggleStyles();
+        setTimeout(setToggleStyles, 500);
+        setTimeout(setToggleStyles, 1000);
+        setTimeout(setToggleStyles, 2000);
+        setTimeout(setToggleStyles, 5000);
         
         // 監聽 DOM 變化
-        new MutationObserver(() => {
-            console.log('DOM 變化，重新執行樣式覆蓋');
-            overrideToggleStyles();
-        }).observe(document.body, { childList: true, subtree: true });
+        const observer = new MutationObserver(() => {
+            console.log('DOM 變化，重新設定開關樣式');
+            setToggleStyles();
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
     </script>""", unsafe_allow_html=True)
 
 # --- 3. 數據與定位邏輯 ---
