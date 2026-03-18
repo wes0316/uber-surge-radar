@@ -381,9 +381,46 @@ st.divider()
 col_map, col_list = st.columns([2.6, 1.4])
 
 with col_map:
-    zoom = (15 if speed_kmh < 20 else (14 if speed_kmh < 60 else 12)) if auto_zoom else 14
-    m = folium.Map(location=st.session_state['gps_pos'], zoom_start=zoom, 
-                   tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", attr="Google")
+    # 計算最佳顯示範圍 - 包含車輛位置和三個需求熱區
+    if auto_zoom and show_heatmap and top_3_centers:
+        # 收集所有需要顯示的點
+        all_points = [st.session_state['gps_pos']]  # 車輛位置
+        for dist in top_3_centers:
+            all_points.append((dist['lat'], dist['lon']))  # 需求熱區
+        
+        # 計算邊界
+        lats = [point[0] for point in all_points]
+        lons = [point[1] for point in all_points]
+        
+        min_lat, max_lat = min(lats), max(lats)
+        min_lon, max_lon = min(lons), max(lons)
+        
+        # 計算中心點
+        center_lat = (min_lat + max_lat) / 2
+        center_lon = (min_lon + max_lon) / 2
+        
+        # 計算適當的縮放級別
+        lat_diff = max_lat - min_lat
+        lon_diff = max_lon - min_lon
+        
+        # 根據範圍大小決定縮放級別
+        if lat_diff > 0.2 or lon_diff > 0.2:
+            zoom = 11
+        elif lat_diff > 0.1 or lon_diff > 0.1:
+            zoom = 12
+        elif lat_diff > 0.05 or lon_diff > 0.05:
+            zoom = 13
+        else:
+            zoom = 14
+            
+        # 使用計算出的中心點和縮放級別
+        m = folium.Map(location=[center_lat, center_lon], zoom_start=zoom, 
+                       tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", attr="Google")
+    else:
+        # 原有的基於速度的縮放邏輯
+        zoom = (15 if speed_kmh < 20 else (14 if speed_kmh < 60 else 12)) if auto_zoom else 14
+        m = folium.Map(location=st.session_state['gps_pos'], zoom_start=zoom, 
+                       tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", attr="Google")
 
     if show_rain:
         radar_b64 = get_radar_image()
