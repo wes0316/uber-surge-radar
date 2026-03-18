@@ -173,8 +173,8 @@ st.markdown("""
                 if (text && (text.includes('雙北紅區') || text.includes('所在區域'))) {
                     elem.style.fontSize = '32px !important';
                     elem.style.fontWeight = '900 !important';
-                    elem.style.color = '#00D4FF !important';
-                    elem.setAttribute('style', elem.getAttribute('style') + '; font-size: 32px !important; font-weight: 900 !important; color: #00D4FF !important;');
+                    elem.style.color = '#87CEEB !important';
+                    elem.setAttribute('style', elem.getAttribute('style') + '; font-size: 32px !important; font-weight: 900 !important; color: #87CEEB !important;');
                     console.log('其他指標標籤已修正:', text);
                 }
             });
