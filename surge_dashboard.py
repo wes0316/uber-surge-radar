@@ -405,15 +405,15 @@ top_3_centers, top_10_list, total_count = fetch_analysis_data()
 # --- 6. 主畫面指標 ---
 m1, m2 = st.columns(2)
 
-# 使用內聯樣式強制設定標題顏色為淺藍色，並確保正確大小
+# 使用內聯樣式強制設定標題顏色為淺藍色，大小與資料項相同
 m1.markdown(f"""
 <style>
 .metric-title {{
     color: #87CEEB !important;
-    font-size: 32px !important;
+    font-size: 68px !important;
     font-weight: 900 !important;
     text-align: center !important;
-    line-height: 1.2 !important;
+    line-height: 1.1 !important;
     display: block !important;
     margin-bottom: 15px !important;
 }}
