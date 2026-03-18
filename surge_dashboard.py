@@ -166,20 +166,21 @@ st.markdown("""
         }
         
         function fixMetricLabels() {
-            console.log('修正指標標籤和數值 - 淺藍色');
+            console.log('修正指標標籤和數值 - 淺藍色 + 字型大小');
             
-            // 超級強制修正指標標籤 - 淺藍色
+            // 超級強制修正指標標籤 - 淺藍色 + 32px
             const metricLabels = document.querySelectorAll('[data-testid="stMetricLabel"]');
             metricLabels.forEach(elem => {
                 elem.style.fontSize = '32px !important';
                 elem.style.fontWeight = '900 !important';
                 elem.style.color = '#87CEEB !important';
                 elem.style.background = 'transparent !important';
-                elem.setAttribute('style', elem.getAttribute('style') + '; font-size: 32px !important; font-weight: 900 !important; color: #87CEEB !important; background: transparent !important;');
-                console.log('指標標籤已修正為淺藍色:', elem.textContent);
+                elem.style.lineHeight = '1.2 !important';
+                elem.setAttribute('style', elem.getAttribute('style') + '; font-size: 32px !important; font-weight: 900 !important; color: #87CEEB !important; background: transparent !important; line-height: 1.2 !important;');
+                console.log('指標標籤已修正為淺藍色 32px:', elem.textContent);
             });
             
-            // 超級強制修正指標數值 - 確保 68px
+            // 超級強制修正指標數值 - 白色 + 68px
             const metricValues = document.querySelectorAll('[data-testid="stMetricValue"]');
             metricValues.forEach(elem => {
                 elem.style.fontSize = '68px !important';
@@ -187,58 +188,52 @@ st.markdown("""
                 elem.style.color = '#FFFFFF !important';
                 elem.style.lineHeight = '1.1 !important';
                 elem.setAttribute('style', elem.getAttribute('style') + '; font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important; line-height: 1.1 !important;');
-                console.log('指標數值已修正:', elem.textContent);
+                console.log('指標數值已修正為 68px:', elem.textContent);
             });
             
-            // 超級強制修正所有可能的標籤選擇器 - 淺藍色
-            const allPossibleLabels = [
-                'div[data-testid="stMetric"] > div > div:first-child',
-                'div.stMetric > div > div:first-child',
-                'div[data-testid="stMetric"] div:first-child',
-                'div.stMetric div:first-child',
-                'div[class*="stMetric"] [data-testid="stMetricLabel"]',
-                'div[class*="stMetric"] div:first-child',
-                'div[data-testid="stMetric"] *:first-child',
-                'div.stMetric *:first-child',
-                'div[class*="stMetric"] *:first-child'
-            ];
-            
-            allPossibleLabels.forEach(selector => {
-                const elements = document.querySelectorAll(selector);
-                elements.forEach(elem => {
-                    const text = elem.textContent || '';
-                    if (text && (text.includes('雙北紅區') || text.includes('所在區域'))) {
-                        elem.style.fontSize = '32px !important';
-                        elem.style.fontWeight = '900 !important';
-                        elem.style.color = '#87CEEB !important';
-                        elem.style.background = 'transparent !important';
-                        elem.setAttribute('style', elem.getAttribute('style') + '; font-size: 32px !important; font-weight: 900 !important; color: #87CEEB !important; background: transparent !important;');
-                        console.log('超級強制修正標籤為淺藍色:', text);
-                    }
-                });
-            });
-            
-            // 超級強制修正其他可能的數值選擇器
-            const allMetricDivs = document.querySelectorAll('div[data-testid="stMetric"] div');
-            allMetricDivs.forEach(elem => {
+            // 終極字型大小保護 - 防止任何縮小
+            const allMetricElements = document.querySelectorAll('div[data-testid="stMetric"] *');
+            allMetricElements.forEach(elem => {
                 const text = elem.textContent || '';
-                // 檢查是否為數值內容
-                if (text.match(/^\d+.*處$/) || text === '新店區' || text.match(/^\d+$/) || text.includes('處')) {
+                const isFirstChild = elem.parentElement && elem.parentElement.firstChild === elem;
+                const isLastChild = elem.parentElement && elem.parentElement.lastChild === elem;
+                
+                // 標籤內容 - 淺藍色 + 32px
+                if (text && (text.includes('雙北紅區') || text.includes('所在區域'))) {
+                    elem.style.fontSize = '32px !important';
+                    elem.style.fontWeight = '900 !important';
+                    elem.style.color = '#87CEEB !important';
+                    elem.style.background = 'transparent !important';
+                    elem.style.lineHeight = '1.2 !important';
+                    elem.setAttribute('style', elem.getAttribute('style') + '; font-size: 32px !important; font-weight: 900 !important; color: #87CEEB !important; background: transparent !important; line-height: 1.2 !important;');
+                    console.log('終極修正標籤為淺藍色 32px:', text);
+                }
+                // 數值內容 - 白色 + 68px
+                else if (text.match(/^\d+.*處$/) || text === '新店區' || text.match(/^\d+$/) || text.includes('處')) {
                     elem.style.fontSize = '68px !important';
                     elem.style.fontWeight = '900 !important';
                     elem.style.color = '#FFFFFF !important';
                     elem.style.lineHeight = '1.1 !important';
                     elem.setAttribute('style', elem.getAttribute('style') + '; font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important; line-height: 1.1 !important;');
-                    console.log('超級強制修正數值:', text);
+                    console.log('終極修正數值為 68px:', text);
                 }
-                // 檢查是否為標籤內容 - 淺藍色
-                else if (text && (text.includes('雙北紅區') || text.includes('所在區域'))) {
+                // 第一個子元素 - 標籤大小
+                else if (isFirstChild) {
                     elem.style.fontSize = '32px !important';
                     elem.style.fontWeight = '900 !important';
                     elem.style.color = '#87CEEB !important';
-                    elem.style.background = 'transparent !important';
-                    elem.setAttribute('style', elem.getAttribute('style') + '; font-size: 32px !important; font-weight: 900 !important; color: #87CEEB !important; background: transparent !important;');
-                    console.log('超級強制修正標籤為淺藍色:', text);
+                    elem.setAttribute('style', elem.getAttribute('style') + '; font-size: 32px !important; font-weight: 900 !important; color: #87CEEB !important;');
+                }
+                // 最後一個子元素 - 數值大小
+                else if (isLastChild) {
+                    elem.style.fontSize = '68px !important';
+                    elem.style.fontWeight = '900 !important';
+                    elem.style.color = '#FFFFFF !important';
+                    elem.setAttribute('style', elem.getAttribute('style') + '; font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important;');
+                }
+                // 其他元素 - 繼承大小
+                else {
+                    elem.style.fontSize = 'inherit !important';
                 }
             });
         }
