@@ -184,7 +184,7 @@ st.markdown("""
         }
         
         function fixMetricLabels() {
-            console.log('修正指標標籤和數值 - 白色 + 字型大小 + 中央對齊');
+            console.log('修正指標標籤和數值 - 白色 + 字型大小 + 中央對齊（僅指標）');
             
             // 超級強制修正指標標籤 - 白色 + 32px + 中央對齊
             const metricLabels = document.querySelectorAll('[data-testid="stMetricLabel"]');
@@ -215,7 +215,7 @@ st.markdown("""
                 console.log('指標數值已修正為白色 68px 中央對齊:', elem.textContent);
             });
             
-            // 修正指標容器 - 中央對齊
+            // 修正指標容器 - 中央對齊（只影響指標容器）
             const metricContainers = document.querySelectorAll('div[data-testid="stMetric"]');
             metricContainers.forEach(elem => {
                 elem.style.textAlign = 'center !important';
@@ -227,7 +227,7 @@ st.markdown("""
                 console.log('指標容器已修正為中央對齊');
             });
             
-            // 終極字型大小保護 - 防止任何縮小 + 白色 + 中央對齊
+            // 只修正指標容器內的元素 - 不影響其他文字
             const allMetricElements = document.querySelectorAll('div[data-testid="stMetric"] *');
             allMetricElements.forEach(elem => {
                 const text = elem.textContent || '';
@@ -275,7 +275,7 @@ st.markdown("""
                     elem.style.textAlign = 'center !important';
                     elem.setAttribute('style', elem.getAttribute('style') + '; font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important; text-align: center !important;');
                 }
-                // 其他元素 - 繼承大小 + 白色 + 中央對齊
+                // 其他元素 - 繼承大小 + 白色 + 中央對齊（僅限指標容器內）
                 else {
                     elem.style.fontSize = 'inherit !important';
                     elem.style.color = '#FFFFFF !important';
