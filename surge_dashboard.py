@@ -34,7 +34,7 @@ st.markdown("""
         }
         [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 { 
             color: #FFFFFF !important; 
-            font-size: 28px !important; /* 側邊欄標題放大 */
+            font-size: 28px !important; 
         }
         [data-testid="stSidebar"] p, [data-testid="stSidebar"] label { 
             color: #E0E0E0 !important; 
@@ -44,7 +44,7 @@ st.markdown("""
         div[data-testid="stWidgetLabel"] p { 
             color: #FFFFFF !important; 
             font-weight: 600 !important;
-            font-size: 22px !important; /* 開關文字放大 */
+            font-size: 22px !important; 
             white-space: nowrap !important;
         }
         
@@ -53,22 +53,31 @@ st.markdown("""
         div[data-testid="stToggle"] input[type="checkbox"]:checked + div { background-color: #276EF1 !important; }
         div[data-testid="stToggle"] input[type="checkbox"] + div > div { background-color: #FFFFFF !important; }
 
+        /* --- 🎯 放大按鈕高度 --- */
+        div.stButton > button {
+            height: 90px !important; /* 高度變成兩倍 */
+            font-size: 24px !important; /* 字體跟著變大 */
+            font-weight: 800 !important;
+            border-radius: 12px !important; /* 圓角加大更像實體按鍵 */
+            border: 2px solid #444444 !important;
+        }
+
         /* 數據卡片 (Metric) 巨大化，符合 80cm 視距 */
         div[data-testid="stMetric"] {
             background-color: #242424 !important;
             border: 1px solid #444444 !important;
             border-left: 8px solid #276EF1 !important; 
             border-radius: 8px !important;
-            padding: 20px !important; /* 增加內距讓卡片變大 */
+            padding: 20px !important; 
         }
         [data-testid="stMetricValue"] { 
             color: #FFFFFF !important; 
-            font-size: 46px !important; /* 數字超級放大 */
+            font-size: 46px !important; 
             font-weight: 800 !important; 
         }
         [data-testid="stMetricLabel"] { 
             color: #B0B0B0 !important; 
-            font-size: 22px !important; /* 標題放大 */
+            font-size: 22px !important; 
             font-weight: 600 !important; 
         }
 
@@ -77,7 +86,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 2. 核心數據邏輯 (不變) ---
+# --- 2. 核心數據邏輯 ---
 transformer = Transformer.from_crs("epsg:3826", "epsg:4326")
 
 def get_district_only(lat, lon):
@@ -160,7 +169,7 @@ with st.sidebar:
     c1, c2 = st.columns(2)
     with c1: show_rain = st.toggle("🌧️ 雷達雨圖", value=False)
     with c2: show_heatmap = st.toggle("🔥 熱區光罩", value=False)
-    zoom_val = st.slider("地圖縮放級別", 10, 18, 13)
+    zoom_val = st.slider("地圖縮放級別", 10, 18, 14)
     if st.button("🔄 手動強制更新", use_container_width=True):
         st.session_state['last_api_check'] = 0 
         st.cache_data.clear()
@@ -231,7 +240,7 @@ with col_map:
             
             folium.CircleMarker(
                 location=[r['lat'], r['lon']], 
-                radius=8, # 將圖釘稍微放大，讓司機在螢幕上更好看清楚
+                radius=8, 
                 color=c, fill=True, fill_opacity=0.7, weight=1,
                 tooltip=folium.Tooltip(marker_tooltip)
             ).add_to(m)
