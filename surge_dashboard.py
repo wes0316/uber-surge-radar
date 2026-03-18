@@ -124,7 +124,7 @@ st.markdown("""
             align-items: center !important;
         }
         
-        /* 指標容器中央對齊 */
+        /* 指標容器中央對齊 - 只影響指標容器 */
         div[data-testid="stMetric"] {
             background: rgba(45, 45, 45, 0.9) !important; 
             border-left: 12px solid #00D4FF !important; 
