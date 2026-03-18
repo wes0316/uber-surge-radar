@@ -226,6 +226,12 @@ with st.sidebar:
         # 開啟 use_container_width=True，讓按鈕完全填滿中間那個 80% 的欄位
         if st.button("🔄 即時刷新", use_container_width=True):
             st.cache_data.clear()
+            st.rerun()
+
+# 引用 JavaScript 文件來修正開關樣式
+st.components.v1.html("""
+<script src="toggle_styles.js"></script>
+""", height=0)
 
 # 獲取分析資料
 top_3_centers, top_10_list, total_count = fetch_analysis_data()
