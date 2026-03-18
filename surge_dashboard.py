@@ -151,7 +151,7 @@ st.markdown("""
             metricLabels.forEach(elem => {
                 elem.style.fontSize = '32px !important';
                 elem.style.fontWeight = '900 !important';
-                elem.style.color = '#00D4FF !important';
+                elem.style.color = '#87CEEB !important';
                 console.log('指標標籤已修正:', elem.textContent);
             });
             
