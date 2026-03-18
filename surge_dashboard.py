@@ -184,9 +184,9 @@ st.markdown("""
         }
         
         function fixMetricLabels() {
-            console.log('修正指標標籤和數值 - 白色 + 字型大小');
+            console.log('修正指標標籤和數值 - 白色 + 字型大小 + 中央對齊');
             
-            // 超級強制修正指標標籤 - 白色 + 32px
+            // 超級強制修正指標標籤 - 白色 + 32px + 中央對齊
             const metricLabels = document.querySelectorAll('[data-testid="stMetricLabel"]');
             metricLabels.forEach(elem => {
                 elem.style.fontSize = '32px !important';
@@ -194,65 +194,92 @@ st.markdown("""
                 elem.style.color = '#FFFFFF !important';
                 elem.style.background = 'transparent !important';
                 elem.style.lineHeight = '1.2 !important';
-                elem.setAttribute('style', elem.getAttribute('style') + '; font-size: 32px !important; font-weight: 900 !important; color: #FFFFFF !important; background: transparent !important; line-height: 1.2 !important;');
-                console.log('指標標籤已修正為白色 32px:', elem.textContent);
+                elem.style.textAlign = 'center !important';
+                elem.style.justifyContent = 'center !important';
+                elem.style.alignItems = 'center !important';
+                elem.setAttribute('style', elem.getAttribute('style') + '; font-size: 32px !important; font-weight: 900 !important; color: #FFFFFF !important; background: transparent !important; line-height: 1.2 !important; text-align: center !important; justify-content: center !important; align-items: center !important;');
+                console.log('指標標籤已修正為白色 32px 中央對齊:', elem.textContent);
             });
             
-            // 超級強制修正指標數值 - 白色 + 68px
+            // 超級強制修正指標數值 - 白色 + 68px + 中央對齊
             const metricValues = document.querySelectorAll('[data-testid="stMetricValue"]');
             metricValues.forEach(elem => {
                 elem.style.fontSize = '68px !important';
                 elem.style.fontWeight = '900 !important';
                 elem.style.color = '#FFFFFF !important';
                 elem.style.lineHeight = '1.1 !important';
-                elem.setAttribute('style', elem.getAttribute('style') + '; font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important; line-height: 1.1 !important;');
-                console.log('指標數值已修正為白色 68px:', elem.textContent);
+                elem.style.textAlign = 'center !important';
+                elem.style.justifyContent = 'center !important';
+                elem.style.alignItems = 'center !important';
+                elem.setAttribute('style', elem.getAttribute('style') + '; font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important; line-height: 1.1 !important; text-align: center !important; justify-content: center !important; align-items: center !important;');
+                console.log('指標數值已修正為白色 68px 中央對齊:', elem.textContent);
             });
             
-            // 終極字型大小保護 - 防止任何縮小 + 白色
+            // 修正指標容器 - 中央對齊
+            const metricContainers = document.querySelectorAll('div[data-testid="stMetric"]');
+            metricContainers.forEach(elem => {
+                elem.style.textAlign = 'center !important';
+                elem.style.display = 'flex !important';
+                elem.style.flexDirection = 'column !important';
+                elem.style.justifyContent = 'center !important';
+                elem.style.alignItems = 'center !important';
+                elem.setAttribute('style', elem.getAttribute('style') + '; text-align: center !important; display: flex !important; flex-direction: column !important; justify-content: center !important; align-items: center !important;');
+                console.log('指標容器已修正為中央對齊');
+            });
+            
+            // 終極字型大小保護 - 防止任何縮小 + 白色 + 中央對齊
             const allMetricElements = document.querySelectorAll('div[data-testid="stMetric"] *');
             allMetricElements.forEach(elem => {
                 const text = elem.textContent || '';
                 const isFirstChild = elem.parentElement && elem.parentElement.firstChild === elem;
                 const isLastChild = elem.parentElement && elem.parentElement.lastChild === elem;
                 
-                // 標籤內容 - 白色 + 32px
+                // 標籤內容 - 白色 + 32px + 中央對齊
                 if (text && (text.includes('雙北紅區') || text.includes('所在區域'))) {
                     elem.style.fontSize = '32px !important';
                     elem.style.fontWeight = '900 !important';
                     elem.style.color = '#FFFFFF !important';
                     elem.style.background = 'transparent !important';
                     elem.style.lineHeight = '1.2 !important';
-                    elem.setAttribute('style', elem.getAttribute('style') + '; font-size: 32px !important; font-weight: 900 !important; color: #FFFFFF !important; background: transparent !important; line-height: 1.2 !important;');
-                    console.log('終極修正標籤為白色 32px:', text);
+                    elem.style.textAlign = 'center !important';
+                    elem.style.justifyContent = 'center !important';
+                    elem.style.alignItems = 'center !important';
+                    elem.setAttribute('style', elem.getAttribute('style') + '; font-size: 32px !important; font-weight: 900 !important; color: #FFFFFF !important; background: transparent !important; line-height: 1.2 !important; text-align: center !important; justify-content: center !important; align-items: center !important;');
+                    console.log('終極修正標籤為白色 32px 中央對齊:', text);
                 }
-                // 數值內容 - 白色 + 68px
+                // 數值內容 - 白色 + 68px + 中央對齊
                 else if (text.match(/^\d+.*處$/) || text === '新店區' || text.match(/^\d+$/) || text.includes('處')) {
                     elem.style.fontSize = '68px !important';
                     elem.style.fontWeight = '900 !important';
                     elem.style.color = '#FFFFFF !important';
                     elem.style.lineHeight = '1.1 !important';
-                    elem.setAttribute('style', elem.getAttribute('style') + '; font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important; line-height: 1.1 !important;');
-                    console.log('終極修正數值為白色 68px:', text);
+                    elem.style.textAlign = 'center !important';
+                    elem.style.justifyContent = 'center !important';
+                    elem.style.alignItems = 'center !important';
+                    elem.setAttribute('style', elem.getAttribute('style') + '; font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important; line-height: 1.1 !important; text-align: center !important; justify-content: center !important; align-items: center !important;');
+                    console.log('終極修正數值為白色 68px 中央對齊:', text);
                 }
-                // 第一個子元素 - 標籤大小 + 白色
+                // 第一個子元素 - 標籤大小 + 白色 + 中央對齊
                 else if (isFirstChild) {
                     elem.style.fontSize = '32px !important';
                     elem.style.fontWeight = '900 !important';
                     elem.style.color = '#FFFFFF !important';
-                    elem.setAttribute('style', elem.getAttribute('style') + '; font-size: 32px !important; font-weight: 900 !important; color: #FFFFFF !important;');
+                    elem.style.textAlign = 'center !important';
+                    elem.setAttribute('style', elem.getAttribute('style') + '; font-size: 32px !important; font-weight: 900 !important; color: #FFFFFF !important; text-align: center !important;');
                 }
-                // 最後一個子元素 - 數值大小 + 白色
+                // 最後一個子元素 - 數值大小 + 白色 + 中央對齊
                 else if (isLastChild) {
                     elem.style.fontSize = '68px !important';
                     elem.style.fontWeight = '900 !important';
                     elem.style.color = '#FFFFFF !important';
-                    elem.setAttribute('style', elem.getAttribute('style') + '; font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important;');
+                    elem.style.textAlign = 'center !important';
+                    elem.setAttribute('style', elem.getAttribute('style') + '; font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important; text-align: center !important;');
                 }
-                // 其他元素 - 繼承大小 + 白色
+                // 其他元素 - 繼承大小 + 白色 + 中央對齊
                 else {
                     elem.style.fontSize = 'inherit !important';
                     elem.style.color = '#FFFFFF !important';
+                    elem.style.textAlign = 'center !important';
                 }
             });
         }
