@@ -81,6 +81,29 @@ st.markdown("""
         [data-testid="stMetricValue"] { color: #FFFFFF !important; font-size: 75px !important; font-weight: 900 !important; }
         [data-testid="stMetricLabel"] { color: #00D4FF !important; font-size: 32px !important; font-weight: 900 !important; }
         div[data-testid="stMetric"] { background: rgba(45, 45, 45, 0.9) !important; border-left: 12px solid #00D4FF !important; border-radius: 15px !important; padding: 30px !important; }
+        
+        /* 強制覆蓋所有可能的指標標籤樣式 - 終極版 */
+        div[data-testid="stMetric"] > div > div:first-child,
+        div[data-testid="stMetric"] div:first-child,
+        div[data-testid="stMetric"] > div:first-child,
+        div[data-testid="stMetric"] [data-testid="stMetricLabel"],
+        div.stMetric > div > div:first-child,
+        div.stMetric div:first-child,
+        .st-em,
+        div[data-testid="stMetric"] .st-em {
+            font-size: 32px !important;
+            font-weight: 900 !important;
+            color: #00D4FF !important;
+            line-height: 1.2 !important;
+        }
+        
+        /* 針對 Streamlit 可能的動態類別 */
+        div[class*="st-"] div[class*="st-"] div[class*="st-"]:first-child,
+        div[class*="st-"] > div > div:first-child {
+            font-size: 32px !important;
+            font-weight: 900 !important;
+            color: #00D4FF !important;
+        }
         [data-testid="stSidebar"] { background-color: #111111 !important; border-right: 1px solid #333333 !important; padding-top: 2rem !important; }
         #MainMenu, footer, header {visibility: hidden;}
     </style>
