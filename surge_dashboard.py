@@ -82,27 +82,31 @@ st.markdown("""
         [data-testid="stMetricLabel"] { color: #00D4FF !important; font-size: 32px !important; font-weight: 900 !important; }
         div[data-testid="stMetric"] { background: rgba(45, 45, 45, 0.9) !important; border-left: 12px solid #00D4FF !important; border-radius: 15px !important; padding: 30px !important; }
         
-        /* 強制確保指標數值保持 68px - 最高權限 */
-        [data-testid="stMetricValue"],
-        div[data-testid="stMetric"] [data-testid="stMetricValue"],
-        div.stMetric [data-testid="stMetricValue"],
-        div[data-testid="stMetric"] > div > div:last-child,
-        div.stMetric > div > div:last-child,
-        div[data-testid="stMetric"] div:last-child {
+        /* 萬用選擇器 - 強制所有指標數值為 68px */
+        * [data-testid="stMetricValue"],
+        * div[data-testid="stMetric"] [data-testid="stMetricValue"],
+        * div.stMetric [data-testid="stMetricValue"],
+        * div[data-testid="stMetric"] > div > div:last-child,
+        * div.stMetric > div > div:last-child,
+        * div[data-testid="stMetric"] div:last-child,
+        * div[class*="st-"] [data-testid="stMetricValue"],
+        * div[class*="st-"] div[data-testid="stMetricValue"],
+        * div[class*="st-"] > div > div:last-child,
+        * div[class*="st-"] div:last-child:not(:first-child) {
             font-size: 68px !important;
             font-weight: 900 !important;
             color: #FFFFFF !important;
+            line-height: 1.1 !important;
+            background: transparent !important;
         }
         
-        /* 強制覆蓋所有可能的指標標籤樣式 - 終極版 */
-        div[data-testid="stMetric"] > div > div:first-child,
-        div[data-testid="stMetric"] div:first-child,
-        div[data-testid="stMetric"] > div:first-child,
+        /* 精確的指標標籤樣式 - 排除數值 */
+        [data-testid="stMetricLabel"],
         div[data-testid="stMetric"] [data-testid="stMetricLabel"],
-        div.stMetric > div > div:first-child,
-        div.stMetric div:first-child,
-        .st-em,
-        div[data-testid="stMetric"] .st-em {
+        div.stMetric [data-testid="stMetricLabel"],
+        div[data-testid="stMetric"] > div > div:first-child:not([data-testid="stMetricValue"]),
+        div.stMetric > div > div:first-child:not([data-testid="stMetricValue"]),
+        .st-em:not([data-testid="stMetricValue"]) {
             font-size: 32px !important;
             font-weight: 900 !important;
             color: #00D4FF !important;
