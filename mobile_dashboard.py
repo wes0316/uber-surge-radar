@@ -455,26 +455,29 @@ gps_pos, speed_kmh, top_3_centers, top_10_list, total_count = fetch_mobile_data(
 # --- 7. 手機版主畫面指標 ---
 st.markdown('<div class="mobile-header">📊 實時數據</div>', unsafe_allow_html=True)
 
-col1, col2 = st.columns(2, gap="10px")
-
-with col1:
-    st.markdown(f"""
-    <div class="mobile-metric-container">
+# 橫向佈局的指標區域
+st.markdown("""
+<div class="landscape-metrics">
+    <div class="landscape-metric-container">
         <div class="mobile-metric-title">🔥 雙北紅區</div>
         <div class="mobile-metric-value">{total_count} 處</div>
     </div>
-    """, unsafe_allow_html=True)
-
-with col2:
-    st.markdown(f"""
-    <div class="mobile-metric-container">
+    <div class="landscape-metric-container">
         <div class="mobile-metric-title">📍 車輛所在區域</div>
         <div class="mobile-metric-value">新店區</div>
     </div>
-    """, unsafe_allow_html=True)
+</div>
+""", unsafe_allow_html=True)
 
 # --- 8. 手機版地圖 ---
 st.markdown('<div class="mobile-header">🗺️ 實時地圖</div>', unsafe_allow_html=True)
+
+# 橫向佈局的地圖和排行榜
+st.markdown("""
+<div class="landscape-content">
+    <div class="landscape-map">
+        <div class="mobile-map-container">
+""", unsafe_allow_html=True)
 
 # 計算手機版地圖顯示範圍
 if auto_zoom and show_heatmap and top_3_centers:
@@ -526,25 +529,33 @@ folium.Marker(
 ).add_to(m)
 
 # 顯示手機版地圖
-st.markdown('<div class="mobile-map-container">', unsafe_allow_html=True)
 st_folium(m, width="100%", height=300, use_container_width=True)
-st.markdown('</div>', unsafe_allow_html=True)
+
+st.markdown("""
+        </div>
+    </div>
+    <div class="landscape-list">
+        <div class="mobile-list-title">📈 紅區排行</div>
+""", unsafe_allow_html=True)
 
 # --- 9. 手機版排行榜 ---
-st.markdown('<div class="mobile-header">📈 紅區排行</div>', unsafe_allow_html=True)
-
 if not top_10_list.empty:
     html = "<table class='mobile-table'>"
     for i, row in top_10_list.iterrows():
         color = "#FF4B4B" if i < 3 else "#FFFFFF"
         html += f"""
         <tr>
-            <td style='padding: 8px; color: {color};'>{row['area']}</td>
-            <td style='padding: 8px; color: {color}; text-align: right; font-weight: bold;'>{row['count']}</td>
+            <td style='padding: 6px; color: {color};'>{row['area']}</td>
+            <td style='padding: 6px; color: {color}; text-align: right; font-weight: bold;'>{row['count']}</td>
         </tr>
         """
     html += "</table>"
     st.markdown(html, unsafe_allow_html=True)
+
+st.markdown("""
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
 # --- 10. 手機版底部信息 ---
 st.markdown("---")
