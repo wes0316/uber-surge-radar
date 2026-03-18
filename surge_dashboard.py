@@ -109,12 +109,31 @@ st.markdown("""
             line-height: 1.2 !important;
         }
         
-        /* 針對 Streamlit 可能的動態類別 */
-        div[class*="st-"] div[class*="st-"] div[class*="st-"]:first-child,
-        div[class*="st-"] > div > div:first-child {
+        /* 針對 Streamlit 可能的動態類別 - 排除指標數值 */
+        div[class*="st-"] div[class*="st-"] div[class*="st-"]:first-child:not([data-testid="stMetricValue"]),
+        div[class*="st-"] > div > div:first-child:not([data-testid="stMetricValue"]),
+        div[class*="st-"] div[class*="st-"] div[class*="st-"]:first-child:not(.stMetricValue),
+        div[class*="st-"] > div > div:first-child:not(.stMetricValue) {
             font-size: 32px !important;
             font-weight: 900 !important;
             color: #00D4FF !important;
+        }
+        
+        /* 終極保護：確保所有可能的指標數值元素都是 68px */
+        [data-testid="stMetricValue"],
+        div[data-testid="stMetric"] [data-testid="stMetricValue"],
+        div.stMetric [data-testid="stMetricValue"],
+        div[data-testid="stMetric"] > div > div:last-child,
+        div.stMetric > div > div:last-child,
+        div[data-testid="stMetric"] div:last-child,
+        div[class*="st-"] [data-testid="stMetricValue"],
+        div[class*="st-"] div[data-testid="stMetricValue"],
+        div[class*="st-"] > div > div:last-child,
+        div[class*="st-"] div:last-child:not(:first-child) {
+            font-size: 68px !important;
+            font-weight: 900 !important;
+            color: #FFFFFF !important;
+            line-height: 1.1 !important;
         }
         [data-testid="stSidebar"] { background-color: #111111 !important; border-right: 1px solid #333333 !important; padding-top: 2rem !important; }
         #MainMenu, footer, header {visibility: hidden;}
