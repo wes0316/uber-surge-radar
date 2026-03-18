@@ -37,24 +37,35 @@ st.markdown("""
         }
 
         /* 🎯 戰術開關 (Toggle) 本體 */
-        [data-testid="stToggle"] label > div:first-child { 
-            width: 100px !important; height: 56px !important; 
-            background-color: #2D1B1B !important; 
-            border: 3px solid #8B4513 !important; border-radius: 30px !important;
+        /* 未選中狀態 */
+        [data-testid="stToggle"] label > div:first-child {
+            width: 100px !important; height: 56px !important;
+            background-color: #2D1B1B !important;
+            border: 3px solid #8B4513 !important;
+            border-radius: 30px !important;
+            transition: background-color 0.3s, border 0.3s, box-shadow 0.3s;
         }
-        [data-testid="stToggle"] input:checked + div { 
-            background-color: #00D4FF !important; 
-            border: 3px solid #00D4FF !important; 
-            box-shadow: 0 0 30px rgba(0, 212, 255, 1) !important; 
+        /* 選中狀態 */
+        [data-testid="stToggle"] input:checked + label > div:first-child {
+            background-color: #00D4FF !important;
+            border: 3px solid #00D4FF !important;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 1) !important;
         }
-        [data-testid="stToggle"] label > div:first-child > div { 
-            width: 44px !important; height: 44px !important; 
-            top: 4px !important; left: 4px !important; 
-            background-color: #FF4444 !important; border: 2px solid #CC0000 !important;
+
+        /* 🎯 戰術開關 (Toggle) 內部圓點 */
+        /* 未選中狀態 */
+        [data-testid="stToggle"] label > div:first-child > div {
+            width: 44px !important; height: 44px !important;
+            top: 4px !important; left: 4px !important;
+            background-color: #FF4444 !important;
+            border: 2px solid #CC0000 !important;
+            transition: transform 0.3s, background-color 0.3s, border 0.3s;
         }
-        [data-testid="stToggle"] input:checked + div > div { 
-            transform: translateX(44px) !important; 
-            background-color: #00FF88 !important; border: 2px solid #00CC66 !important;
+        /* 選中狀態 */
+        [data-testid="stToggle"] input:checked + label > div:first-child > div {
+            transform: translateX(44px) !important;
+            background-color: #00FF88 !important;
+            border: 2px solid #00CC66 !important;
         }
 
         /* ========================================= */
@@ -181,31 +192,7 @@ st.markdown("""
     </style>
     
     <script>
-        function overrideToggleStyles() {
-            const toggles = document.querySelectorAll('[data-testid="stToggle"]');
-            toggles.forEach(toggle => {
-                const divs = toggle.querySelectorAll('div');
-                const input = toggle.querySelector('input');
-                if (input && divs.length >= 2) {
-                    const update = () => {
-                        if (input.checked) {
-                            divs[0].style.backgroundColor = '#00D4FF';
-                            divs[0].style.border = '3px solid #00D4FF';
-                            divs[0].style.boxShadow = '0 0 30px rgba(0, 212, 255, 1)';
-                            divs[1].style.backgroundColor = '#00FF88';
-                        } else {
-                            divs[0].style.backgroundColor = '#2D1B1B';
-                            divs[0].style.border = '3px solid #8B4513';
-                            divs[0].style.boxShadow = 'none';
-                            divs[1].style.backgroundColor = '#FF4444';
-                        }
-                    };
-                    input.removeEventListener('change', update);
-                    input.addEventListener('change', update);
-                    update();
-                }
-            });
-        }
+
         
         function fixMetricLabels() {
             console.log('修正指標標籤和數值 - 標題淺藍色 + 數值白色 + 中央對齊 - 終極強化');
@@ -315,14 +302,14 @@ st.markdown("""
             });
         }
         
-        setTimeout(overrideToggleStyles, 200);
+
         setTimeout(fixMetricLabels, 200);
         setTimeout(fixMetricLabels, 500);
         setTimeout(fixMetricLabels, 1000);
         setTimeout(fixMetricLabels, 2000);
         
         new MutationObserver(() => {
-            overrideToggleStyles();
+
             fixMetricLabels();
         }).observe(document.body, { childList: true, subtree: true });
     </script>
