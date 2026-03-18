@@ -79,9 +79,9 @@ st.markdown("""
 
         /* --- 🎯 主畫面指標區域 --- */
         [data-testid="stMetricValue"] { color: #FFFFFF !important; font-size: 68px !important; font-weight: 900 !important; }
-        [data-testid="stMetricLabel"] { color: #87CEEB !important; font-size: 32px !important; font-weight: 900 !important; }
+        [data-testid="stMetricLabel"] { color: #FFFFFF !important; font-size: 32px !important; font-weight: 900 !important; }
         
-        /* 超級強制保護指標數值 - 確保 68px */
+        /* 超級強制保護指標數值 - 確保 68px + 白色 */
         html body [data-testid="stMetricValue"],
         html body div[data-testid="stMetric"] [data-testid="stMetricValue"],
         html body div.stMetric [data-testid="stMetricValue"],
@@ -99,7 +99,7 @@ st.markdown("""
             line-height: 1.1 !important;
         }
         
-        /* 超級強制覆蓋指標標籤 - 淺藍色 - 最高權限 */
+        /* 超級強制覆蓋指標標籤 - 白色 - 最高權限 */
         html body [data-testid="stMetricLabel"],
         html body div[data-testid="stMetric"] [data-testid="stMetricLabel"],
         html body div.stMetric [data-testid="stMetricLabel"],
@@ -112,7 +112,7 @@ st.markdown("""
         html body div[data-testid="stMetric"] *,
         html body div.stMetric *:first-child,
         html body div[class*="stMetric"] *:first-child {
-            color: #87CEEB !important; 
+            color: #FFFFFF !important; 
             font-size: 32px !important; 
             font-weight: 900 !important;
             background: transparent !important;
