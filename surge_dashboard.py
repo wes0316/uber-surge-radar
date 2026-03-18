@@ -28,7 +28,7 @@ st.markdown("""
 
         /* 🎯 側邊欄開關文字 */
         [data-testid="stSidebar"] [data-testid="stWidgetLabel"] p {
-            font-size: 40px !important; 
+            font-size: 34px !important; 
             font-weight: 900 !important;
             color: #FFFFFF !important;
             line-height: 1.5 !important;
@@ -70,7 +70,7 @@ st.markdown("""
         }
         
         [data-testid="stSidebar"] div.stButton > button p {
-            font-size: 32px !important; 
+            font-size: 26px !important; 
             font-weight: 900 !important;
             color: #FFFFFF !important;
             white-space: nowrap !important; /* 絕對不換行 */
@@ -79,123 +79,13 @@ st.markdown("""
 
         /* --- 🎯 主畫面指標區域 --- */
         [data-testid="stMetricValue"] { color: #FFFFFF !important; font-size: 68px !important; font-weight: 900 !important; }
-        [data-testid="stMetricLabel"] { color: #00D4FF !important; font-size: 32px !important; font-weight: 900 !important; }
-        div[data-testid="stMetric"] { background: rgba(45, 45, 45, 0.9) !important; border-left: 12px solid #00D4FF !important; border-radius: 15px !important; padding: 30px !important; }
-        
-        /* 超級激進方案 - 使用所有可能的選擇器組合 */
-        html body [data-testid="stMetricValue"],
-        html body div[data-testid="stMetric"] [data-testid="stMetricValue"],
-        html body div.stMetric [data-testid="stMetricValue"],
-        html body div[data-testid="stMetric"] > div > div:last-child,
-        html body div.stMetric > div > div:last-child,
-        html body div[data-testid="stMetric"] div:last-child,
-        html body div[class*="st-"] [data-testid="stMetricValue"],
-        html body div[class*="st-"] div[data-testid="stMetricValue"],
-        html body div[class*="st-"] > div > div:last-child,
-        html body div[class*="st-"] div:last-child:not(:first-child),
-        html body div[data-testid="stMetric"] div,
-        html body div.stMetric div,
-        html body div[class*="st-"] div,
-        html body div[data-testid="stMetric"] *,
-        html body div.stMetric *,
-        html body div[class*="st-"] * {
-            font-size: 68px !important;
-            font-weight: 900 !important;
-            color: #FFFFFF !important;
-            line-height: 1.1 !important;
-            background: transparent !important;
-        }
-        
-        /* 然後精確修正標籤 */
-        html body [data-testid="stMetricLabel"],
-        html body div[data-testid="stMetric"] [data-testid="stMetricLabel"],
-        html body div.stMetric [data-testid="stMetricLabel"],
-        html body .st-em,
-        html body div[data-testid="stMetric"] > div > div:first-child,
-        html body div.stMetric > div > div:first-child {
-            font-size: 32px !important;
-            font-weight: 900 !important;
-            color: #00D4FF !important;
-            line-height: 1.2 !important;
-            background: transparent !important;
-        }
-        
-        /* 針對 Streamlit 可能的動態類別 - 排除指標數值 */
-        div[class*="st-"] div[class*="st-"] div[class*="st-"]:first-child:not([data-testid="stMetricValue"]),
-        div[class*="st-"] > div > div:first-child:not([data-testid="stMetricValue"]),
-        div[class*="st-"] div[class*="st-"] div[class*="st-"]:first-child:not(.stMetricValue),
-        div[class*="st-"] > div > div:first-child:not(.stMetricValue) {
-            font-size: 32px !important;
-            font-weight: 900 !important;
-            color: #00D4FF !important;
-        }
-        
-        /* 終極保護：確保所有可能的指標數值元素都是 68px */
-        [data-testid="stMetricValue"],
-        div[data-testid="stMetric"] [data-testid="stMetricValue"],
-        div.stMetric [data-testid="stMetricValue"],
-        div[data-testid="stMetric"] > div > div:last-child,
-        div.stMetric > div > div:last-child,
-        div[data-testid="stMetric"] div:last-child,
-        div[class*="st-"] [data-testid="stMetricValue"],
-        div[class*="st-"] div[data-testid="stMetricValue"],
-        div[class*="st-"] > div > div:last-child,
-        div[class*="st-"] div:last-child:not(:first-child) {
-            font-size: 68px !important;
-            font-weight: 900 !important;
-            color: #FFFFFF !important;
-            line-height: 1.1 !important;
-        }
+        [data-testid="stMetricLabel"] { color: #00D4FF !important; font-size: 28px !important; }
+        div[data-testid="stMetric"] { background: rgba(45, 45, 45, 0.9) !important; border-left: 12px solid #00D4FF !important; border-radius: 15px !important; }
         [data-testid="stSidebar"] { background-color: #111111 !important; border-right: 1px solid #333333 !important; padding-top: 2rem !important; }
         #MainMenu, footer, header {visibility: hidden;}
     </style>
     
     <script>
-        function fixMetricLabels() {
-            console.log('修正指標標籤文字大小');
-            const metrics = document.querySelectorAll('[data-testid="stMetric"]');
-            metrics.forEach((metric, index) => {
-                console.log(`處理指標 ${index}`);
-                const label = metric.querySelector('[data-testid="stMetricLabel"]');
-                const value = metric.querySelector('[data-testid="stMetricValue"]');
-                const allDivs = metric.querySelectorAll('div');
-                
-                console.log(`指標 ${index} 找到標籤:`, !!label, '找到數值:`, !!value, '總div數:', allDivs.length);
-                
-                // 強制設定數值為 68px - 使用多種方法
-                if (value) {
-                    value.style.cssText = 'font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important; line-height: 1.1 !important;';
-                    value.setAttribute('style', 'font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important; line-height: 1.1 !important;');
-                    console.log(`指標 ${index} 數值已強制設定為 68px`);
-                }
-                
-                // 檢查所有 div 元素，根據內容設定樣式
-                allDivs.forEach((div, divIndex) => {
-                    const text = div.textContent || '';
-                    console.log(`指標 ${index} div ${divIndex} 內容: "${text}"`);
-                    
-                    // 如果是數值內容，強制設定為 68px
-                    if (text.match(/^\d+.*處$/) || text.match(/^\d+$/) || text === '207 處' || text === '新店區') {
-                        div.style.cssText = 'font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important; line-height: 1.1 !important;';
-                        div.setAttribute('style', 'font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important; line-height: 1.1 !important;');
-                        console.log(`指標 ${index} div ${divIndex} 已設定為數值樣式 68px: "${text}"`);
-                    }
-                    // 如果是標籤內容，設定為 32px
-                    else if (text && text.trim() !== '') {
-                        div.style.cssText = 'font-size: 32px !important; font-weight: 900 !important; color: #00D4FF !important; line-height: 1.2 !important;';
-                        div.setAttribute('style', 'font-size: 32px !important; font-weight: 900 !important; color: #00D4FF !important; line-height: 1.2 !important;');
-                        console.log(`指標 ${index} div ${divIndex} 已設定為標籤樣式 32px: "${text}"`);
-                    }
-                });
-            });
-        }
-        
-        // 持續監控函數
-        function continuousFix() {
-            console.log('持續監控和修正指標樣式');
-            fixMetricLabels();
-        }
-        
         function overrideToggleStyles() {
             const toggles = document.querySelectorAll('[data-testid="stToggle"]');
             toggles.forEach(toggle => {
@@ -221,21 +111,8 @@ st.markdown("""
                 }
             });
         }
-        
         setTimeout(overrideToggleStyles, 200);
-        setTimeout(fixMetricLabels, 200);
-        setTimeout(fixMetricLabels, 500);
-        setTimeout(fixMetricLabels, 1000);
-        setTimeout(fixMetricLabels, 2000);
-        
-        // 持續監控 - 每 3 秒檢查一次
-        setInterval(continuousFix, 3000);
-        
-        // DOM 變化監控
-        new MutationObserver(() => {
-            overrideToggleStyles();
-            fixMetricLabels();
-        }).observe(document.body, { childList: true, subtree: true });
+        new MutationObserver(overrideToggleStyles).observe(document.body, { childList: true, subtree: true });
     </script>
 """, unsafe_allow_html=True)
 
@@ -290,7 +167,7 @@ if curr and 'coords' in curr:
 
 # --- 5. 側邊欄控制區 ---
 with st.sidebar:
-    st.markdown("<h2 style='color:#00D4FF; text-align:center; font-size: 48px; font-weight: 900; margin-bottom: 20px;'>⚒️ 戰術圖層</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='color:#00D4FF; text-align:center; font-size: 42px; font-weight: 900; margin-bottom: 20px;'>⚒️ 戰術圖層</h2>", unsafe_allow_html=True)
     
     show_rain = st.toggle("🌧️ 雷達回波", value=False)
     st.markdown("<div style='margin-bottom: 15px;'></div>", unsafe_allow_html=True)
@@ -315,20 +192,8 @@ top_3_centers, top_10_list, total_count = fetch_analysis_data()
 
 # --- 6. 主畫面指標 ---
 m1, m2 = st.columns(2)
-# 使用內聯樣式強制設定數值大小
-m1.markdown(f"""
-<div style="background-color: rgba(45, 45, 45, 0.9) !important; background: rgba(45, 45, 45, 0.9) !important; border-left: 12px solid #00D4FF !important; border-radius: 15px !important; padding: 30px !important; text-align: center; min-height: 120px;">
-    <div style="font-size: 32px !important; font-weight: 900 !important; color: #00D4FF !important; margin-bottom: 10px;">🔥 雙北紅區</div>
-    <div style="font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important; line-height: 1.1 !important;">{total_count} 處</div>
-</div>
-""", unsafe_allow_html=True)
-
-m2.markdown(f"""
-<div style="background-color: rgba(45, 45, 45, 0.9) !important; background: rgba(45, 45, 45, 0.9) !important; border-left: 12px solid #00D4FF !important; border-radius: 15px !important; padding: 30px !important; text-align: center; min-height: 120px;">
-    <div style="font-size: 32px !important; font-weight: 900 !important; color: #00D4FF !important; margin-bottom: 10px;">📍 所在區域</div>
-    <div style="font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important; line-height: 1.1 !important;">新店區</div>
-</div>
-""", unsafe_allow_html=True)
+m1.metric("🔥 雙北紅區", f"{total_count} 處")
+m2.metric("📍 所在區域", "新店區")
 st.divider()
 
 # --- 7. 地圖與排行 ---
@@ -353,9 +218,9 @@ with col_map:
     st_folium(m, width="100%", height=580, key=f"v12_{show_rain}_{show_heatmap}_{zoom}")
 
 with col_list:
-    st.markdown("<h3 style='font-size: 36px; color:#00D4FF; font-weight: 900;'>📈 紅區排行 TOP 10</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='font-size: 28px; color:#00D4FF;'>📈 紅區排行 TOP 10</h3>", unsafe_allow_html=True)
     if not top_10_list.empty:
-        html = "<table style='width:100%; color:white; font-size: 28px; border-collapse:collapse; font-weight: 900;'>"
+        html = "<table style='width:100%; color:white; font-size:24px; border-collapse:collapse;'>"
         for i, row in top_10_list.iterrows():
             color = "#FF4B4B" if i < 3 else "#FFFFFF"
             html += f"<tr style='border-bottom:1px solid #444;'><td style='padding:15px; color:{color};'>{row['area']}</td><td style='color:{color}; font-weight:bold; text-align:right;'>{row['count']}</td></tr>"
