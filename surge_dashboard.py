@@ -110,8 +110,18 @@ st.markdown("""
 
         /* --- 🎯 主畫面指標區域 --- */
         [data-testid="stMetricValue"] { color: #FFFFFF !important; font-size: 68px !important; font-weight: 900 !important; }
-        [data-testid="stMetricLabel"] { color: #00D4FF !important; font-size: 26px !important; font-weight: 900 !important; line-height: 1.2 !important; }
-        div[data-testid="stMetric"] { background: rgba(45, 45, 45, 0.9) !important; border-left: 12px solid #00D4FF !important; border-radius: 15px !important; padding: 20px !important; }
+        [data-testid="stMetricLabel"] { color: #00D4FF !important; font-size: 28px !important; font-weight: 900 !important; line-height: 1.2 !important; text-transform: uppercase !important; letter-spacing: 1px !important; }
+        div[data-testid="stMetric"] { background: rgba(45, 45, 45, 0.9) !important; border-left: 12px solid #00D4FF !important; border-radius: 15px !important; padding: 25px !important; }
+        
+        /* 強制覆蓋所有可能的指標標籤樣式 */
+        .st-em, [data-testid="stMetricLabel"], div[data-testid="stMetric"] [data-testid="stMetricLabel"], 
+        div.stMetric > div > div, div[data-testid="stMetric"] > div > div,
+        div[data-testid="stMetric"] > div:first-child,
+        div[data-testid="stMetric"] > div:last-child {
+            font-size: 28px !important; 
+            font-weight: 900 !important; 
+            color: #00D4FF !important;
+        }
         [data-testid="stSidebar"] { background-color: #111111 !important; border-right: 1px solid #333333 !important; padding-top: 2rem !important; }
         
         /* 🎯 開關底色終極修正 - 精確針對開關組件 */
