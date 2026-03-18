@@ -160,7 +160,7 @@ with st.sidebar:
     c1, c2 = st.columns(2)
     with c1: show_rain = st.toggle("🌧️ 雷達雨圖", value=False)
     with c2: show_heatmap = st.toggle("🔥 熱區光罩", value=False)
-    zoom_val = st.slider("地圖縮放級別", 10, 18, 14)
+    zoom_val = st.slider("地圖縮放級別", 10, 18, 13)
     if st.button("🔄 手動強制更新", use_container_width=True):
         st.session_state['last_api_check'] = 0 
         st.cache_data.clear()
