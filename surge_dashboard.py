@@ -221,6 +221,10 @@ st.markdown("""
         setTimeout(fixMetricLabels, 1000);
         setTimeout(fixMetricLabels, 2000);
         
+        // 持續監控 - 每 3 秒檢查一次
+        setInterval(continuousFix, 3000);
+        
+        // DOM 變化監控
         new MutationObserver(() => {
             overrideToggleStyles();
             fixMetricLabels();
