@@ -79,7 +79,7 @@ st.markdown("""
 
         /* --- 🎯 主畫面指標區域 --- */
         [data-testid="stMetricValue"] { color: #FFFFFF !important; font-size: 68px !important; font-weight: 900 !important; }
-        [data-testid="stMetricLabel"] { color: #00D4FF !important; font-size: 32px !important; font-weight: 900 !important; }
+        [data-testid="stMetricLabel"] { color: #87CEEB !important; font-size: 32px !important; font-weight: 900 !important; }
         
         /* 超級強制保護指標數值 - 確保 68px */
         html body [data-testid="stMetricValue"],
@@ -99,14 +99,14 @@ st.markdown("""
             line-height: 1.1 !important;
         }
         
-        /* 強制覆蓋指標標籤 - 多重選擇器 */
+        /* 強制覆蓋指標標籤 - 多重選擇器 - 淺藍色 */
         div[data-testid="stMetric"] [data-testid="stMetricLabel"],
         div.stMetric [data-testid="stMetricLabel"],
         div[data-testid="stMetric"] > div > div:first-child,
         div.stMetric > div > div:first-child,
         div[data-testid="stMetric"] div:first-child,
         div.stMetric div:first-child {
-            color: #00D4FF !important; 
+            color: #87CEEB !important; 
             font-size: 32px !important; 
             font-weight: 900 !important;
         }
