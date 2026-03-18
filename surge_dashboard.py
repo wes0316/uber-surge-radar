@@ -36,56 +36,25 @@ st.markdown("""
             white-space: nowrap !important; 
         }
 
-        /* 🎯 戰術開關 (Toggle) 本體 - 終極強制覆蓋 */
-        
-        /* 使用所有可能的選擇器強制覆蓋 OFF 狀態 */
-        [data-testid="stToggle"] label > div:first-child,
-        [data-testid="stToggle"] .st-ek,
-        [data-testid="stToggle"] div[style*="background"],
-        [data-testid="stToggle"] label div,
-        div[data-testid="stToggle"] > label > div,
-        div.st-ae > div > label > div {
+        /* 🎯 戰術開關 (Toggle) 本體 */
+        [data-testid="stToggle"] label > div:first-child { 
             width: 100px !important; height: 56px !important; 
             background-color: #2D1B1B !important; 
-            border: 3px solid #8B4513 !important; 
-            border-radius: 30px !important;
-            background-image: none !important;
-            box-shadow: none !important;
+            border: 3px solid #8B4513 !important; border-radius: 30px !important;
         }
-        
-        /* 強制覆蓋 ON 狀態 */
-        [data-testid="stToggle"] input:checked + div,
-        [data-testid="stToggle"] input:checked + .st-ek,
-        [data-testid="stToggle"] input:checked + div[style*="background"],
-        div[data-testid="stToggle"] > input:checked + label > div {
+        [data-testid="stToggle"] input:checked + div { 
             background-color: #00D4FF !important; 
             border: 3px solid #00D4FF !important; 
-            box-shadow: 0 0 30px rgba(0, 212, 255, 1) !important;
-            background-image: none !important;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 1) !important; 
         }
-        
-        /* 強制覆蓋 OFF 狀態滑塊 */
-        [data-testid="stToggle"] label > div:first-child > div,
-        [data-testid="stToggle"] .st-ek > div,
-        [data-testid="stToggle"] div[style*="background"] > div,
-        [data-testid="stToggle"] label div > div,
-        div[data-testid="stToggle"] > label > div > div {
+        [data-testid="stToggle"] label > div:first-child > div { 
             width: 44px !important; height: 44px !important; 
             top: 4px !important; left: 4px !important; 
-            background-color: #FF4444 !important; 
-            border: 2px solid #CC0000 !important;
-            background-image: none !important;
+            background-color: #FF4444 !important; border: 2px solid #CC0000 !important;
         }
-        
-        /* 強制覆蓋 ON 狀態滑塊 */
-        [data-testid="stToggle"] input:checked + div > div,
-        [data-testid="stToggle"] input:checked + .st-ek > div,
-        [data-testid="stToggle"] input:checked + div[style*="background"] > div,
-        div[data-testid="stToggle"] > input:checked + label > div > div {
+        [data-testid="stToggle"] input:checked + div > div { 
             transform: translateX(44px) !important; 
-            background-color: #00FF88 !important; 
-            border: 2px solid #00CC66 !important;
-            background-image: none !important;
+            background-color: #00FF88 !important; border: 2px solid #00CC66 !important;
         }
 
         /* ========================================= */
@@ -110,60 +79,41 @@ st.markdown("""
 
         /* --- 🎯 主畫面指標區域 --- */
         [data-testid="stMetricValue"] { color: #FFFFFF !important; font-size: 68px !important; font-weight: 900 !important; }
-        [data-testid="stMetricLabel"] { color: #00D4FF !important; font-size: 28px !important; font-weight: 900 !important; line-height: 1.2 !important; text-transform: uppercase !important; letter-spacing: 1px !important; }
-        div[data-testid="stMetric"] { background: rgba(45, 45, 45, 0.9) !important; border-left: 12px solid #00D4FF !important; border-radius: 15px !important; padding: 25px !important; }
-        
-        /* 強制覆蓋所有可能的指標標籤樣式 */
-        .st-em, [data-testid="stMetricLabel"], div[data-testid="stMetric"] [data-testid="stMetricLabel"], 
-        div.stMetric > div > div, div[data-testid="stMetric"] > div > div,
-        div[data-testid="stMetric"] > div:first-child,
-        div[data-testid="stMetric"] > div:last-child {
-            font-size: 28px !important; 
-            font-weight: 900 !important; 
-            color: #00D4FF !important;
-        }
+        [data-testid="stMetricLabel"] { color: #00D4FF !important; font-size: 28px !important; }
+        div[data-testid="stMetric"] { background: rgba(45, 45, 45, 0.9) !important; border-left: 12px solid #00D4FF !important; border-radius: 15px !important; }
         [data-testid="stSidebar"] { background-color: #111111 !important; border-right: 1px solid #333333 !important; padding-top: 2rem !important; }
-        
-        /* 🎯 開關底色終極修正 - 精確針對開關組件 */
-        [data-testid="stToggle"] > div,
-        [data-testid="stToggle"] > label > div,
-        [data-testid="stToggle"] div[style*="background"],
-        [data-testid="stToggle"] .st-ek {
-            background-color: #2D1B1B !important;
-            background: #2D1B1B !important;
-            border: 3px solid #8B4513 !important;
-        }
-        
-        [data-testid="stToggle"] input:checked + div,
-        [data-testid="stToggle"] input:checked + label > div,
-        [data-testid="stToggle"] input:checked + div[style*="background"],
-        [data-testid="stToggle"] input:checked + .st-ek {
-            background-color: #00D4FF !important;
-            background: #00D4FF !important;
-            border: 3px solid #00D4FF !important;
-            box-shadow: 0 0 30px rgba(0, 212, 255, 1) !important;
-        }
-        
-        [data-testid="stToggle"] > div > div,
-        [data-testid="stToggle"] > label > div > div,
-        [data-testid="stToggle"] div[style*="background"] > div,
-        [data-testid="stToggle"] .st-ek > div {
-            background-color: #FF4444 !important;
-            background: #FF4444 !important;
-            border: 2px solid #CC0000 !important;
-        }
-        
-        [data-testid="stToggle"] input:checked + div > div,
-        [data-testid="stToggle"] input:checked + label > div > div,
-        [data-testid="stToggle"] input:checked + div[style*="background"] > div,
-        [data-testid="stToggle"] input:checked + .st-ek > div {
-            background-color: #00FF88 !important;
-            background: #00FF88 !important;
-            border: 2px solid #00CC66 !important;
-        }
-        
         #MainMenu, footer, header {visibility: hidden;}
     </style>
+    
+    <script>
+        function overrideToggleStyles() {
+            const toggles = document.querySelectorAll('[data-testid="stToggle"]');
+            toggles.forEach(toggle => {
+                const divs = toggle.querySelectorAll('div');
+                const input = toggle.querySelector('input');
+                if (input && divs.length >= 2) {
+                    const update = () => {
+                        if (input.checked) {
+                            divs[0].style.backgroundColor = '#00D4FF';
+                            divs[0].style.border = '3px solid #00D4FF';
+                            divs[0].style.boxShadow = '0 0 30px rgba(0, 212, 255, 1)';
+                            divs[1].style.backgroundColor = '#00FF88';
+                        } else {
+                            divs[0].style.backgroundColor = '#2D1B1B';
+                            divs[0].style.border = '3px solid #8B4513';
+                            divs[0].style.boxShadow = 'none';
+                            divs[1].style.backgroundColor = '#FF4444';
+                        }
+                    };
+                    input.removeEventListener('change', update);
+                    input.addEventListener('change', update);
+                    update();
+                }
+            });
+        }
+        setTimeout(overrideToggleStyles, 200);
+        new MutationObserver(overrideToggleStyles).observe(document.body, { childList: true, subtree: true });
+    </script>
 """, unsafe_allow_html=True)
 
 # --- 3. 數據與定位邏輯 ---
@@ -236,12 +186,6 @@ with st.sidebar:
         # 開啟 use_container_width=True，讓按鈕完全填滿中間那個 80% 的欄位
         if st.button("🔄 即時刷新", use_container_width=True):
             st.cache_data.clear()
-            st.rerun()
-
-# 引用 JavaScript 文件來修正開關樣式
-st.components.v1.html("""
-<script src="toggle_styles.js"></script>
-""", height=0)
 
 # 獲取分析資料
 top_3_centers, top_10_list, total_count = fetch_analysis_data()
