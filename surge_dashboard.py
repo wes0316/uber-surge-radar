@@ -16,7 +16,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # --- 1. 介面基礎配置 ---
 st.set_page_config(page_title="Uber 運輸需求預測", page_icon="🚕", layout="wide")
 
-# --- 2. 核心 CSS 樣式：按鈕防溢出修正 ---
+# --- 2. 核心 CSS 樣式：移除不穩定的寬度限制，回歸純粹的視覺美化 ---
 st.markdown("""
     <style>
         html, body, [data-testid="stAppViewContainer"] {
@@ -58,43 +58,23 @@ st.markdown("""
         }
 
         /* ========================================= */
-        /* 🎯 立即重新整理按鈕：精確防溢出修正版 */
+        /* 🎯 立即重新整理按鈕：純視覺樣式 (寬度交由 Python columns 處理) */
         /* ========================================= */
-        
-        /* 1. 外層容器置中 */
-        [data-testid="stSidebar"] div.stButton {
-            display: flex !important;
-            justify-content: center !important;
-            width: 100% !important;
-            margin-top: 30px !important; 
-        }
-        
-        /* 2. 按鈕本體：限制 80% 寬度、加入隱藏溢出 */
         [data-testid="stSidebar"] div.stButton > button {
-            width: 80% !important; 
             height: 90px !important; 
             background: linear-gradient(135deg, #0052D4 0%, #4364F7 50%, #6FB1FC 100%) !important;
             border: 2px solid #00D4FF !important;
             border-radius: 18px !important;
             box-shadow: 0 6px 20px rgba(0, 212, 255, 0.4) !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
             padding: 0 !important;
-            overflow: hidden !important; /* 確保內容不會衝出背景 */
         }
         
-        /* 3. 按鈕內部文字：調整字級至 26px 以適應 80% 寬度 */
-        [data-testid="stSidebar"] div.stButton > button div[data-testid="stMarkdownContainer"],
         [data-testid="stSidebar"] div.stButton > button p {
-            width: 100% !important;
-            text-align: center !important;
-            font-size: 26px !important; /* 從 32px 縮減至 26px，確保塞得進 80% 寬度 */
+            font-size: 26px !important; 
             font-weight: 900 !important;
             color: #FFFFFF !important;
             white-space: nowrap !important; /* 絕對不換行 */
             margin: 0 !important;
-            padding: 0 !important;
         }
 
         /* --- 🎯 主畫面指標區域 --- */
@@ -197,10 +177,15 @@ with st.sidebar:
     
     auto_zoom = st.toggle("🚀 自動縮放", value=True)
     
-    st.markdown("<br><hr style='border-color: #444;'>", unsafe_allow_html=True)
+    st.markdown("<br><hr style='border-color: #444; margin-bottom: 20px;'>", unsafe_allow_html=True)
     
-    if st.button("🔄 即時刷新"):
-        st.cache_data.clear()
+    # 【核心修復】：利用 st.columns 原生網格系統切出 [1 : 8 : 1] 的比例
+    spacer_left, btn_col, spacer_right = st.columns([1, 8, 1])
+    
+    with btn_col:
+        # 開啟 use_container_width=True，讓按鈕完全填滿中間那個 80% 的欄位
+        if st.button("🔄 即時刷新", use_container_width=True):
+            st.cache_data.clear()
 
 # 獲取分析資料
 top_3_centers, top_10_list, total_count = fetch_analysis_data()
@@ -230,7 +215,7 @@ with col_map:
             folium.CircleMarker(location=[dist['lat'], dist['lon']], radius=6, color='white', fill=True, fill_color='red').add_to(m)
 
     folium.Marker(st.session_state['gps_pos'], icon=folium.Icon(color='blue', icon='car', prefix='fa')).add_to(m)
-    st_folium(m, width="100%", height=580, key=f"v11_{show_rain}_{show_heatmap}_{zoom}")
+    st_folium(m, width="100%", height=580, key=f"v12_{show_rain}_{show_heatmap}_{zoom}")
 
 with col_list:
     st.markdown("<h3 style='font-size: 28px; color:#00D4FF;'>📈 紅區排行 TOP 10</h3>", unsafe_allow_html=True)
