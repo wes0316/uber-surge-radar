@@ -28,7 +28,7 @@ st.markdown("""
 
         /* 🎯 側邊欄開關文字 */
         [data-testid="stSidebar"] [data-testid="stWidgetLabel"] p {
-            font-size: 34px !important; 
+            font-size: 40px !important; 
             font-weight: 900 !important;
             color: #FFFFFF !important;
             line-height: 1.5 !important;
