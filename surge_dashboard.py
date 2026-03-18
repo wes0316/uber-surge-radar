@@ -173,39 +173,48 @@ st.markdown("""
                 console.log(`處理指標 ${index}`);
                 const label = metric.querySelector('[data-testid="stMetricLabel"]');
                 const value = metric.querySelector('[data-testid="stMetricValue"]');
-                const firstDiv = metric.querySelector('div:first-child');
                 const allDivs = metric.querySelectorAll('div');
                 
-                console.log(`指標 ${index} 找到標籤:`, !!label, '找到數值:', !!value, '第一個div:', !!firstDiv, '總div數:', allDivs.length);
+                console.log(`指標 ${index} 找到標籤:`, !!label, '找到數值:', !!value, '總div數:', allDivs.length);
                 
-                // 只修正標籤，不修正數值
+                // 強制設定數值為 68px
+                if (value) {
+                    value.style.cssText = 'font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important; line-height: 1.1 !important;';
+                    console.log(`指標 ${index} 數值已強制設定為 68px`);
+                }
+                
+                // 強制設定所有可能的數值元素為 68px
+                const possibleValues = [
+                    metric.querySelector('[data-testid="stMetricValue"]'),
+                    allDivs[allDivs.length - 1], // 最後一個div通常是數值
+                    metric.querySelector('div:last-child'),
+                    allDivs[0] // 第一個div也可能是數值
+                ].filter(Boolean);
+                
+                possibleValues.forEach((elem, elemIndex) => {
+                    const text = elem.textContent || '';
+                    // 檢查是否為數值（包含數字和"處"）
+                    if (text.match(/^\d+.*處$/) || text.match(/^\d+$/) || text === '207 處' || text === '新店區') {
+                        elem.style.cssText = 'font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important; line-height: 1.1 !important;';
+                        console.log(`指標 ${index} 數值元素 ${elemIndex} 已設定為 68px:`, text);
+                    }
+                });
+                
+                // 強制設定標籤為 32px
                 const possibleLabels = [
                     label,
                     metric.querySelector('div[data-testid="stMetricLabel"]'),
                     metric.querySelector('.st-em'),
-                    allDivs[1], // 通常第二個div是標籤
-                    firstDiv // 如果第一個div不是數值
+                    allDivs[1], // 第二個div通常是標籤
+                    allDivs[0]  // 第一個div也可能是標籤
                 ].filter(Boolean);
                 
-                // 確保數值保持原來的大小
-                if (value) {
-                    value.style.fontSize = '68px !important';
-                    value.style.fontWeight = '900 !important';
-                    value.style.color = '#FFFFFF !important';
-                    value.setAttribute('style', value.getAttribute('style') + '; font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important;');
-                    console.log(`指標 ${index} 數值已設定為 68px`);
-                }
-                
-                // 只修正標籤
                 possibleLabels.forEach((elem, elemIndex) => {
+                    const text = elem.textContent || '';
                     // 檢查是否為標籤（不是數值）
-                    if (elem && elem !== value && elem.textContent && !elem.textContent.match(/^\d+.*處$/)) {
-                        console.log(`指標 ${index} 標籤元素 ${elemIndex}:`, elem.textContent);
-                        elem.style.fontSize = '32px !important';
-                        elem.style.fontWeight = '900 !important';
-                        elem.style.color = '#00D4FF !important';
-                        elem.style.lineHeight = '1.2 !important';
-                        elem.setAttribute('style', elem.getAttribute('style') + '; font-size: 32px !important; font-weight: 900 !important; color: #00D4FF !important; line-height: 1.2 !important;');
+                    if (!text.match(/^\d+.*處$/) && !text.match(/^\d+$/) && text !== '207 處' && text !== '新店區') {
+                        elem.style.cssText = 'font-size: 32px !important; font-weight: 900 !important; color: #00D4FF !important; line-height: 1.2 !important;';
+                        console.log(`指標 ${index} 標籤元素 ${elemIndex} 已設定為 32px:`, text);
                     }
                 });
             });
