@@ -82,17 +82,23 @@ st.markdown("""
         [data-testid="stMetricLabel"] { color: #00D4FF !important; font-size: 32px !important; font-weight: 900 !important; }
         div[data-testid="stMetric"] { background: rgba(45, 45, 45, 0.9) !important; border-left: 12px solid #00D4FF !important; border-radius: 15px !important; padding: 30px !important; }
         
-        /* 萬用選擇器 - 強制所有指標數值為 68px */
-        * [data-testid="stMetricValue"],
-        * div[data-testid="stMetric"] [data-testid="stMetricValue"],
-        * div.stMetric [data-testid="stMetricValue"],
-        * div[data-testid="stMetric"] > div > div:last-child,
-        * div.stMetric > div > div:last-child,
-        * div[data-testid="stMetric"] div:last-child,
-        * div[class*="st-"] [data-testid="stMetricValue"],
-        * div[class*="st-"] div[data-testid="stMetricValue"],
-        * div[class*="st-"] > div > div:last-child,
-        * div[class*="st-"] div:last-child:not(:first-child) {
+        /* 超級激進方案 - 使用所有可能的選擇器組合 */
+        html body [data-testid="stMetricValue"],
+        html body div[data-testid="stMetric"] [data-testid="stMetricValue"],
+        html body div.stMetric [data-testid="stMetricValue"],
+        html body div[data-testid="stMetric"] > div > div:last-child,
+        html body div.stMetric > div > div:last-child,
+        html body div[data-testid="stMetric"] div:last-child,
+        html body div[class*="st-"] [data-testid="stMetricValue"],
+        html body div[class*="st-"] div[data-testid="stMetricValue"],
+        html body div[class*="st-"] > div > div:last-child,
+        html body div[class*="st-"] div:last-child:not(:first-child),
+        html body div[data-testid="stMetric"] div,
+        html body div.stMetric div,
+        html body div[class*="st-"] div,
+        html body div[data-testid="stMetric"] *,
+        html body div.stMetric *,
+        html body div[class*="st-"] * {
             font-size: 68px !important;
             font-weight: 900 !important;
             color: #FFFFFF !important;
@@ -100,17 +106,18 @@ st.markdown("""
             background: transparent !important;
         }
         
-        /* 精確的指標標籤樣式 - 排除數值 */
-        [data-testid="stMetricLabel"],
-        div[data-testid="stMetric"] [data-testid="stMetricLabel"],
-        div.stMetric [data-testid="stMetricLabel"],
-        div[data-testid="stMetric"] > div > div:first-child:not([data-testid="stMetricValue"]),
-        div.stMetric > div > div:first-child:not([data-testid="stMetricValue"]),
-        .st-em:not([data-testid="stMetricValue"]) {
+        /* 然後精確修正標籤 */
+        html body [data-testid="stMetricLabel"],
+        html body div[data-testid="stMetric"] [data-testid="stMetricLabel"],
+        html body div.stMetric [data-testid="stMetricLabel"],
+        html body .st-em,
+        html body div[data-testid="stMetric"] > div > div:first-child,
+        html body div.stMetric > div > div:first-child {
             font-size: 32px !important;
             font-weight: 900 !important;
             color: #00D4FF !important;
             line-height: 1.2 !important;
+            background: transparent !important;
         }
         
         /* 針對 Streamlit 可能的動態類別 - 排除指標數值 */
