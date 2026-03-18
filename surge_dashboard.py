@@ -118,6 +118,21 @@ st.markdown("""
             background: transparent !important;
         }
         
+        /* 終極字型大小保護 - 防止任何縮小 */
+        html body div[data-testid="stMetric"] *,
+        html body div.stMetric *,
+        html body div[class*="stMetric"] * {
+            font-size: inherit !important;
+        }
+        
+        html body div[data-testid="stMetric"] *:first-child {
+            font-size: 32px !important;
+        }
+        
+        html body div[data-testid="stMetric"] *:last-child {
+            font-size: 68px !important;
+        }
+        
         div[data-testid="stMetric"] { background: rgba(45, 45, 45, 0.9) !important; border-left: 12px solid #00D4FF !important; border-radius: 15px !important; }
         [data-testid="stSidebar"] { background-color: #111111 !important; border-right: 1px solid #333333 !important; padding-top: 2rem !important; }
         #MainMenu, footer, header {visibility: hidden;}
