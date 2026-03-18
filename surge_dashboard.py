@@ -154,67 +154,7 @@ st.markdown("""
         
         #MainMenu, footer, header {visibility: hidden;}
     </style>
-    
-    <script>
-        console.log('開始執行開關樣式覆蓋');
-        
-        function setToggleStyles() {
-            const toggles = document.querySelectorAll('[data-testid="stToggle"]');
-            console.log('找到開關數量:', toggles.length);
-            
-            if (toggles.length === 0) {
-                console.log('沒有找到開關，等待...');
-                return;
-            }
-            
-            toggles.forEach((toggle, index) => {
-                console.log(`處理開關 ${index}`);
-                const divs = toggle.querySelectorAll('div');
-                const input = toggle.querySelector('input');
-                console.log(`開關 ${index} div數量:`, divs.length, 'input存在:', !!input);
-                
-                if (input && divs.length >= 2) {
-                    console.log(`開關 ${index} 狀態:`, input.checked);
-                    
-                    if (input.checked) {
-                        // ON 狀態 - 藍色底座 + 綠色滑塊
-                        divs[0].style.backgroundColor = '#00D4FF';
-                        divs[0].style.border = '3px solid #00D4FF';
-                        divs[0].style.boxShadow = '0 0 30px rgba(0, 212, 255, 1)';
-                        divs[1].style.backgroundColor = '#00FF88';
-                        divs[1].style.border = '2px solid #00CC66';
-                        divs[1].style.transform = 'translateX(44px)';
-                        console.log(`開關 ${index} 設定為 ON 狀態`);
-                    } else {
-                        // OFF 狀態 - 紅色底座 + 紅色滑塊
-                        divs[0].style.backgroundColor = '#2D1B1B';
-                        divs[0].style.border = '3px solid #8B4513';
-                        divs[0].style.boxShadow = 'none';
-                        divs[1].style.backgroundColor = '#FF4444';
-                        divs[1].style.border = '2px solid #CC0000';
-                        divs[1].style.transform = 'translateX(0px)';
-                        console.log(`開關 ${index} 設定為 OFF 狀態`);
-                    }
-                } else {
-                    console.log(`開關 ${index} 結構不符合預期`);
-                }
-            });
-        }
-        
-        // 多次嘗試執行
-        setToggleStyles();
-        setTimeout(setToggleStyles, 500);
-        setTimeout(setToggleStyles, 1000);
-        setTimeout(setToggleStyles, 2000);
-        setTimeout(setToggleStyles, 5000);
-        
-        // 監聽 DOM 變化
-        const observer = new MutationObserver(() => {
-            console.log('DOM 變化，重新設定開關樣式');
-            setToggleStyles();
-        });
-        observer.observe(document.body, { childList: true, subtree: true });
-    </script>""", unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
 # --- 3. 數據與定位邏輯 ---
 transformer = Transformer.from_crs("epsg:3826", "epsg:4326")
