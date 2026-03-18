@@ -151,15 +151,17 @@ st.markdown("""
         }
         
         function fixMetricLabels() {
-            console.log('修正指標標籤和數值');
+            console.log('修正指標標籤和數值 - 淺藍色');
             
-            // 修正指標標籤
+            // 超級強制修正指標標籤 - 淺藍色
             const metricLabels = document.querySelectorAll('[data-testid="stMetricLabel"]');
             metricLabels.forEach(elem => {
                 elem.style.fontSize = '32px !important';
                 elem.style.fontWeight = '900 !important';
                 elem.style.color = '#87CEEB !important';
-                console.log('指標標籤已修正:', elem.textContent);
+                elem.style.background = 'transparent !important';
+                elem.setAttribute('style', elem.getAttribute('style') + '; font-size: 32px !important; font-weight: 900 !important; color: #87CEEB !important; background: transparent !important;');
+                console.log('指標標籤已修正為淺藍色:', elem.textContent);
             });
             
             // 超級強制修正指標數值 - 確保 68px
@@ -173,17 +175,32 @@ st.markdown("""
                 console.log('指標數值已修正:', elem.textContent);
             });
             
-            // 嘗試其他可能的標籤選擇器
-            const otherLabels = document.querySelectorAll('div[data-testid="stMetric"] > div > div:first-child');
-            otherLabels.forEach(elem => {
-                const text = elem.textContent || '';
-                if (text && (text.includes('雙北紅區') || text.includes('所在區域'))) {
-                    elem.style.fontSize = '32px !important';
-                    elem.style.fontWeight = '900 !important';
-                    elem.style.color = '#87CEEB !important';
-                    elem.setAttribute('style', elem.getAttribute('style') + '; font-size: 32px !important; font-weight: 900 !important; color: #87CEEB !important;');
-                    console.log('其他指標標籤已修正:', text);
-                }
+            // 超級強制修正所有可能的標籤選擇器 - 淺藍色
+            const allPossibleLabels = [
+                'div[data-testid="stMetric"] > div > div:first-child',
+                'div.stMetric > div > div:first-child',
+                'div[data-testid="stMetric"] div:first-child',
+                'div.stMetric div:first-child',
+                'div[class*="stMetric"] [data-testid="stMetricLabel"]',
+                'div[class*="stMetric"] div:first-child',
+                'div[data-testid="stMetric"] *:first-child',
+                'div.stMetric *:first-child',
+                'div[class*="stMetric"] *:first-child'
+            ];
+            
+            allPossibleLabels.forEach(selector => {
+                const elements = document.querySelectorAll(selector);
+                elements.forEach(elem => {
+                    const text = elem.textContent || '';
+                    if (text && (text.includes('雙北紅區') || text.includes('所在區域'))) {
+                        elem.style.fontSize = '32px !important';
+                        elem.style.fontWeight = '900 !important';
+                        elem.style.color = '#87CEEB !important';
+                        elem.style.background = 'transparent !important';
+                        elem.setAttribute('style', elem.getAttribute('style') + '; font-size: 32px !important; font-weight: 900 !important; color: #87CEEB !important; background: transparent !important;');
+                        console.log('超級強制修正標籤為淺藍色:', text);
+                    }
+                });
             });
             
             // 超級強制修正其他可能的數值選擇器
@@ -198,6 +215,15 @@ st.markdown("""
                     elem.style.lineHeight = '1.1 !important';
                     elem.setAttribute('style', elem.getAttribute('style') + '; font-size: 68px !important; font-weight: 900 !important; color: #FFFFFF !important; line-height: 1.1 !important;');
                     console.log('超級強制修正數值:', text);
+                }
+                // 檢查是否為標籤內容 - 淺藍色
+                else if (text && (text.includes('雙北紅區') || text.includes('所在區域'))) {
+                    elem.style.fontSize = '32px !important';
+                    elem.style.fontWeight = '900 !important';
+                    elem.style.color = '#87CEEB !important';
+                    elem.style.background = 'transparent !important';
+                    elem.setAttribute('style', elem.getAttribute('style') + '; font-size: 32px !important; font-weight: 900 !important; color: #87CEEB !important; background: transparent !important;');
+                    console.log('超級強制修正標籤為淺藍色:', text);
                 }
             });
         }
