@@ -171,8 +171,11 @@ st.markdown("""
             text-overflow: ellipsis !important;
         }
 
-        /* 🎯 主畫面刷新按鈕樣式 */
-        div[data-testid="stVerticalBlock"] > div > div > div > div.stButton > button {
+        /* 🎯 主畫面刷新按鈕樣式 - 強制優先級 */
+        div[data-testid="stVerticalBlock"] > div > div > div > div.stButton > button,
+        div.stButton > button,
+        button[kind="primary"],
+        .stButton > button {
             background-color: #00D4FF !important;
             color: #000000 !important;
             font-size: 32px !important;
@@ -185,21 +188,29 @@ st.markdown("""
             transition: all 0.3s ease !important;
             text-align: center !important;
             width: 100% !important;
+            height: auto !important;
+            min-height: 60px !important;
         }
         
-        div[data-testid="stVerticalBlock"] > div > div > div > div.stButton > button:hover {
+        div[data-testid="stVerticalBlock"] > div > div > div > div.stButton > button:hover,
+        div.stButton > button:hover,
+        button[kind="primary"]:hover,
+        .stButton > button:hover {
             background-color: #00FF88 !important;
             border-color: #00FF88 !important;
             box-shadow: 0 12px 35px rgba(0, 255, 136, 0.7) !important;
             transform: scale(1.02) !important;
         }
         
-        /* 按鈕容器樣式 */
-        div[data-testid="stVerticalBlock"] > div > div > div > div.stButton {
+        /* 按鈕容器樣式 - 強制優先級 */
+        div[data-testid="stVerticalBlock"] > div > div > div > div.stButton,
+        div.stButton {
             display: flex !important;
             justify-content: center !important;
             align-items: center !important;
             width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
         }
 
         /* 指標容器中央對齊 - 只影響指標容器 */
