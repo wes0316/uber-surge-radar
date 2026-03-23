@@ -301,7 +301,7 @@ st.markdown("""
                 elem.style.justifyContent = "center !important";
                 elem.style.alignItems = "center !important";
                 elem.setAttribute("style", elem.getAttribute("style") + "; font-size: 40px !important; font-weight: 900 !important; color: #87CEEB !important; background: transparent !important; line-height: 1.2 !important; text-align: center !important; justify-content: center !important; align-items: center !important;");
-                console.log("指標標籤已修正為淺藍色 32px 中央對齊:", elem.textContent);
+                console.log("指標標籤已修正為淺藍色 40px 中央對齊:", elem.textContent);
             });
             
             // 終極強制修正指標數值 - 白色 + 68px + 中央對齊 - 多重選擇器
@@ -479,7 +479,7 @@ st.markdown("""
                 elem.style.justifyContent = "center !important";
                 elem.style.alignItems = "center !important";
                 elem.setAttribute("style", elem.getAttribute("style") + "; font-size: 40px !important; font-weight: 900 !important; color: #87CEEB !important; background: transparent !important; line-height: 1.2 !important; text-align: center !important; justify-content: center !important; align-items: center !important;");
-                console.log("指標標籤已修正為淺藍色 32px 中央對齊:", elem.textContent);
+                console.log("指標標籤已修正為淺藍色 40px 中央對齊:", elem.textContent);
             });
             
             // 終極強制修正指標數值 - 白色 + 68px + 中央對齊 - 多重選擇器
@@ -657,7 +657,7 @@ st.markdown("""
                 elem.style.justifyContent = "center !important";
                 elem.style.alignItems = "center !important";
                 elem.setAttribute("style", elem.getAttribute("style") + "; font-size: 40px !important; font-weight: 900 !important; color: #87CEEB !important; background: transparent !important; line-height: 1.2 !important; text-align: center !important; justify-content: center !important; align-items: center !important;");
-                console.log("指標標籤已修正為淺藍色 32px 中央對齊:", elem.textContent);
+                console.log("指標標籤已修正為淺藍色 40px 中央對齊:", elem.textContent);
             });
             
             // 終極強制修正指標數值 - 白色 + 68px + 中央對齊 - 多重選擇器
