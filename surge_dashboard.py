@@ -346,6 +346,59 @@ st.markdown("""
             });
         }
 
+        function fixRankingStyles() {
+            console.log("修正排行榜字體大小 - iPad mini 80cm 觀看距離");
+            
+            // 修正排行榜標題 - 28px
+            const rankingTitles = document.querySelectorAll("h2");
+            rankingTitles.forEach(elem => {
+                if (elem.textContent.includes("紅區排行榜")) {
+                    elem.style.fontSize = "28px !important";
+                    elem.style.fontWeight = "900 !important";
+                    elem.style.color = "#FFD700 !important";
+                    elem.style.whiteSpace = "nowrap !important";
+                    elem.style.overflow = "hidden !important";
+                    elem.style.textOverflow = "ellipsis !important";
+                    console.log("排行榜標題已修正為 28px");
+                }
+            });
+            
+            // 修正無數據提示 - 20px
+            const noDataMessages = document.querySelectorAll("p");
+            noDataMessages.forEach(elem => {
+                if (elem.textContent.includes("目前無紅區數據")) {
+                    elem.style.fontSize = "20px !important";
+                    elem.style.color = "#FFFFFF !important";
+                    elem.style.whiteSpace = "nowrap !important";
+                    elem.style.overflow = "hidden !important";
+                    elem.style.textOverflow = "ellipsis !important";
+                    console.log("無數據提示已修正為 20px");
+                }
+            });
+            
+            // 修正排行榜項目 - 地區名稱 18px, 數量 16px
+            const rankingItems = document.querySelectorAll("div[style*='background: rgba']");
+            rankingItems.forEach(elem => {
+                const goldTexts = elem.querySelectorAll("div[style*='color:#FFD700']");
+                goldTexts.forEach(gold => {
+                    gold.style.fontSize = "18px !important";
+                    gold.style.fontWeight = "900 !important";
+                    gold.style.whiteSpace = "nowrap !important";
+                    gold.style.overflow = "hidden !important";
+                    gold.style.textOverflow = "ellipsis !important";
+                });
+                
+                const whiteTexts = elem.querySelectorAll("div[style*='color:#FFFFFF']");
+                whiteTexts.forEach(white => {
+                    white.style.fontSize = "16px !important";
+                    white.style.fontWeight = "600 !important";
+                    white.style.whiteSpace = "nowrap !important";
+                    white.style.overflow = "hidden !important";
+                    white.style.textOverflow = "ellipsis !important";
+                });
+            });
+        }
+
         // 立即執行並監聽變化
         setTimeout(fixMetricLabels, 100);
         setTimeout(fixMetricLabels, 500);
