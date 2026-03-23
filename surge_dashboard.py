@@ -1089,16 +1089,55 @@ with col_list:
     else:
         st.write("目前無資料")
 
-# --- 8. 非阻塞式前端自動刷新 (180秒) ---
-components.html("""
+# --- 8. GPS三分鐘自動定位與地圖更新 ---
+components.html(f"""
     <script>
-        setTimeout(function() {
+        // GPS定位每三分鐘更新一次
+        function updateGPSAndMap() {{
             const buttons = window.parent.document.querySelectorAll('button');
-            buttons.forEach(b => {
-                if (b.innerText.includes('即時刷新')) {
+            buttons.forEach(b => {{
+                if (b.innerText.includes('即時刷新')) {{
                     b.click();
-                }
-            });
-        }, 180000); 
+                }}
+            }});
+        }}
+        
+        // 初始延遲3秒執行一次，然後每3分鐘執行一次
+        setTimeout(updateGPSAndMap, 3000);
+        setInterval(updateGPSAndMap, 180000);
+        
+        // 每分鐘檢查GPS位置並更新地圖中心
+        function updateMapCenter() {{
+            try {{
+                // 獲取當前GPS位置
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {{
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+                        
+                        // 更新地圖中心點
+                        const mapElements = document.querySelectorAll('.leaflet-map');
+                        mapElements.forEach(map => {{
+                            if (map._map) {{
+                                map._map.setView([lat, lon], map._map.getZoom());
+                            }}
+                        }});
+                    }},
+                    function(error) {{
+                        console.log('GPS定位失敗:', error);
+                    }},
+                    {{
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 60000
+                    }}
+                );
+            }} catch (e) {{
+                console.log('GPS更新失敗:', e);
+            }}
+        }}
+        
+        // 每分鐘嘗試更新地圖中心
+        setInterval(updateMapCenter, 60000);
     </script>
 """, height=0)
