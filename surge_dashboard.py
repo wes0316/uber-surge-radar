@@ -34,6 +34,8 @@ st.markdown("""
             line-height: 1.5 !important;
             margin-left: 10px !important;
             white-space: nowrap !important; 
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
         }
         /* 🎯 戰術開關 (Toggle) 本體 */
         [data-testid="stToggle"] label > div:first-child { 
