@@ -292,7 +292,7 @@ st.markdown("""
             // 終極強制修正指標標籤 - 淺藍色 + 32px + 中央對齊 - 多重選擇器
             const metricLabels = document.querySelectorAll("[data-testid=\"stMetricLabel\"]");
             metricLabels.forEach(elem => {
-                elem.style.fontSize = "32px !important";
+                elem.style.fontSize = "40px !important";
                 elem.style.fontWeight = "900 !important";
                 elem.style.color = "#87CEEB !important";
                 elem.style.background = "transparent !important";
@@ -348,7 +348,7 @@ st.markdown("""
                 elements.forEach(elem => {
                     const text = elem.textContent || "";
                     if (text && (text.includes("雙北紅區") || text.includes("所在區域") || text.includes("🔥") || text.includes("📍"))) {
-                        elem.style.fontSize = "32px !important";
+                        elem.style.fontSize = "40px !important";
                         elem.style.fontWeight = "900 !important";
                         elem.style.color = "#87CEEB !important";
                         elem.style.background = "transparent !important";
@@ -470,7 +470,7 @@ st.markdown("""
             // 終極強制修正指標標籤 - 淺藍色 + 32px + 中央對齊 - 多重選擇器
             const metricLabels = document.querySelectorAll("[data-testid=\"stMetricLabel\"]");
             metricLabels.forEach(elem => {
-                elem.style.fontSize = "32px !important";
+                elem.style.fontSize = "40px !important";
                 elem.style.fontWeight = "900 !important";
                 elem.style.color = "#87CEEB !important";
                 elem.style.background = "transparent !important";
@@ -526,7 +526,7 @@ st.markdown("""
                 elements.forEach(elem => {
                     const text = elem.textContent || "";
                     if (text && (text.includes("雙北紅區") || text.includes("所在區域") || text.includes("🔥") || text.includes("📍"))) {
-                        elem.style.fontSize = "32px !important";
+                        elem.style.fontSize = "40px !important";
                         elem.style.fontWeight = "900 !important";
                         elem.style.color = "#87CEEB !important";
                         elem.style.background = "transparent !important";
@@ -648,7 +648,7 @@ st.markdown("""
             // 終極強制修正指標標籤 - 淺藍色 + 32px + 中央對齊 - 多重選擇器
             const metricLabels = document.querySelectorAll("[data-testid=\"stMetricLabel\"]");
             metricLabels.forEach(elem => {
-                elem.style.fontSize = "32px !important";
+                elem.style.fontSize = "40px !important";
                 elem.style.fontWeight = "900 !important";
                 elem.style.color = "#87CEEB !important";
                 elem.style.background = "transparent !important";
@@ -704,7 +704,7 @@ st.markdown("""
                 elements.forEach(elem => {
                     const text = elem.textContent || "";
                     if (text && (text.includes("雙北紅區") || text.includes("所在區域") || text.includes("🔥") || text.includes("📍"))) {
-                        elem.style.fontSize = "32px !important";
+                        elem.style.fontSize = "40px !important";
                         elem.style.fontWeight = "900 !important";
                         elem.style.color = "#87CEEB !important";
                         elem.style.background = "transparent !important";
