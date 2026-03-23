@@ -978,6 +978,9 @@ m1.markdown(f"""
     line-height: 1.1 !important;
     display: block !important;
     margin-bottom: 15px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
 }}
 .metric-value {{
     color: #FFFFFF !important;
@@ -986,6 +989,9 @@ m1.markdown(f"""
     text-align: center !important;
     line-height: 1.1 !important;
     display: block !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
 }}
 .metric-container {{
     background: rgba(45, 45, 45, 0.9) !important; 
