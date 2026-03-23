@@ -1019,22 +1019,44 @@ with col_list:
         for i, (_, row) in enumerate(top_10_list.iterrows()):
             medal = "🥇" if i == 0 else "🥈" if i == 1 else "🥉" if i == 2 else "🏅"
             st.markdown(f"""
-            <div style="
-                background: rgba(45, 45, 45, 0.9) !important; 
-                border-left: 6px solid #FFD700 !important; 
-                border-radius: 10px !important; 
-                padding: 12px 15px !important; 
-                margin-bottom: 8px !important;
-                text-align: left !important;
-                min-height: 60px !important;
-                display: flex !important;
-                flex-direction: column !important;
-                justify-content: center !important;
-            ">
-                <div style="color:#FFD700 !important; font-size: 18px !important; font-weight: 900 !important; margin-bottom: 4px !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; line-height: 1.2 !important;">{medal} {row['area']}</div>
-                <div style="color:#FFFFFF !important; font-size: 16px !important; font-weight: 600 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; line-height: 1.3 !important;">{row['count']} 處</div>
-            </div>
-            """, unsafe_allow_html=True)
+<style>
+.ranking-item-{i} {{
+    background: rgba(45, 45, 45, 0.9) !important; 
+    border-left: 6px solid #FFD700 !important; 
+    border-radius: 10px !important; 
+    padding: 12px 15px !important; 
+    margin-bottom: 8px !important;
+    text-align: left !important;
+    min-height: 60px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+}}
+.ranking-area-{i} {{
+    color: #FFD700 !important;
+    font-size: 18px !important;
+    font-weight: 900 !important;
+    margin-bottom: 4px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    line-height: 1.2 !important;
+}}
+.ranking-count-{i} {{
+    color: #FFFFFF !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    line-height: 1.3 !important;
+}}
+</style>
+<div class="ranking-item-{i}">
+    <div class="ranking-area-{i}">{medal} {row['area']}</div>
+    <div class="ranking-count-{i}">{row['count']} 處</div>
+</div>
+""", unsafe_allow_html=True)
 
 # --- 10. GPS三分鐘自動定位與地圖更新 ---
 st.markdown(f"""
