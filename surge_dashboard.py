@@ -420,53 +420,59 @@ st.markdown("""
         function fixRankingStyles() {
             console.log("修正排行榜字體大小 - iPad mini 80cm 觀看距離");
             
-            // 修正排行榜標題 - 28px
-            const rankingTitles = document.querySelectorAll("h2");
-            rankingTitles.forEach(elem => {
-                if (elem.textContent.includes("紅區排行榜")) {
-                    elem.style.fontSize = "28px !important";
+            // 超級強制修正所有 h2
+            const allH2 = document.querySelectorAll("h2");
+            allH2.forEach(elem => {
+                elem.style.fontSize = "28px !important";
+                elem.style.fontWeight = "900 !important";
+                elem.style.color = "#FFD700 !important";
+                elem.style.whiteSpace = "nowrap !important";
+                elem.style.overflow = "hidden !important";
+                elem.style.textOverflow = "ellipsis !important";
+                elem.setAttribute("style", elem.getAttribute("style") + "; font-size: 28px !important; font-weight: 900 !important; color: #FFD700 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important;");
+                console.log("H2 強制修正為 28px:", elem.textContent);
+            });
+            
+            // 超級強制修正所有 p
+            const allP = document.querySelectorAll("p");
+            allP.forEach(elem => {
+                elem.style.fontSize = "20px !important";
+                elem.style.color = "#FFFFFF !important";
+                elem.style.whiteSpace = "nowrap !important";
+                elem.style.overflow = "hidden !important";
+                elem.style.textOverflow = "ellipsis !important";
+                elem.setAttribute("style", elem.getAttribute("style") + "; font-size: 20px !important; color: #FFFFFF !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important;");
+                console.log("P 強制修正為 20px:", elem.textContent);
+            });
+            
+            // 超級強制修正所有排行榜項目
+            const allDivs = document.querySelectorAll("div");
+            allDivs.forEach(elem => {
+                const style = elem.getAttribute("style") || "";
+                
+                // 金色文字
+                if (style.includes("color:#FFD700")) {
+                    elem.style.fontSize = "18px !important";
                     elem.style.fontWeight = "900 !important";
                     elem.style.color = "#FFD700 !important";
                     elem.style.whiteSpace = "nowrap !important";
                     elem.style.overflow = "hidden !important";
                     elem.style.textOverflow = "ellipsis !important";
-                    console.log("排行榜標題已修正為 28px");
+                    elem.setAttribute("style", elem.getAttribute("style") + "; font-size: 18px !important; font-weight: 900 !important; color: #FFD700 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important;");
+                    console.log("金色文字強制修正為 18px:", elem.textContent);
                 }
-            });
-            
-            // 修正無數據提示 - 20px
-            const noDataMessages = document.querySelectorAll("p");
-            noDataMessages.forEach(elem => {
-                if (elem.textContent.includes("目前無紅區數據")) {
-                    elem.style.fontSize = "20px !important";
+                
+                // 白色文字
+                if (style.includes("color:#FFFFFF") && !style.includes("color:#FFD700")) {
+                    elem.style.fontSize = "16px !important";
+                    elem.style.fontWeight = "600 !important";
                     elem.style.color = "#FFFFFF !important";
                     elem.style.whiteSpace = "nowrap !important";
                     elem.style.overflow = "hidden !important";
                     elem.style.textOverflow = "ellipsis !important";
-                    console.log("無數據提示已修正為 20px");
+                    elem.setAttribute("style", elem.getAttribute("style") + "; font-size: 16px !important; font-weight: 600 !important; color: #FFFFFF !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important;");
+                    console.log("白色文字強制修正為 16px:", elem.textContent);
                 }
-            });
-            
-            // 修正排行榜項目 - 地區名稱 18px, 數量 16px
-            const rankingItems = document.querySelectorAll("div[style*='background: rgba']");
-            rankingItems.forEach(elem => {
-                const goldTexts = elem.querySelectorAll("div[style*='color:#FFD700']");
-                goldTexts.forEach(gold => {
-                    gold.style.fontSize = "18px !important";
-                    gold.style.fontWeight = "900 !important";
-                    gold.style.whiteSpace = "nowrap !important";
-                    gold.style.overflow = "hidden !important";
-                    gold.style.textOverflow = "ellipsis !important";
-                });
-                
-                const whiteTexts = elem.querySelectorAll("div[style*='color:#FFFFFF']");
-                whiteTexts.forEach(white => {
-                    white.style.fontSize = "16px !important";
-                    white.style.fontWeight = "600 !important";
-                    white.style.whiteSpace = "nowrap !important";
-                    white.style.overflow = "hidden !important";
-                    white.style.textOverflow = "ellipsis !important";
-                });
             });
         }
 
