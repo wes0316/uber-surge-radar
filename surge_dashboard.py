@@ -619,6 +619,11 @@ st.markdown("""
         setTimeout(fixRankingStyles, 5000);
         setTimeout(fixRankingStyles, 8000);
         
+        // 調試字體樣式
+        setTimeout(debugStyles, 2000);
+        setTimeout(debugStyles, 5000);
+        setTimeout(debugStyles, 10000);
+        
         const observer = new MutationObserver(() => {
             setTimeout(fixMetricLabels, 100);
             setTimeout(fixRankingStyles, 100);
