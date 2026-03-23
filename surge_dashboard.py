@@ -85,9 +85,6 @@ def display_logo():
         </div>
         """, unsafe_allow_html=True)
 
-# 顯示 logo
-display_logo()
-
 # --- 2. 核心 CSS 樣式：移除不穩定的寬度限制，回歸純粹的視覺美化 ---
 st.markdown("""
     <style>
