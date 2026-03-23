@@ -483,6 +483,69 @@ st.markdown("""
             });
         }
 
+        function debugStyles() {
+            console.log("=== 調試字體樣式 ===");
+            
+            // 檢查所有 h2 元素
+            const allH2 = document.querySelectorAll("h2");
+            console.log("H2 元素數量:", allH2.length);
+            allH2.forEach((elem, index) => {
+                const computedStyle = window.getComputedStyle(elem);
+                console.log(`H2 ${index}:`, {
+                    text: elem.textContent,
+                    fontSize: computedStyle.fontSize,
+                    fontWeight: computedStyle.fontWeight,
+                    color: computedStyle.color,
+                    elementStyle: elem.getAttribute("style")
+                });
+            });
+            
+            // 檢查所有 p 元素
+            const allP = document.querySelectorAll("p");
+            console.log("P 元素數量:", allP.length);
+            allP.forEach((elem, index) => {
+                const computedStyle = window.getComputedStyle(elem);
+                console.log(`P ${index}:`, {
+                    text: elem.textContent,
+                    fontSize: computedStyle.fontSize,
+                    fontWeight: computedStyle.fontWeight,
+                    color: computedStyle.color,
+                    elementStyle: elem.getAttribute("style")
+                });
+            });
+            
+            // 檢查所有 div 元素
+            const allDivs = document.querySelectorAll("div");
+            let goldCount = 0, whiteCount = 0;
+            allDivs.forEach((elem, index) => {
+                const style = elem.getAttribute("style") || "";
+                if (style.includes("color:#FFD700")) {
+                    goldCount++;
+                    const computedStyle = window.getComputedStyle(elem);
+                    console.log(`金色文字 ${goldCount}:`, {
+                        text: elem.textContent,
+                        fontSize: computedStyle.fontSize,
+                        fontWeight: computedStyle.fontWeight,
+                        color: computedStyle.color,
+                        elementStyle: elem.getAttribute("style")
+                    });
+                }
+                if (style.includes("color:#FFFFFF") && !style.includes("color:#FFD700")) {
+                    whiteCount++;
+                    const computedStyle = window.getComputedStyle(elem);
+                    console.log(`白色文字 ${whiteCount}:`, {
+                        text: elem.textContent,
+                        fontSize: computedStyle.fontSize,
+                        fontWeight: computedStyle.fontWeight,
+                        color: computedStyle.color,
+                        elementStyle: elem.getAttribute("style")
+                    });
+                }
+            });
+            
+            console.log("=== 調試完成 ===");
+        }
+
         function fixRankingStyles() {
             console.log("修正排行榜字體大小 - iPad mini 80cm 觀看距離");
             
