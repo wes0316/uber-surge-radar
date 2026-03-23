@@ -834,6 +834,38 @@ st.markdown("""
 # --- 3. 數據與定位邏輯 ---
 transformer = Transformer.from_crs("epsg:3826", "epsg:4326")
 
+def get_address_from_coords(lat, lon):
+    """根據經緯度獲取地址"""
+    try:
+        # 使用 Nominatim 反向地理編碼服務
+        import json
+        url = f"https://nominatim.openstreetmap.org/reverse?format=json&lat={lat}&lon={lon}&accept-language=zh-TW"
+        headers = {'User-Agent': 'Uber Surge Radar Dashboard'}
+        response = requests.get(url, headers=headers, timeout=5)
+        if response.status_code == 200:
+            data = response.json()
+            # 嘗試獲取區域名稱
+            if 'address' in data:
+                address = data['address']
+                # 優先返回區域或城市
+                if 'suburb' in address:
+                    return address['suburb']
+                elif 'district' in address:
+                    return address['district']
+                elif 'city' in address:
+                    return address['city']
+                elif 'town' in address:
+                    return address['town']
+                elif 'village' in address:
+                    return address['village']
+                else:
+                    return "未知區域"
+            else:
+                return "未知區域"
+    except:
+        return "定位中..."
+    return "定位中..."
+
 @st.cache_data(ttl=600)
 def get_radar_image():
     ts = int(time.time() / 600)
