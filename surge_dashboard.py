@@ -110,6 +110,24 @@ st.markdown("""
             font-family: 'Inter', -apple-system, sans-serif !important;
         }
         
+        /* 🎯 移除頂部白色橫幅 */
+        .stApp > header {
+            background-color: #0E1117 !important;
+            background: #0E1117 !important;
+        }
+        
+        /* Streamlit 頂部導航欄 */
+        .stApp header {
+            background-color: #0E1117 !important;
+            background: #0E1117 !important;
+            border-bottom: none !important;
+        }
+        
+        /* 隱藏 Streamlit 預設標題 */
+        .stApp header .stTitle {
+            color: transparent !important;
+        }
+        
         /* 主內容區域背景 */
         .main .block-container {
             background-color: #0E1117 !important;
