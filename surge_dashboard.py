@@ -16,7 +16,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # --- 1. 介面基礎配置 ---
 st.set_page_config(page_title="Uber 運輸需求預測", page_icon="🚕", layout="wide")
 
-# --- 1.1 左上角 Logo 顯示 ---
+# --- 1.1 Logo 顯示函數 ---
 def display_logo():
     """在側邊欄戰術圖層上方顯示 Uber logo"""
     import os
