@@ -574,7 +574,7 @@ with col_list:
             """, unsafe_allow_html=True)
 
 # --- 10. GPS三分鐘自動定位與地圖更新 ---
-components.html(f"""
+st.markdown(f"""
     <script>
         // GPS定位每三分鐘更新一次
         function updateGPSAndMap() {{
@@ -624,4 +624,4 @@ components.html(f"""
         // 每分鐘嘗試更新地圖中心
         setInterval(updateMapCenter, 60000);
     </script>
-""", height=0)
+""", unsafe_allow_html=True)
