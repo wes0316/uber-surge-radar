@@ -718,12 +718,16 @@ with col_list:
                 background: rgba(45, 45, 45, 0.9) !important; 
                 border-left: 6px solid #FFD700 !important; 
                 border-radius: 10px !important; 
-                padding: 15px !important; 
-                margin-bottom: 10px !important;
+                padding: 12px 15px !important; 
+                margin-bottom: 8px !important;
                 text-align: left !important;
+                min-height: 60px !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: center !important;
             ">
-                <div style="color:#FFD700; font-size: 20px; font-weight: 900; margin-bottom: 5px;">{medal} {row['area']}</div>
-                <div style="color:#FFFFFF; font-size: 18px; font-weight: 600;">{row['count']} 處</div>
+                <div style="color:#FFD700; font-size: 18px; font-weight: 900; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{medal} {row['area']}</div>
+                <div style="color:#FFFFFF; font-size: 16px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{row['count']} 處</div>
             </div>
             """, unsafe_allow_html=True)
 
