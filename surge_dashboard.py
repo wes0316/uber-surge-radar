@@ -759,8 +759,32 @@ def get_geolocation():
 if 'gps_pos' not in st.session_state: st.session_state['gps_pos'] = (24.9669, 121.5451)
 if 'current_address' not in st.session_state: st.session_state['current_address'] = "定位中..."
 
+# 測試模式 - 使用不同的座標測試地址顯示
+test_locations = [
+    (25.0330, 121.5654, "信義區"),
+    (25.0419, 121.5069, "西門町"),
+    (25.0478, 121.5170, "台北車站"),
+    (24.9669, 121.5451, "預設位置"),
+    (25.0173, 121.4644, "板橋區"),
+    (24.1477, 120.6736, "台中區")
+]
+
+# 隨機選擇一個測試位置
+import random
+test_index = random.randint(0, len(test_locations) - 1)
+test_lat, test_lon, test_name = test_locations[test_index]
+
+print(f"測試模式: 使用 {test_name} 的座標 ({test_lat}, {test_lon})")
 print("開始獲取 GPS 位置...")
-curr = get_geolocation()
+
+# 暫時使用測試座標代替真實 GPS
+curr = {
+    'coords': {
+        'latitude': test_lat,
+        'longitude': test_lon,
+        'speed': 0
+    }
+}
 print(f"GPS 結果: {curr}")
 
 speed_kmh = 0
