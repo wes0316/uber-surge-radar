@@ -19,50 +19,65 @@ st.set_page_config(page_title="Uber 運輸需求預測", page_icon="🚕", layou
 # --- 1.1 左上角 Logo 顯示 ---
 def display_logo():
     """在左上角顯示 Uber logo"""
+    import os
+    
     try:
-        # 讀取 logo 文件並轉換為 base64
-        with open("logo.png", "rb") as image_file:
-            encoded_string = base64.b64encode(image_file.read()).decode()
+        # 獲取當前工作目錄並檢查 logo 文件
+        current_dir = os.getcwd()
+        logo_path = os.path.join(current_dir, "logo.png")
         
-        # 使用 CSS 定位在左上角
-        st.markdown(f"""
-        <div style="
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 9999;
-            background: rgba(0, 0, 0, 0.8);
-            border-radius: 15px;
-            padding: 8px;
-            border: 2px solid #00D4FF;
-            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
-        ">
-            <img src="data:image/png;base64,{encoded_string}" 
-                 alt="Uber Logo" 
-                 style="
-                     width: 60px;
-                     height: 60px;
-                     border-radius: 10px;
-                     object-fit: contain;
-                 ">
-        </div>
-        """, unsafe_allow_html=True)
+        if os.path.exists(logo_path):
+            # 讀取 logo 文件並轉換為 base64
+            with open(logo_path, "rb") as image_file:
+                encoded_string = base64.b64encode(image_file.read()).decode()
+            
+            # 使用 CSS 定位在左上角，增加 !important 確保樣式優先級
+            st.markdown(f"""
+            <div id="uber-logo" style="
+                position: fixed !important;
+                top: 20px !important;
+                left: 20px !important;
+                z-index: 99999 !important;
+                background: rgba(0, 0, 0, 0.9) !important;
+                border-radius: 15px !important;
+                padding: 8px !important;
+                border: 2px solid #00D4FF !important;
+                box-shadow: 0 4px 15px rgba(0, 212, 255, 0.6) !important;
+                pointer-events: none !important;
+            ">
+                <img src="data:image/png;base64,{encoded_string}" 
+                     alt="Uber Logo" 
+                     style="
+                         width: 60px !important;
+                         height: 60px !important;
+                         border-radius: 10px !important;
+                         object-fit: contain !important;
+                         display: block !important;
+                     ">
+            </div>
+            """, unsafe_allow_html=True)
+        else:
+            print(f"Logo 文件不存在: {logo_path}")
+            raise FileNotFoundError("Logo file not found")
+            
     except Exception as e:
+        print(f"Logo 載入錯誤: {e}")
         # 如果 logo 文件不存在，顯示文字版 logo
         st.markdown("""
-        <div style="
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 9999;
-            background: rgba(0, 0, 0, 0.8);
-            border-radius: 15px;
-            padding: 15px;
-            border: 2px solid #00D4FF;
-            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
-            color: white;
-            font-size: 24px;
-            font-weight: 900;
+        <div id="uber-logo-text" style="
+            position: fixed !important;
+            top: 20px !important;
+            left: 20px !important;
+            z-index: 99999 !important;
+            background: rgba(0, 0, 0, 0.9) !important;
+            border-radius: 15px !important;
+            padding: 15px !important;
+            border: 2px solid #00D4FF !important;
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.6) !important;
+            color: white !important;
+            font-size: 24px !important;
+            font-weight: 900 !important;
+            pointer-events: none !important;
         ">
             🚕 UBER
         </div>
