@@ -16,6 +16,61 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # --- 1. 介面基礎配置 ---
 st.set_page_config(page_title="Uber 運輸需求預測", page_icon="🚕", layout="wide")
 
+# --- 1.1 左上角 Logo 顯示 ---
+def display_logo():
+    """在左上角顯示 Uber logo"""
+    try:
+        # 讀取 logo 文件並轉換為 base64
+        with open("logo.png", "rb") as image_file:
+            encoded_string = base64.b64encode(image_file.read()).decode()
+        
+        # 使用 CSS 定位在左上角
+        st.markdown(f"""
+        <div style="
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 9999;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 15px;
+            padding: 8px;
+            border: 2px solid #00D4FF;
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
+        ">
+            <img src="data:image/png;base64,{encoded_string}" 
+                 alt="Uber Logo" 
+                 style="
+                     width: 60px;
+                     height: 60px;
+                     border-radius: 10px;
+                     object-fit: contain;
+                 ">
+        </div>
+        """, unsafe_allow_html=True)
+    except Exception as e:
+        # 如果 logo 文件不存在，顯示文字版 logo
+        st.markdown("""
+        <div style="
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 9999;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 15px;
+            padding: 15px;
+            border: 2px solid #00D4FF;
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
+            color: white;
+            font-size: 24px;
+            font-weight: 900;
+        ">
+            🚕 UBER
+        </div>
+        """, unsafe_allow_html=True)
+
+# 顯示 logo
+display_logo()
+
 # --- 2. 核心 CSS 樣式：移除不穩定的寬度限制，回歸純粹的視覺美化 ---
 st.markdown("""
     <style>
