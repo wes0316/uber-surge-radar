@@ -405,8 +405,14 @@ st.markdown("""
         setTimeout(fixMetricLabels, 1000);
         setTimeout(fixMetricLabels, 2000);
         
+        setTimeout(fixRankingStyles, 100);
+        setTimeout(fixRankingStyles, 500);
+        setTimeout(fixRankingStyles, 1000);
+        setTimeout(fixRankingStyles, 2000);
+        
         const observer = new MutationObserver(() => {
             setTimeout(fixMetricLabels, 100);
+            setTimeout(fixRankingStyles, 100);
         });
         observer.observe(document.body, { childList: true, subtree: true });
     </script>
