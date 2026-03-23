@@ -108,18 +108,10 @@ st.markdown("""
             background: #0E1117 !important;
             color: #FFFFFF !important; 
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif !important;
-            font-size: 16px !important;
-            font-weight: 400 !important;
-            line-height: 1.5 !important;
         }
         
-        /* 強制所有文字字體 */
-        *, *::before, *::after {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif !important;
-        }
-        
-        /* 所有段落和標題字體 */
-        p, h1, h2, h3, h4, h5, h6, div, span {
+        /* 只為基本元素設定字體，不覆蓋內聯樣式 */
+        .stApp {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif !important;
         }
         
