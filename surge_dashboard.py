@@ -18,7 +18,7 @@ st.set_page_config(page_title="Uber 運輸需求預測", page_icon="🚕", layou
 
 # --- 1.1 左上角 Logo 顯示 ---
 def display_logo():
-    """在左上角顯示 Uber logo"""
+    """在側邊欄戰術圖層上方顯示 Uber logo"""
     import os
     
     try:
@@ -31,69 +31,59 @@ def display_logo():
             with open(logo_path, "rb") as image_file:
                 encoded_string = base64.b64encode(image_file.read()).decode()
             
-            # 使用 st.columns 在頂部創建一個小區域來顯示 logo
-            col1, col2, col3 = st.columns([1, 8, 1])
-            with col1:
-                st.markdown(f"""
-                <div style="
-                    text-align: left;
-                    margin-top: 10px;
-                    margin-bottom: 10px;
-                ">
-                    <img src="data:image/png;base64,{encoded_string}" 
-                         alt="Uber Logo" 
-                         style="
-                             width: 50px;
-                             height: 50px;
-                             border-radius: 10px;
-                             object-fit: contain;
-                             border: 2px solid #00D4FF;
-                             box-shadow: 0 4px 15px rgba(0, 212, 255, 0.6);
-                         ">
-                </div>
-                """, unsafe_allow_html=True)
-            with col2:
-                st.empty()  # 空白區域
-            with col3:
-                st.empty()  # 空白區域
+            # 顯示 logo 在側邊欄
+            st.markdown(f"""
+            <div style="
+                text-align: center;
+                margin-bottom: 20px;
+                padding: 10px;
+            ">
+                <img src="data:image/png;base64,{encoded_string}" 
+                     alt="Uber Logo" 
+                     style="
+                         width: 80px;
+                         height: 80px;
+                         border-radius: 15px;
+                         object-fit: contain;
+                         border: 3px solid #00D4FF;
+                         box-shadow: 0 6px 20px rgba(0, 212, 255, 0.6);
+                         background: rgba(0, 0, 0, 0.8);
+                         padding: 10px;
+                     ">
+            </div>
+            """, unsafe_allow_html=True)
                 
         else:
             print(f"Logo 文件不存在: {logo_path}")
             # 如果 logo 文件不存在，顯示文字版 logo
-            col1, col2, col3 = st.columns([1, 8, 1])
-            with col1:
-                st.markdown("""
-                <div style="
-                    text-align: left;
-                    margin-top: 10px;
-                    margin-bottom: 10px;
-                    background: rgba(0, 0, 0, 0.9);
-                    border-radius: 15px;
-                    padding: 10px;
-                    border: 2px solid #00D4FF;
-                    box-shadow: 0 4px 15px rgba(0, 212, 255, 0.6);
-                    color: white;
-                    font-size: 20px;
-                    font-weight: 900;
-                ">
-                    🚕 UBER
-                </div>
-                """, unsafe_allow_html=True)
-            with col2:
-                st.empty()
-            with col3:
-                st.empty()
+            st.markdown("""
+            <div style="
+                text-align: center;
+                margin-bottom: 20px;
+                background: rgba(0, 0, 0, 0.9);
+                border-radius: 15px;
+                padding: 15px;
+                border: 3px solid #00D4FF;
+                box-shadow: 0 6px 20px rgba(0, 212, 255, 0.6);
+                color: white;
+                font-size: 28px;
+                font-weight: 900;
+            ">
+                🚕 UBER
+            </div>
+            """, unsafe_allow_html=True)
             
     except Exception as e:
         print(f"Logo 載入錯誤: {e}")
         # 顯示簡單的文字版 logo
-        col1, col2, col3 = st.columns([1, 8, 1])
-        with col1:
-            st.markdown("### 🚕 UBER")
-        with col2:
-            st.empty()
-        with col3:
-            st.empty()
+        st.markdown("""
+        <div style="
+            text-align: center;
+            margin-bottom: 20px;
+        ">
+            ### 🚕 UBER
+        </div>
+        """, unsafe_allow_html=True)
 
 # 顯示 logo
 display_logo()
