@@ -171,6 +171,37 @@ st.markdown("""
             text-overflow: ellipsis !important;
         }
 
+        /* 🎯 主畫面刷新按鈕樣式 */
+        div[data-testid="stVerticalBlock"] > div > div > div > div.stButton > button {
+            background-color: #00D4FF !important;
+            color: #000000 !important;
+            font-size: 32px !important;
+            font-weight: 900 !important;
+            border: 3px solid #00D4FF !important;
+            border-radius: 15px !important;
+            padding: 15px 30px !important;
+            margin: 20px 0 !important;
+            box-shadow: 0 8px 25px rgba(0, 212, 255, 0.5) !important;
+            transition: all 0.3s ease !important;
+            text-align: center !important;
+            width: 100% !important;
+        }
+        
+        div[data-testid="stVerticalBlock"] > div > div > div > div.stButton > button:hover {
+            background-color: #00FF88 !important;
+            border-color: #00FF88 !important;
+            box-shadow: 0 12px 35px rgba(0, 255, 136, 0.7) !important;
+            transform: scale(1.02) !important;
+        }
+        
+        /* 按鈕容器樣式 */
+        div[data-testid="stVerticalBlock"] > div > div > div > div.stButton {
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            width: 100% !important;
+        }
+
         /* 指標容器中央對齊 - 只影響指標容器 */
         div[data-testid="stMetric"] {
             background: rgba(45, 45, 45, 0.9) !important; 
