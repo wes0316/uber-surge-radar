@@ -98,25 +98,6 @@ def display_logo():
 # 顯示 logo
 display_logo()
 
-# 確保 logo 顯示的額外 JavaScript
-st.markdown("""
-<script>
-    // 確保 logo 在頁面載入後顯示
-    document.addEventListener('DOMContentLoaded', function() {
-        setTimeout(function() {
-            const logo = document.getElementById('uber-logo') || document.getElementById('uber-logo-text');
-            if (logo) {
-                logo.style.display = 'block';
-                logo.style.visibility = 'visible';
-                console.log('Uber Logo 已顯示');
-            } else {
-                console.log('未找到 Uber Logo 元素');
-            }
-        }, 1000);
-    });
-</script>
-""", unsafe_allow_html=True)
-
 # --- 2. 核心 CSS 樣式：移除不穩定的寬度限制，回歸純粹的視覺美化 ---
 st.markdown("""
     <style>
