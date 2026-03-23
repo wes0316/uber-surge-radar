@@ -979,84 +979,23 @@ with col_map:
 
 # --- 9.2 排行榜 ---
 with col_list:
-    st.markdown("""
-<style>
-.ranking-title {
-    color: #FFD700 !important;
-    text-align: center !important;
-    font-size: 36px !important;
-    font-weight: 900 !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    line-height: 1.2 !important;
-    margin: 0 !important;
-    padding: 10px 0 !important;
-}
-</style>
-<h2 class="ranking-title"><font size="7" color="#FFD700">🏆 紅區排行榜</font></h2>
-""", unsafe_allow_html=True)
+    # 使用 Streamlit 原生標題
+    st.markdown("## 🏆 紅區排行榜")
     
     if top_10_list.empty:
-        st.markdown("""
-<style>
-.no-data-message {
-    color: #FFFFFF !important;
-    text-align: center !important;
-    font-size: 36px !important;
-    font-weight: 900 !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    line-height: 1.4 !important;
-    margin: 10px 0 !important;
-    padding: 5px 0 !important;
-}
-</style>
-<p class="no-data-message"><font size="7" color="#FFFFFF">📊 目前無紅區數據</font></p>
-""", unsafe_allow_html=True)
+        st.write("### 📊 目前無紅區數據")
     else:
         for i, (_, row) in enumerate(top_10_list.iterrows()):
             medal = "🥇" if i == 0 else "🥈" if i == 1 else "🥉" if i == 2 else "🏅"
-            st.markdown(f"""
-<style>
-.ranking-item-{i} {{
-    background: rgba(45, 45, 45, 0.9) !important; 
-    border-left: 6px solid #FFD700 !important; 
-    border-radius: 10px !important; 
-    padding: 12px 15px !important; 
-    margin-bottom: 8px !important;
-    text-align: left !important;
-    min-height: 85px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-}}
-.ranking-area-{i} {{
-    color: #FFD700 !important;
-    font-size: 36px !important;
-    font-weight: 900 !important;
-    margin-bottom: 4px !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    line-height: 1.2 !important;
-}}
-.ranking-count-{i} {{
-    color: #FFFFFF !important;
-    font-size: 36px !important;
-    font-weight: 900 !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    line-height: 1.3 !important;
-}}
-</style>
-<div class="ranking-item-{i}">
-    <div class="ranking-area-{i}"><font size="7" color="#FFD700">{medal} {row['area']}</font></div>
-    <div class="ranking-count-{i}"><font size="7" color="#FFFFFF">{row['count']} 處</font></div>
-</div>
-""", unsafe_allow_html=True)
+            
+            # 使用 Streamlit 原生組件
+            col1, col2 = st.columns([3, 1])
+            with col1:
+                st.write(f"### {medal} {row['area']}")
+            with col2:
+                st.write(f"### {row['count']} 處")
+            
+            st.write("---")
 
 # --- 10. GPS三分鐘自動定位與地圖更新 ---
 st.markdown(f"""
