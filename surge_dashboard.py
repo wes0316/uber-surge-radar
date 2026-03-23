@@ -301,40 +301,18 @@ st.markdown("""
             padding: 0 !important;
         }
 
-        /* 🎯 排行榜表格樣式 - 強制字體 */
+        /* 🎯 排行榜表格樣式 - 保留內聯樣式 */
         [data-testid="stVerticalBlock"] > div > div > div > div[data-testid="stVerticalBlock"] > div > div > div {
-            font-family: 'Inter', -apple-system, sans-serif !important;
-            font-weight: 600 !important;
-            color: #FFFFFF !important;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif !important;
         }
         
-        /* 排行榜標題樣式 */
+        /* 只為沒有內聯樣式的元素設定字體 */
         [data-testid="stVerticalBlock"] h2 {
-            font-family: 'Inter', -apple-system, sans-serif !important;
-            font-size: 36px !important;
-            font-weight: 900 !important;
-            color: #FFD700 !important;
-            text-align: center !important;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif !important;
         }
         
-        /* 排行榜內容樣式 */
-        [data-testid="stVerticalBlock"] div[style*="background: rgba"] {
-            font-family: 'Inter', -apple-system, sans-serif !important;
-            font-weight: 600 !important;
-        }
-        
-        [data-testid="stVerticalBlock"] div[style*="color:#FFD700"] {
-            font-family: 'Inter', -apple-system, sans-serif !important;
-            font-size: 20px !important;
-            font-weight: 900 !important;
-            color: #FFD700 !important;
-        }
-        
-        [data-testid="stVerticalBlock"] div[style*="color:#FFFFFF"] {
-            font-family: 'Inter', -apple-system, sans-serif !important;
-            font-size: 18px !important;
-            font-weight: 600 !important;
-            color: #FFFFFF !important;
+        [data-testid="stVerticalBlock"] p {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif !important;
         }
 
         /* 指標容器中央對齊 - 只影響指標容器 */
