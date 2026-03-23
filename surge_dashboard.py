@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import requests
 import folium
-from streamlit_folium import st_folium_static
+from streamlit_folium import folium_static
 import time
 import urllib3
 import base64
