@@ -31,25 +31,31 @@ def display_logo():
             with open(logo_path, "rb") as image_file:
                 encoded_string = base64.b64encode(image_file.read()).decode()
             
-            # 顯示 logo 在側邊欄
+            # 顯示 logo 在側邊邊欄，寬度為側邊欄的 80%
             st.markdown(f"""
             <div style="
                 text-align: center;
                 margin-bottom: 20px;
                 padding: 10px;
+                width: 100%;
+                box-sizing: border-box;
             ">
                 <img src="data:image/png;base64,{encoded_string}" 
                      alt="Uber Logo" 
                      style="
-                         width: 80px;
-                         height: 80px;
-                         border-radius: 15px;
+                         width: 80%;
+                         max-width: 200px;
+                         height: auto;
+                         border-radius: 20px;
                          object-fit: contain;
-                         border: 3px solid #00D4FF;
-                         box-shadow: 0 6px 20px rgba(0, 212, 255, 0.6);
-                         background: rgba(0, 0, 0, 0.8);
-                         padding: 10px;
-                     ">
+                         border: 4px solid #00D4FF;
+                         box-shadow: 0 8px 25px rgba(0, 212, 255, 0.7);
+                         background: rgba(0, 0, 0, 0.9);
+                         padding: 15px;
+                         transition: transform 0.3s ease, box-shadow 0.3s ease;
+                     "
+                     onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 12px 35px rgba(0, 212, 255, 0.9)'"
+                     onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 8px 25px rgba(0, 212, 255, 0.7)'">
             </div>
             """, unsafe_allow_html=True)
                 
@@ -61,13 +67,17 @@ def display_logo():
                 text-align: center;
                 margin-bottom: 20px;
                 background: rgba(0, 0, 0, 0.9);
-                border-radius: 15px;
-                padding: 15px;
-                border: 3px solid #00D4FF;
-                box-shadow: 0 6px 20px rgba(0, 212, 255, 0.6);
+                border-radius: 20px;
+                padding: 20px;
+                border: 4px solid #00D4FF;
+                box-shadow: 0 8px 25px rgba(0, 212, 255, 0.7);
                 color: white;
-                font-size: 28px;
+                font-size: 32px;
                 font-weight: 900;
+                width: 80%;
+                margin-left: 10%;
+                margin-right: 10%;
+                box-sizing: border-box;
             ">
                 🚕 UBER
             </div>
@@ -80,6 +90,9 @@ def display_logo():
         <div style="
             text-align: center;
             margin-bottom: 20px;
+            width: 80%;
+            margin-left: 10%;
+            margin-right: 10%;
         ">
             ### 🚕 UBER
         </div>
