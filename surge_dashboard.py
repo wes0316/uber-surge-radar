@@ -994,7 +994,7 @@ with col_list:
     padding: 10px 0 !important;
 }
 </style>
-<h2 class="ranking-title">🏆 紅區排行榜</h2>
+<h2 class="ranking-title"><font size="7" color="#FFD700">🏆 紅區排行榜</font></h2>
 """, unsafe_allow_html=True)
     
     if top_10_list.empty:
