@@ -176,7 +176,7 @@ st.markdown("""
         }
         [data-testid="stMetricLabel"] { 
             color: #87CEEB !important; 
-            font-size: 32px !important; 
+            font-size: 40px !important; 
             font-weight: 900 !important; 
             text-align: center !important;
             white-space: nowrap !important;
