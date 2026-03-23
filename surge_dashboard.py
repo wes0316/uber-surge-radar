@@ -77,6 +77,8 @@ st.markdown("""
             font-weight: 900 !important;
             color: #FFFFFF !important;
             white-space: nowrap !important; /* 絕對不換行 */
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
             margin: 0 !important;
         }
 
