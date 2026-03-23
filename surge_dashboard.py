@@ -293,6 +293,77 @@ st.markdown("""
             padding: 0 !important;
         }
 
+        /* 🎯 排行榜字體大小 - 超級強制優先級 */
+        h2:not([data-testid]) {
+            font-size: 28px !important;
+            font-weight: 900 !important;
+            color: #FFD700 !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+        }
+        
+        /* 排行榜標題 - 終極強制 */
+        html body h2,
+        body h2,
+        .stApp h2,
+        [data-testid="stVerticalBlock"] h2,
+        div[data-testid="stVerticalBlock"] h2 {
+            font-size: 28px !important;
+            font-weight: 900 !important;
+            color: #FFD700 !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+        }
+        
+        /* 無數據提示 - 終極強制 */
+        html body p,
+        body p,
+        .stApp p,
+        [data-testid="stVerticalBlock"] p,
+        div[data-testid="stVerticalBlock"] p {
+            font-size: 20px !important;
+            color: #FFFFFF !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+        }
+        
+        /* 排行榜項目容器 - 終極強制 */
+        html body div[style*="background: rgba"],
+        body div[style*="background: rgba"],
+        .stApp div[style*="background: rgba"],
+        [data-testid="stVerticalBlock"] div[style*="background: rgba"] {
+            font-size: inherit !important;
+        }
+        
+        /* 地區名稱 - 終極強制 */
+        html body div[style*="color:#FFD700"],
+        body div[style*="color:#FFD700"],
+        .stApp div[style*="color:#FFD700"],
+        [data-testid="stVerticalBlock"] div[style*="color:#FFD700"] {
+            font-size: 18px !important;
+            font-weight: 900 !important;
+            color: #FFD700 !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+        }
+        
+        /* 數量顯示 - 終極強制 */
+        html body div[style*="color:#FFFFFF"],
+        body div[style*="color:#FFFFFF"],
+        .stApp div[style*="color:#FFFFFF"],
+        [data-testid="stVerticalBlock"] div[style*="color:#FFFFFF"] {
+            font-size: 16px !important;
+            font-weight: 600 !important;
+            color: #FFFFFF !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+        }
+
         /* 🎯 排行榜表格樣式 - 保留內聯樣式 */
         [data-testid="stVerticalBlock"] > div > div > div > div[data-testid="stVerticalBlock"] > div > div > div {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif !important;
