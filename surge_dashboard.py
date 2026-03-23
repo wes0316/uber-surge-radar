@@ -300,7 +300,7 @@ st.markdown("""
                 elem.style.textAlign = "center !important";
                 elem.style.justifyContent = "center !important";
                 elem.style.alignItems = "center !important";
-                elem.setAttribute("style", elem.getAttribute("style") + "; font-size: 32px !important; font-weight: 900 !important; color: #87CEEB !important; background: transparent !important; line-height: 1.2 !important; text-align: center !important; justify-content: center !important; align-items: center !important;");
+                elem.setAttribute("style", elem.getAttribute("style") + "; font-size: 40px !important; font-weight: 900 !important; color: #87CEEB !important; background: transparent !important; line-height: 1.2 !important; text-align: center !important; justify-content: center !important; align-items: center !important;");
                 console.log("指標標籤已修正為淺藍色 32px 中央對齊:", elem.textContent);
             });
             
@@ -356,7 +356,7 @@ st.markdown("""
                         elem.style.textAlign = "center !important";
                         elem.style.justifyContent = "center !important";
                         elem.style.alignItems = "center !important";
-                        elem.setAttribute("style", elem.getAttribute("style") + "; font-size: 32px !important; font-weight: 900 !important; color: #87CEEB !important; background: transparent !important; line-height: 1.2 !important; text-align: center !important; justify-content: center !important; align-items: center !important;");
+                        elem.setAttribute("style", elem.getAttribute("style") + "; font-size: 40px !important; font-weight: 900 !important; color: #87CEEB !important; background: transparent !important; line-height: 1.2 !important; text-align: center !important; justify-content: center !important; align-items: center !important;");
                         console.log("終極強制修正標題為淺藍色:", text);
                     }
                 });
@@ -478,7 +478,7 @@ st.markdown("""
                 elem.style.textAlign = "center !important";
                 elem.style.justifyContent = "center !important";
                 elem.style.alignItems = "center !important";
-                elem.setAttribute("style", elem.getAttribute("style") + "; font-size: 32px !important; font-weight: 900 !important; color: #87CEEB !important; background: transparent !important; line-height: 1.2 !important; text-align: center !important; justify-content: center !important; align-items: center !important;");
+                elem.setAttribute("style", elem.getAttribute("style") + "; font-size: 40px !important; font-weight: 900 !important; color: #87CEEB !important; background: transparent !important; line-height: 1.2 !important; text-align: center !important; justify-content: center !important; align-items: center !important;");
                 console.log("指標標籤已修正為淺藍色 32px 中央對齊:", elem.textContent);
             });
             
@@ -534,7 +534,7 @@ st.markdown("""
                         elem.style.textAlign = "center !important";
                         elem.style.justifyContent = "center !important";
                         elem.style.alignItems = "center !important";
-                        elem.setAttribute("style", elem.getAttribute("style") + "; font-size: 32px !important; font-weight: 900 !important; color: #87CEEB !important; background: transparent !important; line-height: 1.2 !important; text-align: center !important; justify-content: center !important; align-items: center !important;");
+                        elem.setAttribute("style", elem.getAttribute("style") + "; font-size: 40px !important; font-weight: 900 !important; color: #87CEEB !important; background: transparent !important; line-height: 1.2 !important; text-align: center !important; justify-content: center !important; align-items: center !important;");
                         console.log("終極強制修正標題為淺藍色:", text);
                     }
                 });
@@ -656,7 +656,7 @@ st.markdown("""
                 elem.style.textAlign = "center !important";
                 elem.style.justifyContent = "center !important";
                 elem.style.alignItems = "center !important";
-                elem.setAttribute("style", elem.getAttribute("style") + "; font-size: 32px !important; font-weight: 900 !important; color: #87CEEB !important; background: transparent !important; line-height: 1.2 !important; text-align: center !important; justify-content: center !important; align-items: center !important;");
+                elem.setAttribute("style", elem.getAttribute("style") + "; font-size: 40px !important; font-weight: 900 !important; color: #87CEEB !important; background: transparent !important; line-height: 1.2 !important; text-align: center !important; justify-content: center !important; align-items: center !important;");
                 console.log("指標標籤已修正為淺藍色 32px 中央對齊:", elem.textContent);
             });
             
@@ -712,7 +712,7 @@ st.markdown("""
                         elem.style.textAlign = "center !important";
                         elem.style.justifyContent = "center !important";
                         elem.style.alignItems = "center !important";
-                        elem.setAttribute("style", elem.getAttribute("style") + "; font-size: 32px !important; font-weight: 900 !important; color: #87CEEB !important; background: transparent !important; line-height: 1.2 !important; text-align: center !important; justify-content: center !important; align-items: center !important;");
+                        elem.setAttribute("style", elem.getAttribute("style") + "; font-size: 40px !important; font-weight: 900 !important; color: #87CEEB !important; background: transparent !important; line-height: 1.2 !important; text-align: center !important; justify-content: center !important; align-items: center !important;");
                         console.log("終極強制修正標題為淺藍色:", text);
                     }
                 });
