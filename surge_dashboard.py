@@ -1057,7 +1057,7 @@ with col_map:
     ).add_to(m)
 
     # 顯示地圖
-    folium_static(m, width=700, height=600)
+    folium_static(m, width=900, height=600)
 
 # --- 9.2 排行榜 ---
 with col_list:
