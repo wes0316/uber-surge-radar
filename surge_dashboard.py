@@ -293,6 +293,72 @@ st.markdown("""
             padding: 0 !important;
         }
 
+        /* 🎯 終極字體大小重置 - 最高優先級 */
+        html body h2,
+        body h2,
+        .stApp h2,
+        [data-testid="stVerticalBlock"] h2,
+        div[data-testid="stVerticalBlock"] h2,
+        h2 {
+            font-size: 28px !important;
+            font-weight: 900 !important;
+            color: #FFD700 !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            line-height: 1.2 !important;
+            margin: 0 !important;
+            padding: 10px 0 !important;
+        }
+        
+        html body p,
+        body p,
+        .stApp p,
+        [data-testid="stVerticalBlock"] p,
+        div[data-testid="stVerticalBlock"] p,
+        p {
+            font-size: 20px !important;
+            font-weight: 400 !important;
+            color: #FFFFFF !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            line-height: 1.4 !important;
+            margin: 10px 0 !important;
+            padding: 5px 0 !important;
+        }
+        
+        html body div[style*="color:#FFD700"],
+        body div[style*="color:#FFD700"],
+        .stApp div[style*="color:#FFD700"],
+        [data-testid="stVerticalBlock"] div[style*="color:#FFD700"],
+        div[data-testid="stVerticalBlock"] div[style*="color:#FFD700"],
+        div[style*="color:#FFD700"] {
+            font-size: 18px !important;
+            font-weight: 900 !important;
+            color: #FFD700 !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            line-height: 1.2 !important;
+            margin-bottom: 4px !important;
+        }
+        
+        html body div[style*="color:#FFFFFF"],
+        body div[style*="color:#FFFFFF"],
+        .stApp div[style*="color:#FFFFFF"],
+        [data-testid="stVerticalBlock"] div[style*="color:#FFFFFF"],
+        div[data-testid="stVerticalBlock"] div[style*="color:#FFFFFF"],
+        div[style*="color:#FFFFFF"] {
+            font-size: 16px !important;
+            font-weight: 600 !important;
+            color: #FFFFFF !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            line-height: 1.3 !important;
+        }
+
         /* 🎯 排行榜字體大小 - 超級強制優先級 */
         h2:not([data-testid]) {
             font-size: 28px !important;
