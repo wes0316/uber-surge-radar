@@ -1044,7 +1044,7 @@ with col_list:
 }}
 .ranking-count-{i} {{
     color: #FFFFFF !important;
-    font-size: 28px !important;
+    font-size: 36px !important;
     font-weight: 900 !important;
     white-space: nowrap !important;
     overflow: hidden !important;
