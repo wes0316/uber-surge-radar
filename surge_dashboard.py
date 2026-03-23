@@ -639,30 +639,86 @@ def get_address_from_coords(lat, lon):
     """根據經緯度獲取地址"""
     try:
         import json
+        print(f"正在獲取地址: lat={lat}, lon={lon}")
+        
+        # 嘗試 Nominatim API
         url = f"https://nominatim.openstreetmap.org/reverse?format=json&lat={lat}&lon={lon}&accept-language=zh-TW"
         headers = {'User-Agent': 'Uber Surge Radar Dashboard'}
-        response = requests.get(url, headers=headers, timeout=5)
-        if response.status_code == 200:
-            data = response.json()
-            if 'address' in data:
-                address = data['address']
-                if 'suburb' in address:
-                    return address['suburb']
-                elif 'district' in address:
-                    return address['district']
-                elif 'city' in address:
-                    return address['city']
-                elif 'town' in address:
-                    return address['town']
-                elif 'village' in address:
-                    return address['village']
+        
+        try:
+            response = requests.get(url, headers=headers, timeout=10)
+            print(f"Nominatim API 狀態: {response.status_code}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                print(f"Nominatim API 回應: {data}")
+                
+                if 'address' in data:
+                    address = data['address']
+                    print(f"地址資料: {address}")
+                    
+                    # 優先返回台灣的行政區
+                    if 'suburb' in address:
+                        result = address['suburb']
+                        print(f"找到 suburb: {result}")
+                        return result
+                    elif 'district' in address:
+                        result = address['district']
+                        print(f"找到 district: {result}")
+                        return result
+                    elif 'city' in address and 'county' in address:
+                        # 組合城市和縣市
+                        result = f"{address.get('county', '')}{address.get('city', '')}"
+                        print(f"組合 city+county: {result}")
+                        return result
+                    elif 'city' in address:
+                        result = address['city']
+                        print(f"找到 city: {result}")
+                        return result
+                    elif 'town' in address:
+                        result = address['town']
+                        print(f"找到 town: {result}")
+                        return result
+                    elif 'village' in address:
+                        result = address['village']
+                        print(f"找到 village: {result}")
+                        return result
+                    elif 'county' in address:
+                        result = address['county']
+                        print(f"找到 county: {result}")
+                        return result
+                    else:
+                        print("未找到合適的地址欄位")
+                        return f"位置 ({lat:.2f}, {lon:.2f})"
                 else:
-                    return "未知區域"
+                    print("API 回應中沒有 address 欄位")
+                    return f"位置 ({lat:.2f}, {lon:.2f})"
             else:
-                return "未知區域"
-    except:
-        return "定位中..."
-    return "定位中..."
+                print(f"API 請求失敗: {response.status_code}")
+                return f"位置 ({lat:.2f}, {lon:.2f})"
+                
+        except Exception as e:
+            print(f"Nominatim API 請求異常: {e}")
+            
+            # 備用方案：根據座標範圍判斷大概區域
+            try:
+                # 台北市的範圍大約是
+                if 24.9 <= lat <= 25.3 and 121.4 <= lon <= 121.7:
+                    return "台北市區"
+                elif 24.8 <= lat <= 25.1 and 121.3 <= lon <= 121.6:
+                    return "新北市區"
+                elif 25.0 <= lat <= 25.1 and 121.5 <= lon <= 121.6:
+                    return "信義區"
+                elif 24.9 <= lat <= 25.0 and 121.5 <= lon <= 121.6:
+                    return "大安區"
+                else:
+                    return f"台灣地區 ({lat:.2f}, {lon:.2f})"
+            except:
+                return f"位置 ({lat:.2f}, {lon:.2f})"
+                
+    except Exception as e:
+        print(f"地址獲取完全失敗: {e}")
+        return f"定位中... ({lat:.2f}, {lon:.2f})"
 
 def get_geolocation():
     """獲取當前 GPS 位置"""
