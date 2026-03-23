@@ -706,7 +706,7 @@ with col_map:
 
 # --- 9.2 排行榜 ---
 with col_list:
-    st.markdown("<h2 style='color:#FFD700; text-align:center; font-size: 36px; font-weight: 900;'>🏆 紅區排行榜</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='color:#FFD700; text-align:center; font-size: 28px; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'>🏆 紅區排行榜</h2>", unsafe_allow_html=True)
     
     if top_10_list.empty:
         st.markdown("<p style='color:#FFFFFF; text-align:center; font-size: 24px;'>📊 目前無紅區數據</p>", unsafe_allow_html=True)
