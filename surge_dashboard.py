@@ -486,6 +486,9 @@ st.markdown("""
         setTimeout(fixRankingStyles, 500);
         setTimeout(fixRankingStyles, 1000);
         setTimeout(fixRankingStyles, 2000);
+        setTimeout(fixRankingStyles, 3000);
+        setTimeout(fixRankingStyles, 5000);
+        setTimeout(fixRankingStyles, 8000);
         
         const observer = new MutationObserver(() => {
             setTimeout(fixMetricLabels, 100);
