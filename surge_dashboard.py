@@ -910,7 +910,14 @@ def fetch_analysis_data():
                 red_data.append({'lat': lat, 'lon': lon, 'area': r.get('area', '未知')})
         
         full_df = pd.DataFrame(red_data)
-        if full_df.empty: return [], [], 0
+        if full_df.empty: 
+            # 如果沒有紅區數據，返回預設的三個熱區位置
+            default_locations = [
+                {'area': '台北車站', 'lat': 25.0478, 'lon': 121.5170, 'count': 0},
+                {'area': '西門町', 'lat': 25.0419, 'lon': 121.5069, 'count': 0},
+                {'area': '信義區', 'lat': 25.0330, 'lon': 121.5654, 'count': 0}
+            ]
+            return default_locations, pd.DataFrame(columns=['area', 'count']), 0
         
         full_rank = full_df['area'].value_counts().reset_index()
         full_rank.columns = ['area', 'count']
@@ -920,9 +927,28 @@ def fetch_analysis_data():
         for area in top_10_list['area'].head(3):
             subset = full_df[full_df['area'] == area]
             top_3_centers.append({'area': area, 'lat': subset['lat'].mean(), 'lon': subset['lon'].mean(), 'count': len(subset)})
+        
+        # 如果熱區少於3個，補充預設位置
+        if len(top_3_centers) < 3:
+            default_locations = [
+                {'area': '台北車站', 'lat': 25.0478, 'lon': 121.5170, 'count': 0},
+                {'area': '西門町', 'lat': 25.0419, 'lon': 121.5069, 'count': 0},
+                {'area': '信義區', 'lat': 25.0330, 'lon': 121.5654, 'count': 0}
+            ]
+            existing_areas = {center['area'] for center in top_3_centers}
+            for default_loc in default_locations:
+                if default_loc['area'] not in existing_areas and len(top_3_centers) < 3:
+                    top_3_centers.append(default_loc)
             
         return top_3_centers, top_10_list, len(full_df)
-    except: return [], [], 0
+    except: 
+        # 異常情況下也返回預設的三個熱區
+        default_locations = [
+            {'area': '台北車站', 'lat': 25.0478, 'lon': 121.5170, 'count': 0},
+            {'area': '西門町', 'lat': 25.0419, 'lon': 121.5069, 'count': 0},
+            {'area': '信義區', 'lat': 25.0330, 'lon': 121.5654, 'count': 0}
+        ]
+        return default_locations, pd.DataFrame(columns=['area', 'count']), 0
 
 # --- 4. 定位處理 ---
 if 'gps_pos' not in st.session_state: st.session_state['gps_pos'] = (24.9669, 121.5451)
