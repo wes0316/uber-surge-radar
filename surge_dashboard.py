@@ -1075,7 +1075,7 @@ with col_list:
             with col1:
                 st.write(f"### {medal} {row['area']}")
             with col2:
-                st.write(f"### {row['count']} 處")
+                st.markdown(f"<div style='text-align: left; font-size: 28px; font-weight: 900; color: white;'>{row['count']} 處</div>", unsafe_allow_html=True)
             
             st.write("---")
 
