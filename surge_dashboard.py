@@ -367,14 +367,7 @@ with st.sidebar:
     st.markdown(f"<h2 style='color:#00FF88; text-align:center; font-size: 48px; font-weight: 900;'>{speed_kmh:.0f}</h2>", unsafe_allow_html=True)
     st.markdown("<h3 style='color:#FFD700; text-align:center; font-size: 36px; font-weight: 900;'>km/h</h3>", unsafe_allow_html=True)
 
-# --- 6. 主畫面按鈕 ---
-col1, col2, col3 = st.columns([1, 8, 1])
-with col2:
-    # 開啟 use_container_width=True，讓按鈕完全填滿中間那個 80% 的欄位
-    if st.button("🔄 即時刷新", use_container_width=True):
-        st.cache_data.clear()
-
-# --- 7. 數據獲取 ---
+# --- 6. 數據獲取 ---
 @st.cache_data(ttl=60)
 def fetch_analysis_data():
     try:
