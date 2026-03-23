@@ -1003,8 +1003,8 @@ with col_list:
 .no-data-message {
     color: #FFFFFF !important;
     text-align: center !important;
-    font-size: 20px !important;
-    font-weight: 400 !important;
+    font-size: 36px !important;
+    font-weight: 900 !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
