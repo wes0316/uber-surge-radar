@@ -83,8 +83,24 @@ st.markdown("""
         }
 
         /* --- 🎯 主畫面指標區域 --- */
-        [data-testid="stMetricValue"] { color: #FFFFFF !important; font-size: 68px !important; font-weight: 900 !important; text-align: center !important; }
-        [data-testid="stMetricLabel"] { color: #87CEEB !important; font-size: 32px !important; font-weight: 900 !important; text-align: center !important; }
+        [data-testid="stMetricValue"] { 
+            color: #FFFFFF !important; 
+            font-size: 68px !important; 
+            font-weight: 900 !important; 
+            text-align: center !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+        }
+        [data-testid="stMetricLabel"] { 
+            color: #87CEEB !important; 
+            font-size: 32px !important; 
+            font-weight: 900 !important; 
+            text-align: center !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+        }
         
         /* 超級強制保護指標數值 - 確保 68px + 白色 + 中央對齊 - 絕對保護 */
         html body [data-testid="stMetricValue"],
