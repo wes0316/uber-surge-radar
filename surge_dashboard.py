@@ -988,7 +988,7 @@ m1.markdown(f"""
 m2.markdown(f"""
 <div class="metric-container">
     <div class="metric-title">📍 車輛所在區域</div>
-    <div class="metric-value">新店區</div>
+    <div class="metric-value">{st.session_state.get('current_address', '定位中...')}</div>
 </div>
 """, unsafe_allow_html=True)
 st.divider()
