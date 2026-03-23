@@ -865,8 +865,8 @@ with col_list:
                 flex-direction: column !important;
                 justify-content: center !important;
             ">
-                <div style="color:#FFD700; font-size: 18px; font-weight: 900; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{medal} {row['area']}</div>
-                <div style="color:#FFFFFF; font-size: 16px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{row['count']} 處</div>
+                <div style="color:#FFD700 !important; font-size: 18px !important; font-weight: 900 !important; margin-bottom: 4px !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; line-height: 1.2 !important;">{medal} {row['area']}</div>
+                <div style="color:#FFFFFF !important; font-size: 16px !important; font-weight: 600 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; line-height: 1.3 !important;">{row['count']} 處</div>
             </div>
             """, unsafe_allow_html=True)
 
