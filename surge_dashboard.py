@@ -1027,7 +1027,7 @@ with col_list:
     padding: 12px 15px !important; 
     margin-bottom: 8px !important;
     text-align: left !important;
-    min-height: 70px !important;
+    min-height: 85px !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: center !important;
