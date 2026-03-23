@@ -984,7 +984,7 @@ with col_list:
 .ranking-title {
     color: #FFD700 !important;
     text-align: center !important;
-    font-size: 28px !important;
+    font-size: 36px !important;
     font-weight: 900 !important;
     white-space: nowrap !important;
     overflow: hidden !important;
