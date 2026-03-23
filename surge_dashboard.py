@@ -1013,7 +1013,7 @@ with col_list:
     padding: 5px 0 !important;
 }
 </style>
-<p class="no-data-message">📊 目前無紅區數據</p>
+<p class="no-data-message"><font size="7" color="#FFFFFF">📊 目前無紅區數據</font></p>
 """, unsafe_allow_html=True)
     else:
         for i, (_, row) in enumerate(top_10_list.iterrows()):
