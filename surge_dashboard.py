@@ -31,28 +31,32 @@ def display_logo():
             with open(logo_path, "rb") as image_file:
                 encoded_string = base64.b64encode(image_file.read()).decode()
             
-            # 顯示 logo 在側邊邊欄，寬度為側邊欄的 80%
+            # 顯示 logo 在側邊欄，寬度為側邊欄的 80%
             st.markdown(f"""
             <div style="
                 text-align: center;
                 margin-bottom: 20px;
                 padding: 10px;
-                width: 100%;
-                box-sizing: border-box;
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+                display: block !important;
             ">
                 <img src="data:image/png;base64,{encoded_string}" 
                      alt="Uber Logo" 
                      style="
-                         width: 80%;
-                         max-width: 200px;
-                         height: auto;
-                         border-radius: 20px;
-                         object-fit: contain;
-                         border: 4px solid #00D4FF;
-                         box-shadow: 0 8px 25px rgba(0, 212, 255, 0.7);
-                         background: rgba(0, 0, 0, 0.9);
-                         padding: 15px;
-                         transition: transform 0.3s ease, box-shadow 0.3s ease;
+                         width: 80% !important;
+                         max-width: 200px !important;
+                         height: auto !important;
+                         border-radius: 20px !important;
+                         object-fit: contain !important;
+                         border: 4px solid #00D4FF !important;
+                         box-shadow: 0 8px 25px rgba(0, 212, 255, 0.7) !important;
+                         background: rgba(0, 0, 0, 0.9) !important;
+                         padding: 15px !important;
+                         transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+                         display: block !important;
+                         margin: 0 auto !important;
                      "
                      onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 12px 35px rgba(0, 212, 255, 0.9)'"
                      onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 8px 25px rgba(0, 212, 255, 0.7)'">
