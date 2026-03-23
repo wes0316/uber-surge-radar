@@ -102,11 +102,30 @@ def display_logo():
 # --- 2. 核心 CSS 樣式 ---
 st.markdown("""
     <style>
-        html, body, [data-testid="stAppViewContainer"] {
+        html, body, [data-testid="stAppViewContainer"], .stApp {
             overflow: hidden !important; 
             background-color: #0E1117 !important;
+            background: #0E1117 !important;
             color: #FFFFFF !important; 
             font-family: 'Inter', -apple-system, sans-serif !important;
+        }
+        
+        /* 主內容區域背景 */
+        .main .block-container {
+            background-color: #0E1117 !important;
+            background: #0E1117 !important;
+        }
+        
+        /* 側邊欄背景 */
+        [data-testid="stSidebar"] {
+            background-color: #0E1117 !important;
+            background: #0E1117 !important;
+        }
+        
+        /* 所有容器背景 */
+        div[data-testid="stVerticalBlock"] {
+            background-color: #0E1117 !important;
+            background: #0E1117 !important;
         }
 
         /* 🎯 側邊欄開關文字 */
