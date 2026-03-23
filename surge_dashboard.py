@@ -16,7 +16,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # --- 1. 介面基礎配置 ---
 st.set_page_config(page_title="Uber 運輸需求預測", page_icon="🚕", layout="wide")
 
-# --- 2. 核心 CSS 樣式：移除不穩定的寬度限制，回歸純粹的視覺美化 ---
+# --- 2. 核心 CSS 樣式：移除不穩定的寬度限制，回歸純粹的視覺美1化 ---
 st.markdown("""
     <style>
         html, body, [data-testid="stAppViewContainer"] {
