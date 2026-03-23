@@ -1083,7 +1083,7 @@ m1.markdown(f"""
 <style>
 .metric-title {{
     color: #87CEEB !important;
-    font-size: 66px !important;
+    font-size: 46px !important;
     font-weight: 900 !important;
     text-align: center !important;
     line-height: 1.1 !important;
