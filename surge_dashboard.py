@@ -979,7 +979,23 @@ with col_map:
 
 # --- 9.2 排行榜 ---
 with col_list:
-    st.markdown("<h2 style='color:#FFD700 !important; text-align:center !important; font-size: 28px !important; font-weight: 900 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; line-height: 1.2 !important; margin: 0 !important; padding: 10px 0 !important;'>🏆 紅區排行榜</h2>", unsafe_allow_html=True)
+    st.markdown("""
+<style>
+.ranking-title {
+    color: #FFD700 !important;
+    text-align: center !important;
+    font-size: 28px !important;
+    font-weight: 900 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    line-height: 1.2 !important;
+    margin: 0 !important;
+    padding: 10px 0 !important;
+}
+</style>
+<h2 class="ranking-title">🏆 紅區排行榜</h2>
+""", unsafe_allow_html=True)
     
     if top_10_list.empty:
         st.markdown("<p style='color:#FFFFFF !important; text-align:center !important; font-size: 20px !important; font-weight: 400 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; line-height: 1.4 !important; margin: 10px 0 !important; padding: 5px 0 !important;'>📊 目前無紅區數據</p>", unsafe_allow_html=True)
