@@ -1053,8 +1053,8 @@ with col_list:
 }}
 </style>
 <div class="ranking-item-{i}">
-    <div class="ranking-area-{i}">{medal} {row['area']}</div>
-    <div class="ranking-count-{i}">{row['count']} 處</div>
+    <div class="ranking-area-{i}"><font size="7" color="#FFD700">{medal} {row['area']}</font></div>
+    <div class="ranking-count-{i}"><font size="7" color="#FFFFFF">{row['count']} 處</font></div>
 </div>
 """, unsafe_allow_html=True)
 
