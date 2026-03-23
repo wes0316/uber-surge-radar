@@ -1027,14 +1027,14 @@ with col_list:
     padding: 12px 15px !important; 
     margin-bottom: 8px !important;
     text-align: left !important;
-    min-height: 60px !important;
+    min-height: 70px !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: center !important;
 }}
 .ranking-area-{i} {{
     color: #FFD700 !important;
-    font-size: 18px !important;
+    font-size: 36px !important;
     font-weight: 900 !important;
     margin-bottom: 4px !important;
     white-space: nowrap !important;
@@ -1044,8 +1044,8 @@ with col_list:
 }}
 .ranking-count-{i} {{
     color: #FFFFFF !important;
-    font-size: 16px !important;
-    font-weight: 600 !important;
+    font-size: 28px !important;
+    font-weight: 900 !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
