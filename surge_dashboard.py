@@ -906,11 +906,18 @@ def fetch_analysis_data():
 
 # --- 4. 定位處理 ---
 if 'gps_pos' not in st.session_state: st.session_state['gps_pos'] = (24.9669, 121.5451)
+if 'current_address' not in st.session_state: st.session_state['current_address'] = "定位中..."
+
 curr = get_geolocation()
 speed_kmh = 0
 if curr and 'coords' in curr:
     st.session_state['gps_pos'] = (curr['coords']['latitude'], curr['coords']['longitude'])
     speed_kmh = (curr['coords'].get('speed') or 0) * 3.6
+    # 更新地址
+    st.session_state['current_address'] = get_address_from_coords(
+        curr['coords']['latitude'], 
+        curr['coords']['longitude']
+    )
 
 # --- 5. 側邊欄控制區 ---
 with st.sidebar:
