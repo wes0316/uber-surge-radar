@@ -110,22 +110,40 @@ st.markdown("""
             font-family: 'Inter', -apple-system, sans-serif !important;
         }
         
-        /* 🎯 移除頂部白色橫幅 */
-        .stApp > header {
-            background-color: #0E1117 !important;
-            background: #0E1117 !important;
-        }
-        
-        /* Streamlit 頂部導航欄 */
-        .stApp header {
+        /* 🎯 移除頂部白色橫幅 - 強制覆蓋 */
+        .stApp > header,
+        .stApp header,
+        header[data-testid="stHeader"],
+        div[data-testid="stHeader"],
+        .stApp .stHeader,
+        .stHeader {
             background-color: #0E1117 !important;
             background: #0E1117 !important;
             border-bottom: none !important;
+            box-shadow: none !important;
+            border: none !important;
         }
         
-        /* 隱藏 Streamlit 預設標題 */
-        .stApp header .stTitle {
+        /* 隱藏 Streamlit 預設標題和圖標 */
+        .stApp header .stTitle,
+        .stApp header .stIcon,
+        header[data-testid="stHeader"] .stTitle,
+        header[data-testid="stHeader"] .stIcon,
+        div[data-testid="stHeader"] .stTitle,
+        div[data-testid="stHeader"] .stIcon {
             color: transparent !important;
+            opacity: 0 !important;
+        }
+        
+        /* 移除任何可能的邊框或陰影 */
+        .stApp > header *,
+        .stApp header *,
+        header[data-testid="stHeader"] *,
+        div[data-testid="stHeader"] * {
+            border-bottom: none !important;
+            box-shadow: none !important;
+            background-color: #0E1117 !important;
+            background: #0E1117 !important;
         }
         
         /* 主內容區域背景 */
