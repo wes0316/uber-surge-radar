@@ -1096,9 +1096,37 @@ with col_map:
             folium.raster_layers.ImageOverlay(image=radar_b64, bounds=[[21.8, 120.0], [25.4, 122.2]], opacity=0.45, zindex=1).add_to(m)
 
     if show_heatmap and top_3_centers:
-        for dist in top_3_centers:
-            folium.Circle(location=[dist['lat'], dist['lon']], radius=1500, color='#FF0000', fill=True, fill_opacity=0.45, weight=4, tooltip=f"<b style='font-size:20px;'>{dist['area']}</b>", zindex=10).add_to(m)
-            folium.CircleMarker(location=[dist['lat'], dist['lon']], radius=6, color='white', fill=True, fill_color='red').add_to(m)
+        for i, dist in enumerate(top_3_centers):
+            # 根據數量調整圓圈顏色和透明度
+            if dist['count'] > 0:
+                color = '#FF0000'
+                fill_opacity = 0.45
+                radius = 1500
+            else:
+                color = '#FFA500'  # 橙色表示預設位置
+                fill_opacity = 0.25
+                radius = 1000
+            
+            # 添加熱區圓圈
+            folium.Circle(
+                location=[dist['lat'], dist['lon']], 
+                radius=radius, 
+                color=color, 
+                fill=True, 
+                fill_opacity=fill_opacity, 
+                weight=4, 
+                tooltip=f"<b style='font-size:20px;'>{dist['area']} ({dist['count']}處)</b>", 
+                zindex=10
+            ).add_to(m)
+            
+            # 添加中心點標記
+            folium.CircleMarker(
+                location=[dist['lat'], dist['lon']], 
+                radius=6, 
+                color='white', 
+                fill=True, 
+                fill_color=color
+            ).add_to(m)
 
     folium.Marker(st.session_state['gps_pos'], icon=folium.Icon(color='blue', icon='car', prefix='fa')).add_to(m)
     st_folium(m, width="100%", height=580, use_container_width=True, key=f"v12_{show_rain}_{show_heatmap}_{zoom}")
