@@ -107,7 +107,20 @@ st.markdown("""
             background-color: #0E1117 !important;
             background: #0E1117 !important;
             color: #FFFFFF !important; 
-            font-family: 'Inter', -apple-system, sans-serif !important;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif !important;
+            font-size: 16px !important;
+            font-weight: 400 !important;
+            line-height: 1.5 !important;
+        }
+        
+        /* 強制所有文字字體 */
+        *, *::before, *::after {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif !important;
+        }
+        
+        /* 所有段落和標題字體 */
+        p, h1, h2, h3, h4, h5, h6, div, span {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif !important;
         }
         
         /* 🎯 移除頂部白色橫幅 - 強制覆蓋 */
