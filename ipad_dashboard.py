@@ -299,10 +299,28 @@ body {
     
     .ipad-table {
         font-size: 13px !important;
+        table-layout: fixed !important;
+    }
+    
+    .ipad-table td {
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+    
+    .ipad-table td:first-child {
+        width: 60% !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
     }
     
     .ipad-table td:last-child {
         font-size: 15px !important;
+        width: 40% !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
     }
     
     .ipad-list-title {
@@ -392,6 +410,58 @@ body {
 .stApp {
     height: 100vh !important;
     overflow: hidden !important;
+}
+
+/* --- 強制所有表格元素不斷行 --- */
+table {
+    white-space: nowrap !important;
+    table-layout: fixed !important;
+}
+
+table td {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+table th {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+/* --- 針對 Streamlit 表格的特殊處理 --- */
+[data-testid="stTable"] {
+    white-space: nowrap !important;
+}
+
+[data-testid="stTable"] td {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+[data-testid="stTable"] th {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+/* --- 確保所有可能的表格容器都不斷行 --- */
+.stDataFrame {
+    white-space: nowrap !important;
+}
+
+.stDataFrame td {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+.stDataFrame th {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
 }
 
 </style>
