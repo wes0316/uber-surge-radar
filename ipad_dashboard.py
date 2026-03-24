@@ -175,6 +175,32 @@ body {
     position: relative !important;
 }
 
+/* 去除 st_folium 前後 Streamlit 自動產生的空白 */
+.ipad-map-container + div,
+.ipad-map-container ~ div [data-testid="stIFrame"],
+[data-testid="stIFrame"] {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.element-container:has(iframe) {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.element-container:has(.ipad-map-container),
+.element-container:has([data-testid="stIFrame"]) {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* 去除 iframe 本身的多餘空白 */
+iframe {
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
 /* === 排行榜表格 === */
 .ipad-list-title {
     font-size: 24px !important;
