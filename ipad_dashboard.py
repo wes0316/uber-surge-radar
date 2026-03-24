@@ -90,6 +90,34 @@ body {
 
 #MainMenu, footer, header { visibility: hidden; }
 
+/* === 壓縮 Streamlit 自動產生的 block 間距 === */
+.element-container {
+    margin-bottom: 0 !important;
+    margin-top: 0 !important;
+}
+
+[data-testid="stMarkdownContainer"] {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+[data-testid="stMarkdownContainer"] p {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+[data-testid="column"] {
+    padding: 0 4px !important;
+}
+
+[data-testid="stVerticalBlock"] {
+    gap: 0 !important;
+}
+
+[data-testid="stVerticalBlockBorderWrapper"] {
+    padding: 0 !important;
+}
+
 /* === 側邊欄 === */
 [data-testid="stSidebar"] {
     background: linear-gradient(180deg, #111111 0%, #1a1a1a 100%) !important;
