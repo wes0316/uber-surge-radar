@@ -207,6 +207,7 @@ body {
     border-spacing: 0 4px !important;
     font-weight: 600 !important;
     background: transparent !important;
+    table-layout: fixed !important;
 }
 
 .ipad-table tr {
@@ -214,6 +215,7 @@ body {
     border-radius: 12px !important;
     box-shadow: 0 4px 16px rgba(0, 212, 255, 0.1) !important;
     transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+    white-space: nowrap !important;
 }
 
 .ipad-table tr:hover {
@@ -226,11 +228,18 @@ body {
     color: #FFFFFF !important;
     border: none !important;
     white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: none !important;
 }
 
 .ipad-table td:first-child {
     border-radius: 12px 0 0 12px !important;
     font-weight: 700 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    width: 60% !important;
 }
 
 .ipad-table td:last-child {
@@ -240,6 +249,9 @@ body {
     font-size: 16px !important;
     color: #00D4FF !important;
     white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    width: 40% !important;
 }
 
 /* --- iPad Mini 橫向版標題 --- */
@@ -394,7 +406,7 @@ function fixiPadMiniStyles() {
     // 確保地圖容器正確顯示
     const mapContainers = document.querySelectorAll('.ipad-map-container');
     mapContainers.forEach(elem => {
-        elem.style.height = '500px !important';
+        elem.style.height = '350px !important';
         elem.style.borderRadius = '20px !important';
         elem.style.overflow = 'hidden !important';
     });
