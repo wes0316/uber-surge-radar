@@ -490,6 +490,41 @@ function fixiPadMiniStyles() {
         elem.style.alignItems = 'center !important';
     });
     
+    // 確保所有表格都不斷行
+    const allTables = document.querySelectorAll('table, [data-testid="stTable"], .stDataFrame');
+    allTables.forEach(table => {
+        table.style.whiteSpace = 'nowrap !important';
+        table.style.tableLayout = 'fixed !important';
+        
+        const cells = table.querySelectorAll('td, th');
+        cells.forEach(cell => {
+            cell.style.whiteSpace = 'nowrap !important';
+            cell.style.overflow = 'hidden !important';
+            cell.style.textOverflow = 'ellipsis !important';
+        });
+    });
+    
+    // 特別處理 iPad 表格
+    const ipadTables = document.querySelectorAll('.ipad-table');
+    ipadTables.forEach(table => {
+        table.style.whiteSpace = 'nowrap !important';
+        table.style.tableLayout = 'fixed !important';
+        
+        const cells = table.querySelectorAll('td');
+        cells.forEach((cell, index) => {
+            cell.style.whiteSpace = 'nowrap !important';
+            cell.style.overflow = 'hidden !important';
+            cell.style.textOverflow = 'ellipsis !important';
+            
+            // 設定列寬
+            if (cell.cellIndex === 0) {
+                cell.style.width = '60% !important';
+            } else if (cell.cellIndex === 1) {
+                cell.style.width = '40% !important';
+            }
+        });
+    });
+    
     // 添加懸停效果
     const containers = document.querySelectorAll('.ipad-metric-container');
     containers.forEach(elem => {
