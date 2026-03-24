@@ -1059,12 +1059,14 @@ st.markdown('</div>', unsafe_allow_html=True)
 st.markdown('<div class="ipad-header">📈 紅區排行榜</div>', unsafe_allow_html=True)
 
 if not top_10_list.empty:
-    html = "<table class='ipad-table'>"
+    html = """
+    <table class='ipad-table' style='white-space: nowrap !important; table-layout: fixed !important; width: 100% !important;'>
+    """
     for i, row in top_10_list.iterrows():
         html += f"""
-        <tr>
-            <td style='padding: 12px 16px; color: #FFFFFF;'>{row['area']}</td>
-            <td style='padding: 12px 16px; color: #00D4FF; text-align: right; font-weight: 900; font-size: 18px;'>{row['count']}</td>
+        <tr style='white-space: nowrap !important;'>
+            <td style='padding: 8px 12px !important; color: #FFFFFF !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; word-wrap: normal !important; word-break: keep-all !important; width: 60% !important;'>{row['area']}</td>
+            <td style='padding: 8px 12px !important; color: #00D4FF !important; text-align: right !important; font-weight: 900 !important; font-size: 16px !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; word-wrap: normal !important; word-break: keep-all !important; width: 40% !important;'>{row['count']}</td>
         </tr>
         """
     html += "</table>"
