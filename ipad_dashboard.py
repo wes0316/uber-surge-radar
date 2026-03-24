@@ -63,57 +63,31 @@ def display_logo():
 # --- 2. iPad Mini 橫向版 CSS ---
 st.markdown("""
 <style>
-/* --- 最高優先級的內聯樣式強制設定 --- */
-table, td, th {
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    word-wrap: normal !important;
-    word-break: keep-all !important;
-}
 
-.ipad-table, .ipad-table td, .ipad-table th {
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    word-wrap: normal !important;
-    word-break: keep-all !important;
-}
-
-[data-testid="stTable"], [data-testid="stTable"] td, [data-testid="stTable"] th {
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    word-wrap: normal !important;
-    word-break: keep-all !important;
-}
-
-.stDataFrame, .stDataFrame td, .stDataFrame th {
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    word-wrap: normal !important;
-    word-break: keep-all !important;
-}
-
-/* --- 全域文字不斷行設定 --- */
-* {
-    word-wrap: normal !important;
-    word-break: keep-all !important;
-}
-
-/* --- iPad Mini 橫向版基礎樣式 --- */
+/* === 基礎樣式 === */
 body {
     background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%) !important;
     color: white !important;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
     margin: 0 !important;
     padding: 0 !important;
-    overflow-x: hidden !important;
     overflow: hidden !important;
 }
 
-/* --- iPad Mini 橫向版側邊欄 --- */
+.stApp {
+    height: 100vh !important;
+    overflow: hidden !important;
+}
+
+.stMain, [data-testid="stMainBlockContainer"] {
+    overflow: hidden !important;
+    padding: 15px !important;
+    max-width: none !important;
+}
+
+#MainMenu, footer, header { visibility: hidden; }
+
+/* === 側邊欄 === */
 [data-testid="stSidebar"] {
     background: linear-gradient(180deg, #111111 0%, #1a1a1a 100%) !important;
     border-right: 2px solid #00D4FF !important;
@@ -126,152 +100,25 @@ body {
     z-index: 1000 !important;
 }
 
-/* iPad Mini 橫向版側邊欄標題 */
+[data-testid="stSidebar"] * {
+    white-space: nowrap !important;
+}
+
 [data-testid="stSidebar"] [data-testid="stWidgetLabel"] p {
     font-size: 16px !important;
     font-weight: 700 !important;
     color: #00D4FF !important;
     line-height: 1.4 !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
 }
 
-/* --- 超級強制所有元素不斷行 --- */
-html body table,
-html body td,
-html body th,
-html body .ipad-table,
-html body .ipad-table td,
-html body .ipad-table th,
-html body [data-testid="stTable"],
-html body [data-testid="stTable"] td,
-html body [data-testid="stTable"] th,
-html body .stDataFrame,
-html body .stDataFrame td,
-html body .stDataFrame th {
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    word-wrap: normal !important;
-    word-break: keep-all !important;
-    display: table-cell !important;
-    max-width: none !important;
-    min-width: 0 !important;
-}
-
-/* --- 針對所有可能的表格容器 --- */
-div table,
-div td,
-div th,
-section table,
-section td,
-section th,
-main table,
-main td,
-main th {
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    word-wrap: normal !important;
-    word-break: keep-all !important;
-}
-
-/* --- 最終強制解決方案 --- */
-@media all {
-    table, td, th {
-        white-space: nowrap !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
-        word-wrap: normal !important;
-        word-break: keep-all !important;
-    }
-    
-    .ipad-table, .ipad-table td, .ipad-table th {
-        white-space: nowrap !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
-        word-wrap: normal !important;
-        word-break: keep-all !important;
-    }
-}
-
-/* --- CSS 變數定義 --- */
-:root {
-    --force-nowrap: nowrap;
-    --force-overflow: hidden;
-    --force-text-overflow: ellipsis;
-    --force-word-wrap: normal;
-    --force-word-break: keep-all;
-}
-
-/* --- 使用 CSS 變數的強制樣式 --- */
-table {
-    white-space: var(--force-nowrap) !important;
-    overflow: var(--force-overflow) !important;
-    text-overflow: var(--force-text-overflow) !important;
-    word-wrap: var(--force-word-wrap) !important;
-    word-break: var(--force-word-break) !important;
-    table-layout: fixed !important;
-}
-
-td, th {
-    white-space: var(--force-nowrap) !important;
-    overflow: var(--force-overflow) !important;
-    text-overflow: var(--force-text-overflow) !important;
-    word-wrap: var(--force-word-wrap) !important;
-    word-break: var(--force-word-break) !important;
-}
-
-/* --- 針對所有可能的表格類別 --- */
-[class*="table"], 
-[class*="Table"], 
-[data-testid*="Table"],
-[data-testid*="table"] {
-    white-space: var(--force-nowrap) !important;
-    overflow: var(--force-overflow) !important;
-    text-overflow: var(--force-text-overflow) !important;
-    word-wrap: var(--force-word-wrap) !important;
-    word-break: var(--force-word-break) !important;
-}
-
-[class*="table"] td, 
-[class*="table"] th,
-[class*="Table"] td, 
-[class*="Table"] th,
-[data-testid*="Table"] td, 
-[data-testid*="Table"] th,
-[data-testid*="table"] td, 
-[data-testid*="table"] th {
-    white-space: var(--force-nowrap) !important;
-    overflow: var(--force-overflow) !important;
-    text-overflow: var(--force-text-overflow) !important;
-    word-wrap: var(--force-word-wrap) !important;
-    word-break: var(--force-word-break) !important;
-}
-
-/* iPad Mini 橫向版按鈕 */
 [data-testid="stSidebar"] div.stButton > button p {
     font-size: 14px !important;
     font-weight: 700 !important;
     color: #FFFFFF !important;
     white-space: nowrap !important;
-    margin: 0 !important;
-    padding: 8px 12px !important;
-    border-radius: 8px !important;
-    background: linear-gradient(45deg, #00D4FF, #0099CC) !important;
-    border: 1px solid #00D4FF !important;
-    box-shadow: 0 4px 8px rgba(0, 212, 255, 0.3) !important;
-    transition: all 0.3s ease !important;
 }
 
-[data-testid="stSidebar"] div.stButton > button:hover p {
-    background: linear-gradient(45deg, #0099CC, #00D4FF) !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 6px 12px rgba(0, 212, 255, 0.4) !important;
-}
-
-/* --- iPad Mini 橫向版主畫面指標區域 --- */
+/* === 指標卡片 === */
 .ipad-metric-title {
     color: #87CEEB !important;
     font-size: 28px !important;
@@ -317,7 +164,7 @@ td, th {
     box-shadow: 0 12px 40px rgba(0, 212, 255, 0.3) !important;
 }
 
-/* --- iPad Mini 橫向版地圖容器 --- */
+/* === 地圖容器 === */
 .ipad-map-container {
     height: 350px !important;
     border-radius: 20px !important;
@@ -328,19 +175,7 @@ td, th {
     position: relative !important;
 }
 
-.ipad-map-container::before {
-    content: '' !important;
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    background: linear-gradient(45deg, rgba(0, 212, 255, 0.1), transparent) !important;
-    pointer-events: none !important;
-    z-index: 1 !important;
-}
-
-/* --- iPad Mini 橫向版排行榜 --- */
+/* === 排行榜表格 === */
 .ipad-list-title {
     font-size: 24px !important;
     color: #00D4FF !important;
@@ -367,7 +202,6 @@ td, th {
     border-radius: 12px !important;
     box-shadow: 0 4px 16px rgba(0, 212, 255, 0.1) !important;
     transition: transform 0.3s ease, box-shadow 0.3s ease !important;
-    white-space: nowrap !important;
 }
 
 .ipad-table tr:hover {
@@ -382,15 +216,11 @@ td, th {
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
-    max-width: none !important;
 }
 
 .ipad-table td:first-child {
     border-radius: 12px 0 0 12px !important;
     font-weight: 700 !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
     width: 60% !important;
 }
 
@@ -400,13 +230,10 @@ td, th {
     font-weight: 900 !important;
     font-size: 16px !important;
     color: #00D4FF !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
     width: 40% !important;
 }
 
-/* --- iPad Mini 橫向版標題 --- */
+/* === 標題與分隔線 === */
 .ipad-header {
     font-size: 32px !important;
     color: #00D4FF !important;
@@ -418,76 +245,6 @@ td, th {
     white-space: nowrap !important;
 }
 
-/* --- iPad Mini 橫向版響應式設計 --- */
-@media (min-width: 1024px) and (max-width: 1366px) and (orientation: landscape) {
-    /* iPad Mini 橫向專用樣式 */
-    [data-testid="stSidebar"] {
-        width: 300px !important;
-        min-width: 300px !important;
-        max-width: 300px !important;
-    }
-    
-    .ipad-metric-container {
-        padding: 15px !important;
-        margin-bottom: 15px !important;
-    }
-    
-    .ipad-map-container {
-        height: 320px !important;
-    }
-    
-    .ipad-metric-title {
-        font-size: 26px !important;
-    }
-    
-    .ipad-metric-value {
-        font-size: 44px !important;
-    }
-    
-    .ipad-header {
-        font-size: 30px !important;
-        margin-bottom: 15px !important;
-    }
-    
-    .ipad-table {
-        font-size: 13px !important;
-        table-layout: fixed !important;
-    }
-    
-    .ipad-table td {
-        white-space: nowrap !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
-    }
-    
-    .ipad-table td:first-child {
-        width: 60% !important;
-        white-space: nowrap !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
-    }
-    
-    .ipad-table td:last-child {
-        font-size: 15px !important;
-        width: 40% !important;
-        white-space: nowrap !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
-    }
-    
-    .ipad-list-title {
-        font-size: 22px !important;
-        margin-bottom: 8px !important;
-    }
-}
-
-/* --- iPad Mini 橫向版主內容區域 --- */
-[data-testid="stMainBlockContainer"] {
-    padding: 15px !important;
-    max-width: none !important;
-}
-
-/* --- iPad Mini 橫向版分隔線 --- */
 .ipad-divider {
     height: 2px !important;
     background: linear-gradient(90deg, transparent, #00D4FF, transparent) !important;
@@ -496,183 +253,27 @@ td, th {
     box-shadow: 0 2px 8px rgba(0, 212, 255, 0.3) !important;
 }
 
-/* --- 隱藏 Streamlit 預設元素 --- */
-#MainMenu, footer, header {
-    visibility: hidden;
-}
+/* === 滾動條 === */
+::-webkit-scrollbar { width: 8px !important; }
+::-webkit-scrollbar-track { background: rgba(45, 45, 45, 0.3) !important; border-radius: 4px !important; }
+::-webkit-scrollbar-thumb { background: linear-gradient(45deg, #00D4FF, #0099CC) !important; border-radius: 4px !important; }
+::-webkit-scrollbar-thumb:hover { background: linear-gradient(45deg, #0099CC, #00D4FF) !important; }
 
-/* --- iPad Mini 橫向版滾動條樣式 --- */
-::-webkit-scrollbar {
-    width: 8px !important;
-}
-
-::-webkit-scrollbar-track {
-    background: rgba(45, 45, 45, 0.3) !important;
-    border-radius: 4px !important;
-}
-
-::-webkit-scrollbar-thumb {
-    background: linear-gradient(45deg, #00D4FF, #0099CC) !important;
-    border-radius: 4px !important;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(45deg, #0099CC, #00D4FF) !important;
-}
-
-/* --- 確保所有文字元素都不斷行 --- */
-[data-testid="stSidebar"] * {
-    white-space: nowrap !important;
-}
-
-.ipad-sidebar-title {
-    white-space: nowrap !important;
-}
-
-.ipad-sidebar-label {
-    white-space: nowrap !important;
-}
-
-.ipad-sidebar-button {
-    white-space: nowrap !important;
-}
-
-.stButton > button {
-    white-space: nowrap !important;
-}
-
-.stSelectbox > div > div {
-    white-space: nowrap !important;
-}
-
-.stTextInput > div > div > input {
-    white-space: nowrap !important;
-}
-
-/* --- 確保內容不會溢出 --- */
-.stMain {
-    overflow: hidden !important;
-}
-
-[data-testid="stMainBlockContainer"] {
-    overflow: hidden !important;
-}
-
-/* --- 調整整體佈局以適應一頁顯示 --- */
-.stApp {
-    height: 100vh !important;
-    overflow: hidden !important;
-}
-
-/* --- 強制所有表格元素不斷行 --- */
-table {
-    white-space: nowrap !important;
-    table-layout: fixed !important;
-}
-
-table td {
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-}
-
-table th {
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-}
-
-/* --- 針對 Streamlit 表格的特殊處理 --- */
-[data-testid="stTable"] {
-    white-space: nowrap !important;
-}
-
-[data-testid="stTable"] td {
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-}
-
-[data-testid="stTable"] th {
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-}
-
-/* --- 確保所有可能的表格容器都不斷行 --- */
-.stDataFrame {
-    white-space: nowrap !important;
-}
-
-.stDataFrame td {
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-}
-
-.stDataFrame th {
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-}
-
-/* --- 超級強制表格不斷行樣式 --- */
-* table,
-* [data-testid="stTable"],
-* .stDataFrame,
-* .ipad-table {
-    white-space: nowrap !important;
-    table-layout: fixed !important;
-}
-
-* table td,
-* table th,
-* [data-testid="stTable"] td,
-* [data-testid="stTable"] th,
-* .stDataFrame td,
-* .stDataFrame th,
-* .ipad-table td,
-* .ipad-table th {
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    display: table-cell !important;
-    vertical-align: middle !important;
-}
-
-/* --- 針對所有可能的文字容器 --- */
-div[data-testid="stTable"] table,
-div[data-testid="stTable"] table td,
-div[data-testid="stTable"] table th {
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-}
-
-/* --- 強制所有子元素不斷行 --- */
-.ipad-table * {
-    white-space: nowrap !important;
-}
-
-[data-testid="stTable"] * {
-    white-space: nowrap !important;
-}
-
-.stDataFrame * {
-    white-space: nowrap !important;
-}
-
-/* --- 最高優先級的強制樣式 --- */
-table.ipad-table td,
-table.ipad-table th,
-.ipad-table td,
-.ipad-table th {
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    max-width: none !important;
-    min-width: 0 !important;
-    width: auto !important;
+/* === iPad Mini 橫向響應式 === */
+@media (min-width: 1024px) and (max-width: 1366px) and (orientation: landscape) {
+    [data-testid="stSidebar"] {
+        width: 300px !important;
+        min-width: 300px !important;
+        max-width: 300px !important;
+    }
+    .ipad-metric-container { padding: 15px !important; margin-bottom: 15px !important; }
+    .ipad-map-container { height: 320px !important; }
+    .ipad-metric-title { font-size: 26px !important; }
+    .ipad-metric-value { font-size: 44px !important; }
+    .ipad-header { font-size: 30px !important; margin-bottom: 15px !important; }
+    .ipad-table { font-size: 13px !important; }
+    .ipad-table td:last-child { font-size: 15px !important; }
+    .ipad-list-title { font-size: 22px !important; margin-bottom: 8px !important; }
 }
 
 </style>
@@ -923,9 +524,7 @@ else:
 
 # 添加熱區標記
 if show_heatmap and top_3_centers:
-    st.write(f"🔥 熱區數量: {len(top_3_centers)}")  # 調試信息
-    for i, center in enumerate(top_3_centers):
-        st.write(f"📍 熱區 {i+1}: {center['area']} - {center['count']}")  # 調試信息
+    for center in top_3_centers:
         folium.Circle(
             location=[center['lat'], center['lon']], 
             radius=1200, 
@@ -936,11 +535,6 @@ if show_heatmap and top_3_centers:
             tooltip=f"<b style='font-size:16px;'>{center['area']}</b><br><span style='font-size:14px;'>需求: {center['count']}</span>", 
             zindex=10
         ).add_to(m)
-else:
-    if not show_heatmap:
-        st.write("⚠️ 需求熱區開關已關閉")
-    if not top_3_centers:
-        st.write("⚠️ 沒有熱區數據")
 
 # 添加車輛位置
 folium.Marker(
