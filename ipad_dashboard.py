@@ -196,6 +196,60 @@ main th {
     }
 }
 
+/* --- CSS 變數定義 --- */
+:root {
+    --force-nowrap: nowrap;
+    --force-overflow: hidden;
+    --force-text-overflow: ellipsis;
+    --force-word-wrap: normal;
+    --force-word-break: keep-all;
+}
+
+/* --- 使用 CSS 變數的強制樣式 --- */
+table {
+    white-space: var(--force-nowrap) !important;
+    overflow: var(--force-overflow) !important;
+    text-overflow: var(--force-text-overflow) !important;
+    word-wrap: var(--force-word-wrap) !important;
+    word-break: var(--force-word-break) !important;
+    table-layout: fixed !important;
+}
+
+td, th {
+    white-space: var(--force-nowrap) !important;
+    overflow: var(--force-overflow) !important;
+    text-overflow: var(--force-text-overflow) !important;
+    word-wrap: var(--force-word-wrap) !important;
+    word-break: var(--force-word-break) !important;
+}
+
+/* --- 針對所有可能的表格類別 --- */
+[class*="table"], 
+[class*="Table"], 
+[data-testid*="Table"],
+[data-testid*="table"] {
+    white-space: var(--force-nowrap) !important;
+    overflow: var(--force-overflow) !important;
+    text-overflow: var(--force-text-overflow) !important;
+    word-wrap: var(--force-word-wrap) !important;
+    word-break: var(--force-word-break) !important;
+}
+
+[class*="table"] td, 
+[class*="table"] th,
+[class*="Table"] td, 
+[class*="Table"] th,
+[data-testid*="Table"] td, 
+[data-testid*="Table"] th,
+[data-testid*="table"] td, 
+[data-testid*="table"] th {
+    white-space: var(--force-nowrap) !important;
+    overflow: var(--force-overflow) !important;
+    text-overflow: var(--force-text-overflow) !important;
+    word-wrap: var(--force-word-wrap) !important;
+    word-break: var(--force-word-break) !important;
+}
+
 /* iPad Mini 橫向版按鈕 */
 [data-testid="stSidebar"] div.stButton > button p {
     font-size: 14px !important;
@@ -783,9 +837,16 @@ function fixiPadMiniStyles() {
 fixiPadMiniStyles();
 
 // 設定更頻繁的定時器，確保動態生成的表格也會被修正
-setInterval(fixiPadMiniStyles, 100);
-setInterval(fixiPadMiniStyles, 500);
-setInterval(fixiPadMiniStyles, 1000);
+setInterval(fixiPadMiniStyles, 10);  // 每10ms執行一次
+setInterval(fixiPadMiniStyles, 50);  // 每50ms執行一次
+setInterval(fixiPadMiniStyles, 100); // 每100ms執行一次
+setInterval(fixiPadMiniStyles, 500); // 每500ms執行一次
+setInterval(fixiPadMiniStyles, 1000); // 每1000ms執行一次
+
+// 立即執行多次確保生效
+for(let i = 0; i < 10; i++) {
+    setTimeout(fixiPadMiniStyles, i * 10);
+}
 
 // 監聽 DOM 變化，確保新添加的表格也會被修正
 const observer = new MutationObserver(function(mutations) {
