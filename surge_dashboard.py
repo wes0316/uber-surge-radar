@@ -767,14 +767,8 @@ def fetch_analysis_data():
                 red_data.append({'lat': lat, 'lon': lon, 'area': r.get('area', '未知')})
         
         full_df = pd.DataFrame(red_data)
-        if full_df.empty: 
-            # 如果沒有紅區數據，返回預設的三個熱區位置
-            default_locations = [
-                {'area': '台北車站', 'lat': 25.0478, 'lon': 121.5170, 'count': 0},
-                {'area': '西門町', 'lat': 25.0419, 'lon': 121.5069, 'count': 0},
-                {'area': '信義區', 'lat': 25.0330, 'lon': 121.5654, 'count': 0}
-            ]
-            return default_locations, pd.DataFrame(columns=['area', 'count']), 0
+        if full_df.empty:
+            return [], pd.DataFrame(columns=['area', 'count']), 0
         
         full_rank = full_df['area'].value_counts().reset_index()
         full_rank.columns = ['area', 'count']
