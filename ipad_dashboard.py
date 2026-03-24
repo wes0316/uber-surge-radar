@@ -537,6 +537,30 @@ function fixiPadMiniStyles() {
     });
 }
 
+// 立即執行一次修正
+fixiPadMiniStyles();
+
+// 設定定時器，確保動態生成的表格也會被修正
+setInterval(fixiPadMiniStyles, 1000);
+
+// 監聽 DOM 變化，確保新添加的表格也會被修正
+const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+        if (mutation.type === 'childList') {
+            fixiPadMiniStyles();
+        }
+    });
+});
+
+observer.observe(document.body, {
+    childList: true,
+    subtree: true
+});
+
+// 頁面載入完成後再次執行修正
+document.addEventListener('DOMContentLoaded', fixiPadMiniStyles);
+window.addEventListener('load', fixiPadMiniStyles);
+
 // 延遲執行確保 DOM 完全載入
 setTimeout(fixiPadMiniStyles, 200);
 setTimeout(fixiPadMiniStyles, 500);
