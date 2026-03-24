@@ -565,14 +565,6 @@ window.addEventListener('load', fixiPadMiniStyles);
 setTimeout(fixiPadMiniStyles, 200);
 setTimeout(fixiPadMiniStyles, 500);
 setTimeout(fixiPadMiniStyles, 1000);
-
-// 監聽 DOM 變化
-new MutationObserver(() => {
-    fixiPadMiniStyles();
-}).observe(document.body, {
-    childList: true,
-    subtree: true
-});
 </script>
 """, unsafe_allow_html=True)
 
