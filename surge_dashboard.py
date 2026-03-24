@@ -785,18 +785,6 @@ def fetch_analysis_data():
             subset = full_df[full_df['area'] == area]
             top_3_centers.append({'area': area, 'lat': subset['lat'].mean(), 'lon': subset['lon'].mean(), 'count': len(subset)})
         
-        # 如果熱區少於3個，補充預設位置
-        if len(top_3_centers) < 3:
-            default_locations = [
-                {'area': '台北車站', 'lat': 25.0478, 'lon': 121.5170, 'count': 0},
-                {'area': '西門町', 'lat': 25.0419, 'lon': 121.5069, 'count': 0},
-                {'area': '信義區', 'lat': 25.0330, 'lon': 121.5654, 'count': 0}
-            ]
-            existing_areas = {center['area'] for center in top_3_centers}
-            for default_loc in default_locations:
-                if default_loc['area'] not in existing_areas and len(top_3_centers) < 3:
-                    top_3_centers.append(default_loc)
-            
         return top_3_centers, top_10_list, len(full_df)
     except: 
         # 異常情況下也返回預設的三個熱區
