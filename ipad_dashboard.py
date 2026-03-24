@@ -816,13 +816,6 @@ def fetch_ipad_data():
     # 模擬 速度
     speed_kmh = 45
     
-    # 模擬 熱區數據
-    top_3_centers = [
-        {'area': '信義區', 'lat': 25.0330, 'lon': 121.5654, 'count': 52},
-        {'area': '大安區', 'lat': 25.0263, 'lon': 121.5436, 'count': 48},
-        {'area': '中山區', 'lat': 25.0667, 'lon': 121.5175, 'count': 41}
-    ]
-    
     # 模擬 排行榜
     top_10_list = pd.DataFrame([
         {'area': '信義區', 'count': 52},
@@ -836,6 +829,33 @@ def fetch_ipad_data():
         {'area': '中正區', 'count': 24},
         {'area': '大同區', 'count': 21}
     ])
+    
+    # 從排行榜前三名生成熱區數據，確保一致性
+    area_coords = {
+        '信義區': {'lat': 25.0330, 'lon': 121.5654},
+        '大安區': {'lat': 25.0263, 'lon': 121.5436},
+        '中山區': {'lat': 25.0667, 'lon': 121.5175},
+        '松山區': {'lat': 25.0496, 'lon': 121.5809},
+        '內湖區': {'lat': 25.0697, 'lon': 121.5880},
+        '士林區': {'lat': 25.0877, 'lon': 121.5240},
+        '北投區': {'lat': 25.1319, 'lon': 121.5009},
+        '萬華區': {'lat': 25.0329, 'lon': 121.5064},
+        '中正區': {'lat': 25.0320, 'lon': 121.5195},
+        '大同區': {'lat': 25.0644, 'lon': 121.5129}
+    }
+    
+    # 取前三名作為熱區
+    top_3_centers = []
+    for i in range(min(3, len(top_10_list))):
+        area = top_10_list.iloc[i]['area']
+        count = top_10_list.iloc[i]['count']
+        if area in area_coords:
+            top_3_centers.append({
+                'area': area,
+                'lat': area_coords[area]['lat'],
+                'lon': area_coords[area]['lon'],
+                'count': count
+            })
     
     total_count = sum([center['count'] for center in top_3_centers])
     
