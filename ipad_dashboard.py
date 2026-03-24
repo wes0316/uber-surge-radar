@@ -83,7 +83,7 @@ body {
 }
 
 .stMain, [data-testid="stMainBlockContainer"] {
-    padding: 15px !important;
+    padding: 8px 12px !important;
     max-width: none !important;
     background: transparent !important;
 }
@@ -124,19 +124,19 @@ body {
 /* === 指標卡片 === */
 .ipad-metric-title {
     color: #87CEEB !important;
-    font-size: 28px !important;
+    font-size: 20px !important;
     font-weight: 800 !important;
     text-align: center !important;
     line-height: 1.2 !important;
     display: block !important;
-    margin-bottom: 12px !important;
+    margin-bottom: 4px !important;
     text-shadow: 0 2px 4px rgba(135, 206, 235, 0.3) !important;
     white-space: nowrap !important;
 }
 
 .ipad-metric-value {
     color: #FFFFFF !important;
-    font-size: 48px !important;
+    font-size: 34px !important;
     font-weight: 900 !important;
     text-align: center !important;
     line-height: 1.1 !important;
@@ -147,16 +147,16 @@ body {
 
 .ipad-metric-container {
     background: linear-gradient(135deg, rgba(45, 45, 45, 0.95) 0%, rgba(30, 30, 30, 0.95) 100%) !important;
-    border-left: 12px solid #00D4FF !important;
-    border-radius: 20px !important;
-    padding: 15px !important;
+    border-left: 8px solid #00D4FF !important;
+    border-radius: 12px !important;
+    padding: 8px 12px !important;
     text-align: center !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: center !important;
     align-items: center !important;
-    margin-bottom: 15px !important;
-    box-shadow: 0 8px 32px rgba(0, 212, 255, 0.2) !important;
+    margin-bottom: 6px !important;
+    box-shadow: 0 4px 16px rgba(0, 212, 255, 0.2) !important;
     backdrop-filter: blur(10px) !important;
     border: 1px solid rgba(0, 212, 255, 0.3) !important;
     transition: transform 0.3s ease, box-shadow 0.3s ease !important;
@@ -169,11 +169,11 @@ body {
 
 /* === 地圖容器 === */
 .ipad-map-container {
-    height: 350px !important;
-    border-radius: 20px !important;
+    height: 210px !important;
+    border-radius: 12px !important;
     overflow: hidden !important;
-    margin-bottom: 15px !important;
-    box-shadow: 0 8px 32px rgba(0, 212, 255, 0.2) !important;
+    margin-bottom: 6px !important;
+    box-shadow: 0 4px 16px rgba(0, 212, 255, 0.2) !important;
     border: 2px solid #00D4FF !important;
     position: relative !important;
 }
@@ -197,10 +197,10 @@ iframe {
 
 /* === 排行榜表格 === */
 .ipad-list-title {
-    font-size: 24px !important;
+    font-size: 18px !important;
     color: #00D4FF !important;
     font-weight: 800 !important;
-    margin-bottom: 10px !important;
+    margin-bottom: 4px !important;
     text-shadow: 0 2px 4px rgba(0, 212, 255, 0.3) !important;
     text-align: center !important;
     white-space: nowrap !important;
@@ -209,9 +209,9 @@ iframe {
 .ipad-table {
     width: 100% !important;
     color: white !important;
-    font-size: 14px !important;
+    font-size: 12px !important;
     border-collapse: separate !important;
-    border-spacing: 0 4px !important;
+    border-spacing: 0 1px !important;
     font-weight: 600 !important;
     background: transparent !important;
     table-layout: fixed !important;
@@ -230,7 +230,7 @@ iframe {
 }
 
 .ipad-table td {
-    padding: 8px 12px !important;
+    padding: 3px 8px !important;
     color: #FFFFFF !important;
     border: none !important;
     white-space: nowrap !important;
@@ -245,32 +245,31 @@ iframe {
 }
 
 .ipad-table td:last-child {
-    border-radius: 0 12px 12px 0 !important;
+    border-radius: 0 8px 8px 0 !important;
     text-align: right !important;
     font-weight: 900 !important;
-    font-size: 16px !important;
+    font-size: 13px !important;
     color: #00D4FF !important;
     width: 40% !important;
 }
 
 /* === 標題與分隔線 === */
 .ipad-header {
-    font-size: 32px !important;
+    font-size: 20px !important;
     color: #00D4FF !important;
     font-weight: 900 !important;
     text-align: center !important;
-    margin-bottom: 20px !important;
-    text-shadow: 0 3px 6px rgba(0, 212, 255, 0.3) !important;
+    margin-bottom: 5px !important;
+    text-shadow: 0 2px 4px rgba(0, 212, 255, 0.3) !important;
     letter-spacing: 1px !important;
     white-space: nowrap !important;
 }
 
 .ipad-divider {
-    height: 2px !important;
+    height: 1px !important;
     background: linear-gradient(90deg, transparent, #00D4FF, transparent) !important;
-    margin: 15px 0 !important;
+    margin: 5px 0 !important;
     border: none !important;
-    box-shadow: 0 2px 8px rgba(0, 212, 255, 0.3) !important;
 }
 
 /* === 滾動條 === */
@@ -499,7 +498,7 @@ folium.Marker(
 ).add_to(m)
 
 # 顯示 iPad Mini 版地圖
-st_folium(m, width="100%", height=350, use_container_width=True)
+st_folium(m, width="100%", height=210, use_container_width=True)
 
 # --- 10. iPad Mini 橫向版排行榜 ---
 st.markdown('<div class="ipad-header">📈 紅區排行榜</div>', unsafe_allow_html=True)
@@ -511,8 +510,8 @@ if not top_10_list.empty:
     for i, row in top_10_list.iterrows():
         html += f"""
         <tr style='white-space: nowrap !important;'>
-            <td style='padding: 8px 12px !important; color: #FFFFFF !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; word-wrap: normal !important; word-break: keep-all !important; width: 60% !important;'>{row['area']}</td>
-            <td style='padding: 8px 12px !important; color: #00D4FF !important; text-align: right !important; font-weight: 900 !important; font-size: 16px !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; word-wrap: normal !important; word-break: keep-all !important; width: 40% !important;'>{row['count']}</td>
+            <td style='padding: 3px 8px !important; color: #FFFFFF !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; word-wrap: normal !important; word-break: keep-all !important; width: 60% !important; font-size: 12px !important;'>{row['area']}</td>
+            <td style='padding: 3px 8px !important; color: #00D4FF !important; text-align: right !important; font-weight: 900 !important; font-size: 13px !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; word-wrap: normal !important; word-break: keep-all !important; width: 40% !important;'>{row['count']}</td>
         </tr>
         """
     html += "</table>"
