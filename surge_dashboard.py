@@ -780,14 +780,8 @@ def fetch_analysis_data():
             top_3_centers.append({'area': area, 'lat': subset['lat'].mean(), 'lon': subset['lon'].mean(), 'count': len(subset)})
         
         return top_3_centers, top_10_list, len(full_df)
-    except: 
-        # 異常情況下也返回預設的三個熱區
-        default_locations = [
-            {'area': '台北車站', 'lat': 25.0478, 'lon': 121.5170, 'count': 0},
-            {'area': '西門町', 'lat': 25.0419, 'lon': 121.5069, 'count': 0},
-            {'area': '信義區', 'lat': 25.0330, 'lon': 121.5654, 'count': 0}
-        ]
-        return default_locations, pd.DataFrame(columns=['area', 'count']), 0
+    except:
+        return [], pd.DataFrame(columns=['area', 'count']), 0
 
 # --- 8. 主畫面指標 ---
 top_3_centers, top_10_list, total_count = fetch_analysis_data()
