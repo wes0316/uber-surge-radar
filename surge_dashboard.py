@@ -834,12 +834,9 @@ col_list, col_map = st.columns([1.4, 2.8])
 
 # --- 9.1 地圖區域 ---
 with col_map:
-    # 地圖永遠以車輛位置為中心，auto_zoom 只影響縮放等級
+    # 地圖永遠以車輛位置為中心
     center_lat, center_lon = st.session_state['gps_pos']
-    if auto_zoom and top_3_centers and len(top_3_centers) > 0:
-        zoom_start = 12
-    else:
-        zoom_start = 14
+    zoom_start = 13
 
     m = folium.Map(
         location=[center_lat, center_lon], 
@@ -848,6 +845,11 @@ with col_map:
         zoom_control=False,
         attributionControl=False
     )
+
+    # auto_zoom：用 fit_bounds 確保車輛 + 所有熱區圓都在視窗內
+    if auto_zoom and top_3_centers and len(top_3_centers) > 0:
+        all_points = [[center_lat, center_lon]] + [[c['lat'], c['lon']] for c in top_3_centers]
+        m.fit_bounds(all_points, padding=[30, 30])
 
     # 添加雷達回波圖層
     if show_rain:
