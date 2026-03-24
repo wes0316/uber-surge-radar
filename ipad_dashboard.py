@@ -60,9 +60,56 @@ def display_logo():
     except Exception as e:
         st.info("🚕 Uber 運輸需求預測")
 
-# --- 2. iPad Mini 橫向版 CSS 樣式 ---
+# --- 2. iPad Mini 橫向版 CSS ---
 st.markdown("""
 <style>
+/* --- 最高優先級的內聯樣式強制設定 --- */
+table, td, th {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    word-wrap: normal !important;
+    word-break: keep-all !important;
+}
+
+.ipad-table, .ipad-table td, .ipad-table th {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    word-wrap: normal !important;
+    word-break: keep-all !important;
+}
+
+[data-testid="stTable"], [data-testid="stTable"] td, [data-testid="stTable"] th {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    word-wrap: normal !important;
+    word-break: keep-all !important;
+}
+
+.stDataFrame, .stDataFrame td, .stDataFrame th {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    word-wrap: normal !important;
+    word-break: keep-all !important;
+}
+
+/* --- 全域文字不斷行設定 --- */
+* {
+    word-wrap: normal !important;
+    word-break: keep-all !important;
+}
+
+/* --- iPad Mini 橫向版基礎樣式 --- */
+body {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%) !important;
+    color: white !important;
+    font-family: 'Arial', sans-serif !important;
+    overflow: hidden !important;
+}
+
 /* --- iPad Mini 橫向版全域樣式 --- */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
