@@ -464,6 +464,65 @@ table th {
     text-overflow: ellipsis !important;
 }
 
+/* --- 超級強制表格不斷行樣式 --- */
+* table,
+* [data-testid="stTable"],
+* .stDataFrame,
+* .ipad-table {
+    white-space: nowrap !important;
+    table-layout: fixed !important;
+}
+
+* table td,
+* table th,
+* [data-testid="stTable"] td,
+* [data-testid="stTable"] th,
+* .stDataFrame td,
+* .stDataFrame th,
+* .ipad-table td,
+* .ipad-table th {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: table-cell !important;
+    vertical-align: middle !important;
+}
+
+/* --- 針對所有可能的文字容器 --- */
+div[data-testid="stTable"] table,
+div[data-testid="stTable"] table td,
+div[data-testid="stTable"] table th {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+/* --- 強制所有子元素不斷行 --- */
+.ipad-table * {
+    white-space: nowrap !important;
+}
+
+[data-testid="stTable"] * {
+    white-space: nowrap !important;
+}
+
+.stDataFrame * {
+    white-space: nowrap !important;
+}
+
+/* --- 最高優先級的強制樣式 --- */
+table.ipad-table td,
+table.ipad-table th,
+.ipad-table td,
+.ipad-table th {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    width: auto !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
