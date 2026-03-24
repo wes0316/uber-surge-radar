@@ -730,19 +730,10 @@ function fixiPadMiniStyles() {
 // 立即執行一次修正
 fixiPadMiniStyles();
 
-// 設定更頻繁的定時器，確保動態生成的表格也會被修正
-setInterval(fixiPadMiniStyles, 10);  // 每10ms執行一次
-setInterval(fixiPadMiniStyles, 50);  // 每50ms執行一次
-setInterval(fixiPadMiniStyles, 100); // 每100ms執行一次
-setInterval(fixiPadMiniStyles, 500); // 每500ms執行一次
-setInterval(fixiPadMiniStyles, 1000); // 每1000ms執行一次
+// 設定合理的定時器
+setInterval(fixiPadMiniStyles, 1000);
 
-// 立即執行多次確保生效
-for(let i = 0; i < 10; i++) {
-    setTimeout(fixiPadMiniStyles, i * 10);
-}
-
-// 監聽 DOM 變化，確保新添加的表格也會被修正
+// 監聽 DOM 變化
 const observer = new MutationObserver(function(mutations) {
     mutations.forEach(function(mutation) {
         if (mutation.type === 'childList') {
@@ -753,30 +744,17 @@ const observer = new MutationObserver(function(mutations) {
 
 observer.observe(document.body, {
     childList: true,
-    subtree: true,
-    attributes: true,
-    characterData: true
+    subtree: true
 });
 
 // 頁面載入完成後再次執行修正
 document.addEventListener('DOMContentLoaded', fixiPadMiniStyles);
 window.addEventListener('load', fixiPadMiniStyles);
-window.addEventListener('resize', fixiPadMiniStyles);
 
 // 延遲執行確保 DOM 完全載入
-setTimeout(fixiPadMiniStyles, 50);
 setTimeout(fixiPadMiniStyles, 100);
-setTimeout(fixiPadMiniStyles, 200);
 setTimeout(fixiPadMiniStyles, 500);
 setTimeout(fixiPadMiniStyles, 1000);
-setTimeout(fixiPadMiniStyles, 2000);
-
-// 監聽滾動事件
-window.addEventListener('scroll', fixiPadMiniStyles);
-
-// 監聽鍵盤事件（以防有動態內容生成）
-document.addEventListener('keydown', fixiPadMiniStyles);
-document.addEventListener('keyup', fixiPadMiniStyles);
 </script>
 """, unsafe_allow_html=True)
 
