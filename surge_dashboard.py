@@ -914,45 +914,9 @@ m1, m2 = st.columns(2)
 
 # 使用內聯樣式強制設定標題顏色為淺藍色，大小為 40px
 m1.markdown(f"""
-<style>
-.metric-title {{
-    color: #87CEEB !important;
-    font-size: 40px !important;
-    font-weight: 900 !important;
-    text-align: center !important;
-    line-height: 1.1 !important;
-    display: block !important;
-    margin-bottom: 15px !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-}}
-.metric-value {{
-    color: #FFFFFF !important;
-    font-size: 68px !important;
-    font-weight: 900 !important;
-    text-align: center !important;
-    line-height: 1.1 !important;
-    display: block !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-}}
-.metric-container {{
-    background: rgba(45, 45, 45, 0.9) !important; 
-    border-left: 12px solid #00D4FF !important; 
-    border-radius: 15px !important; 
-    padding: 20px !important; 
-    text-align: center !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    align-items: center !important;
-}}
-</style>
-<div class="metric-container">
-    <div class="metric-title">🔥 雙北紅區</div>
-    <div class="metric-value">{total_count} 處</div>
+<div style="background:rgba(45,45,45,0.9); border-left:12px solid #00D4FF; border-radius:15px; padding:20px; text-align:center; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+    <div style="color:#87CEEB; font-size:40px; font-weight:900; line-height:1.1; margin-bottom:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:100%;">🔥 雙北紅區</div>
+    <div style="color:#FFFFFF; font-size:68px; font-weight:900; line-height:1.1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:100%;">{total_count} 處</div>
 </div>
 """, unsafe_allow_html=True)
 
