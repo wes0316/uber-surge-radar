@@ -175,30 +175,21 @@ body {
     position: relative !important;
 }
 
-/* 去除 st_folium 前後 Streamlit 自動產生的空白 */
-.ipad-map-container + div,
-.ipad-map-container ~ div [data-testid="stIFrame"],
-[data-testid="stIFrame"] {
+/* 去除 st_folium / iframe 多餘空白 */
+.element-container:has(iframe),
+.stCustomComponentV1,
+[data-testid="stCustomComponentV1"] {
     margin: 0 !important;
     padding: 0 !important;
 }
 
-.element-container:has(iframe) {
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
-.element-container:has(.ipad-map-container),
-.element-container:has([data-testid="stIFrame"]) {
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
-/* 去除 iframe 本身的多餘空白 */
 iframe {
     display: block !important;
     margin: 0 !important;
     padding: 0 !important;
+    border-radius: 20px !important;
+    border: 2px solid #00D4FF !important;
+    box-shadow: 0 8px 32px rgba(0, 212, 255, 0.2) !important;
 }
 
 /* === 排行榜表格 === */
@@ -505,9 +496,7 @@ folium.Marker(
 ).add_to(m)
 
 # 顯示 iPad Mini 版地圖
-st.markdown('<div class="ipad-map-container">', unsafe_allow_html=True)
 st_folium(m, width="100%", height=350, use_container_width=True)
-st.markdown('</div>', unsafe_allow_html=True)
 
 # --- 10. iPad Mini 橫向版排行榜 ---
 st.markdown('<div class="ipad-header">📈 紅區排行榜</div>', unsafe_allow_html=True)
