@@ -973,7 +973,7 @@ m2.markdown(f"""
 st.divider()
 
 # --- 9. 地圖與排行 ---
-col_list, col_map = st.columns([1.0, 3.2])
+col_list, col_map = st.columns([1.4, 2.8])
 
 # --- 9.1 地圖區域 ---
 with col_map:
