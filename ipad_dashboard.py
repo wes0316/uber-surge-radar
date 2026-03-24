@@ -879,9 +879,9 @@ if auto_zoom and show_heatmap and top_3_centers:
     min_lat, max_lat = min(lats), max(lats)
     min_lon, max_lon = min(lons), max(lons)
     
-    # 確保中心點包含 GPS 位置
-    center_lat = (min_lat + max_lat) / 2
-    center_lon = (min_lon + max_lon) / 2
+    # 始終以車輛位置（GPS位置）為中心點
+    center_lat = gps_pos[0]
+    center_lon = gps_pos[1]
     
     lat_diff = max_lat - min_lat
     lon_diff = max_lon - min_lon
