@@ -176,10 +176,24 @@ main th {
     word-wrap: normal !important;
     word-break: keep-all !important;
 }
-    margin-left: 8px !important;
-    margin-bottom: 8px !important;
-    white-space: nowrap !important;
-    text-shadow: 0 2px 4px rgba(0, 212, 255, 0.3) !important;
+
+/* --- 最終強制解決方案 --- */
+@media all {
+    table, td, th {
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        word-wrap: normal !important;
+        word-break: keep-all !important;
+    }
+    
+    .ipad-table, .ipad-table td, .ipad-table th {
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        word-wrap: normal !important;
+        word-break: keep-all !important;
+    }
 }
 
 /* iPad Mini 橫向版按鈕 */
@@ -615,6 +629,59 @@ st.markdown("""
 <script>
 function fixiPadMiniStyles() {
     console.log('修正 iPad Mini 橫向版樣式');
+    
+    // 超級強制表格不斷行 - 直接設定屬性
+    const allElements = document.querySelectorAll('table, td, th, .ipad-table, [data-testid="stTable"], .stDataFrame');
+    allElements.forEach(element => {
+        // 直接設定 style 屬性字符串
+        element.setAttribute('style', 
+            'white-space: nowrap !important; ' +
+            'overflow: hidden !important; ' +
+            'text-overflow: ellipsis !important; ' +
+            'word-wrap: normal !important; ' +
+            'word-break: keep-all !important; ' +
+            'display: table-cell !important; ' +
+            'max-width: none !important; ' +
+            'min-width: 0 !important;'
+        );
+    });
+    
+    // 針對表格的特殊處理
+    const tables = document.querySelectorAll('table');
+    tables.forEach(table => {
+        table.setAttribute('style', 
+            'white-space: nowrap !important; ' +
+            'table-layout: fixed !important; ' +
+            'width: 100% !important; ' +
+            'overflow: hidden !important;'
+        );
+        
+        // 處理所有單元格
+        const cells = table.querySelectorAll('td, th');
+        cells.forEach((cell, index) => {
+            const baseStyle = 
+                'white-space: nowrap !important; ' +
+                'overflow: hidden !important; ' +
+                'text-overflow: ellipsis !important; ' +
+                'word-wrap: normal !important; ' +
+                'word-break: keep-all !important; ' +
+                'display: table-cell !important; ' +
+                'vertical-align: middle !important;';
+            
+            if (table.classList.contains('ipad-table')) {
+                // iPad 表格的列寬設定
+                if (cell.cellIndex === 0) {
+                    cell.setAttribute('style', baseStyle + ' width: 60% !important;');
+                } else if (cell.cellIndex === 1) {
+                    cell.setAttribute('style', baseStyle + ' width: 40% !important;');
+                } else {
+                    cell.setAttribute('style', baseStyle);
+                }
+            } else {
+                cell.setAttribute('style', baseStyle);
+            }
+        });
+    });
     
     // 確保地圖容器正確顯示
     const mapContainers = document.querySelectorAll('.ipad-map-container');
