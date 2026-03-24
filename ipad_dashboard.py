@@ -1007,6 +1007,7 @@ if auto_zoom and show_heatmap and top_3_centers:
     min_lat, max_lat = min(lats), max(lats)
     min_lon, max_lon = min(lons), max(lons)
     
+    # 確保中心點包含 GPS 位置
     center_lat = (min_lat + max_lat) / 2
     center_lon = (min_lon + max_lon) / 2
     
@@ -1024,6 +1025,7 @@ if auto_zoom and show_heatmap and top_3_centers:
                    tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", attr="Google")
 else:
     zoom = 13
+    # 確保使用正確的 GPS 位置作為中心點
     m = folium.Map(location=gps_pos, zoom_start=zoom,
                    tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", attr="Google")
 
