@@ -903,7 +903,9 @@ else:
 
 # 添加熱區標記
 if show_heatmap and top_3_centers:
-    for center in top_3_centers:
+    st.write(f"🔥 熱區數量: {len(top_3_centers)}")  # 調試信息
+    for i, center in enumerate(top_3_centers):
+        st.write(f"📍 熱區 {i+1}: {center['area']} - {center['count']}")  # 調試信息
         folium.Circle(
             location=[center['lat'], center['lon']], 
             radius=1200, 
@@ -914,6 +916,11 @@ if show_heatmap and top_3_centers:
             tooltip=f"<b style='font-size:16px;'>{center['area']}</b><br><span style='font-size:14px;'>需求: {center['count']}</span>", 
             zindex=10
         ).add_to(m)
+else:
+    if not show_heatmap:
+        st.write("⚠️ 需求熱區開關已關閉")
+    if not top_3_centers:
+        st.write("⚠️ 沒有熱區數據")
 
 # 添加車輛位置
 folium.Marker(
