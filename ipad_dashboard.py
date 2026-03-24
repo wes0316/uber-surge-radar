@@ -264,38 +264,44 @@ body {
     }
     
     .ipad-metric-container {
-        padding: 25px !important;
-        margin-bottom: 25px !important;
+        padding: 15px !important;
+        margin-bottom: 15px !important;
     }
     
     .ipad-map-container {
-        height: 550px !important;
+        height: 320px !important;
     }
     
     .ipad-metric-title {
-        font-size: 30px !important;
+        font-size: 26px !important;
     }
     
     .ipad-metric-value {
-        font-size: 52px !important;
+        font-size: 44px !important;
     }
     
     .ipad-header {
-        font-size: 36px !important;
+        font-size: 30px !important;
+        margin-bottom: 15px !important;
     }
     
     .ipad-table {
-        font-size: 18px !important;
+        font-size: 13px !important;
     }
     
     .ipad-table td:last-child {
-        font-size: 20px !important;
+        font-size: 15px !important;
+    }
+    
+    .ipad-list-title {
+        font-size: 22px !important;
+        margin-bottom: 8px !important;
     }
 }
 
 /* --- iPad Mini 橫向版主內容區域 --- */
 [data-testid="stMainBlockContainer"] {
-    padding: 20px !important;
+    padding: 15px !important;
     max-width: none !important;
 }
 
@@ -303,7 +309,7 @@ body {
 .ipad-divider {
     height: 2px !important;
     background: linear-gradient(90deg, transparent, #00D4FF, transparent) !important;
-    margin: 30px 0 !important;
+    margin: 15px 0 !important;
     border: none !important;
     box-shadow: 0 2px 8px rgba(0, 212, 255, 0.3) !important;
 }
@@ -331,6 +337,51 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(45deg, #0099CC, #00D4FF) !important;
 }
+
+/* --- 確保所有文字元素都不斷行 --- */
+[data-testid="stSidebar"] * {
+    white-space: nowrap !important;
+}
+
+.ipad-sidebar-title {
+    white-space: nowrap !important;
+}
+
+.ipad-sidebar-label {
+    white-space: nowrap !important;
+}
+
+.ipad-sidebar-button {
+    white-space: nowrap !important;
+}
+
+.stButton > button {
+    white-space: nowrap !important;
+}
+
+.stSelectbox > div > div {
+    white-space: nowrap !important;
+}
+
+.stTextInput > div > div > input {
+    white-space: nowrap !important;
+}
+
+/* --- 確保內容不會溢出 --- */
+.stMain {
+    overflow: hidden !important;
+}
+
+[data-testid="stMainBlockContainer"] {
+    overflow: hidden !important;
+}
+
+/* --- 調整整體佈局以適應一頁顯示 --- */
+.stApp {
+    height: 100vh !important;
+    overflow: hidden !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
