@@ -550,37 +550,69 @@ function fixiPadMiniStyles() {
     });
     
     // 確保所有表格都不斷行
-    const allTables = document.querySelectorAll('table, [data-testid="stTable"], .stDataFrame');
+    const allTables = document.querySelectorAll('table, [data-testid="stTable"], .stDataFrame, .ipad-table');
     allTables.forEach(table => {
-        table.style.whiteSpace = 'nowrap !important';
-        table.style.tableLayout = 'fixed !important';
+        // 強制設定表格樣式
+        table.style.setProperty('white-space', 'nowrap', 'important');
+        table.style.setProperty('table-layout', 'fixed', 'important');
+        table.style.setProperty('width', '100%', 'important');
         
-        const cells = table.querySelectorAll('td, th');
+        // 處理所有單元格
+        const cells = table.querySelectorAll('td, th, *');
         cells.forEach(cell => {
-            cell.style.whiteSpace = 'nowrap !important';
-            cell.style.overflow = 'hidden !important';
-            cell.style.textOverflow = 'ellipsis !important';
+            cell.style.setProperty('white-space', 'nowrap', 'important');
+            cell.style.setProperty('overflow', 'hidden', 'important');
+            cell.style.setProperty('text-overflow', 'ellipsis', 'important');
+            cell.style.setProperty('word-wrap', 'normal', 'important');
+            cell.style.setProperty('word-break', 'keep-all', 'important');
         });
     });
     
     // 特別處理 iPad 表格
-    const ipadTables = document.querySelectorAll('.ipad-table');
+    const ipadTables = document.querySelectorAll('.ipad-table, table.ipad-table');
     ipadTables.forEach(table => {
-        table.style.whiteSpace = 'nowrap !important';
-        table.style.tableLayout = 'fixed !important';
+        table.style.setProperty('white-space', 'nowrap', 'important');
+        table.style.setProperty('table-layout', 'fixed', 'important');
+        table.style.setProperty('width', '100%', 'important');
         
-        const cells = table.querySelectorAll('td');
-        cells.forEach((cell, index) => {
-            cell.style.whiteSpace = 'nowrap !important';
-            cell.style.overflow = 'hidden !important';
-            cell.style.textOverflow = 'ellipsis !important';
+        const rows = table.querySelectorAll('tr');
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td, th');
+            cells.forEach((cell, index) => {
+                cell.style.setProperty('white-space', 'nowrap', 'important');
+                cell.style.setProperty('overflow', 'hidden', 'important');
+                cell.style.setProperty('text-overflow', 'ellipsis', 'important');
+                cell.style.setProperty('word-wrap', 'normal', 'important');
+                cell.style.setProperty('word-break', 'keep-all', 'important');
+                cell.style.setProperty('display', 'table-cell', 'important');
+                cell.style.setProperty('vertical-align', 'middle', 'important');
+                
+                // 設定列寬
+                if (cell.cellIndex === 0) {
+                    cell.style.setProperty('width', '60%', 'important');
+                } else if (cell.cellIndex === 1) {
+                    cell.style.setProperty('width', '40%', 'important');
+                }
+            });
+        });
+    });
+    
+    // 處理 Streamlit 特定的表格容器
+    const streamlitTables = document.querySelectorAll('[data-testid="stTable"]');
+    streamlitTables.forEach(container => {
+        const tables = container.querySelectorAll('table');
+        tables.forEach(table => {
+            table.style.setProperty('white-space', 'nowrap', 'important');
+            table.style.setProperty('table-layout', 'fixed', 'important');
             
-            // 設定列寬
-            if (cell.cellIndex === 0) {
-                cell.style.width = '60% !important';
-            } else if (cell.cellIndex === 1) {
-                cell.style.width = '40% !important';
-            }
+            const allCells = table.querySelectorAll('td, th, *');
+            allCells.forEach(cell => {
+                cell.style.setProperty('white-space', 'nowrap', 'important');
+                cell.style.setProperty('overflow', 'hidden', 'important');
+                cell.style.setProperty('text-overflow', 'ellipsis', 'important');
+                cell.style.setProperty('word-wrap', 'normal', 'important');
+                cell.style.setProperty('word-break', 'keep-all', 'important');
+            });
         });
     });
     
@@ -599,7 +631,9 @@ function fixiPadMiniStyles() {
 // 立即執行一次修正
 fixiPadMiniStyles();
 
-// 設定定時器，確保動態生成的表格也會被修正
+// 設定更頻繁的定時器，確保動態生成的表格也會被修正
+setInterval(fixiPadMiniStyles, 100);
+setInterval(fixiPadMiniStyles, 500);
 setInterval(fixiPadMiniStyles, 1000);
 
 // 監聽 DOM 變化，確保新添加的表格也會被修正
@@ -613,17 +647,30 @@ const observer = new MutationObserver(function(mutations) {
 
 observer.observe(document.body, {
     childList: true,
-    subtree: true
+    subtree: true,
+    attributes: true,
+    characterData: true
 });
 
 // 頁面載入完成後再次執行修正
 document.addEventListener('DOMContentLoaded', fixiPadMiniStyles);
 window.addEventListener('load', fixiPadMiniStyles);
+window.addEventListener('resize', fixiPadMiniStyles);
 
 // 延遲執行確保 DOM 完全載入
+setTimeout(fixiPadMiniStyles, 50);
+setTimeout(fixiPadMiniStyles, 100);
 setTimeout(fixiPadMiniStyles, 200);
 setTimeout(fixiPadMiniStyles, 500);
 setTimeout(fixiPadMiniStyles, 1000);
+setTimeout(fixiPadMiniStyles, 2000);
+
+// 監聽滾動事件
+window.addEventListener('scroll', fixiPadMiniStyles);
+
+// 監聽鍵盤事件（以防有動態內容生成）
+document.addEventListener('keydown', fixiPadMiniStyles);
+document.addEventListener('keyup', fixiPadMiniStyles);
 </script>
 """, unsafe_allow_html=True)
 
