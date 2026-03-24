@@ -834,17 +834,11 @@ col_list, col_map = st.columns([1.4, 2.8])
 
 # --- 9.1 地圖區域 ---
 with col_map:
-    # 自動縮放邏輯
-    if auto_zoom:
-        if top_3_centers and len(top_3_centers) > 0:
-            center_lat = sum([c['lat'] for c in top_3_centers]) / len(top_3_centers)
-            center_lon = sum([c['lon'] for c in top_3_centers]) / len(top_3_centers)
-            zoom_start = 12
-        else:
-            center_lat, center_lon = st.session_state['gps_pos']
-            zoom_start = 14
+    # 地圖永遠以車輛位置為中心，auto_zoom 只影響縮放等級
+    center_lat, center_lon = st.session_state['gps_pos']
+    if auto_zoom and top_3_centers and len(top_3_centers) > 0:
+        zoom_start = 12
     else:
-        center_lat, center_lon = st.session_state['gps_pos']
         zoom_start = 14
 
     m = folium.Map(
@@ -927,15 +921,8 @@ with col_list:
         rows_html = ""
         for i, (_, row) in enumerate(top_10_list.iterrows()):
             medal = medals[i] if i < len(medals) else "🏅"
-            rows_html += f"""
-            <div style="display:flex; flex-direction:row; justify-content:space-between; align-items:center; padding:3px 6px; margin-bottom:2px; background:rgba(45,45,45,0.7); border-radius:6px; border-left:3px solid #00D4FF;">
-                <span style="white-space:nowrap; word-break:keep-all; color:#FFFFFF; font-size:15px; font-weight:700; overflow:hidden; text-overflow:ellipsis; min-width:0; flex:1;">{medal} {row['area']}</span>
-                <span style="white-space:nowrap; color:#00D4FF; font-size:15px; font-weight:900; margin-left:8px; flex-shrink:0;">{row['count']}處</span>
-            </div>"""
-        st.markdown(f"""
-        <div style="width:100%;">
-            {rows_html}
-        </div>""", unsafe_allow_html=True)
+            rows_html += f'<div style="display:flex;flex-direction:row;justify-content:space-between;align-items:center;padding:3px 6px;margin-bottom:2px;background:rgba(45,45,45,0.7);border-radius:6px;border-left:3px solid #00D4FF;"><span style="white-space:nowrap;word-break:keep-all;color:#FFFFFF;font-size:15px;font-weight:700;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1;">{medal} {row["area"]}</span><span style="white-space:nowrap;color:#00D4FF;font-size:15px;font-weight:900;margin-left:8px;flex-shrink:0;">{row["count"]}處</span></div>'
+        st.markdown(f'<div style="width:100%;">{rows_html}</div>', unsafe_allow_html=True)
 
 # --- 10. GPS三分鐘自動定位與地圖更新 ---
 st.markdown(f"""
