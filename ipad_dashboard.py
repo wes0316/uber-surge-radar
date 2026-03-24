@@ -403,7 +403,7 @@ gps_pos, speed_kmh, top_3_centers, top_10_list, total_count = fetch_ipad_data()
 # --- 8. iPad Mini 橫向版主畫面指標 ---
 st.markdown('<div class="ipad-header">📊 實時數據監控</div>', unsafe_allow_html=True)
 
-col1, col2 = st.columns(2, gap="20px")
+col1, col2 = st.columns(2, gap="medium")
 
 with col1:
     st.markdown(f"""
