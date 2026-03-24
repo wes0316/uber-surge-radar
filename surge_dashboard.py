@@ -915,7 +915,7 @@ m1, m2 = st.columns(2)
 # 使用內聯樣式強制設定標題顏色為淺藍色，大小為 40px
 m1.markdown(f"""
 <div style="background:rgba(45,45,45,0.9); border-left:12px solid #00D4FF; border-radius:15px; padding:20px; text-align:center; display:flex; flex-direction:column; justify-content:center; align-items:center;">
-    <div style="color:#87CEEB; font-size:40px; font-weight:900; line-height:1.1; margin-bottom:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:100%;">🔥 雙北紅區</div>
+    <div style="color:#87CEEB; font-size:28px; font-weight:900; line-height:1.1; margin-bottom:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:100%;">🔥 雙北紅區</div>
     <div style="color:#FFFFFF; font-size:68px; font-weight:900; line-height:1.1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:100%;">{total_count} 處</div>
 </div>
 """, unsafe_allow_html=True)
