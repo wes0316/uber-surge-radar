@@ -305,7 +305,7 @@ st.markdown("""
 window.addEventListener('load', function() {
     setTimeout(function() {
         document.querySelectorAll('.ipad-map-container').forEach(function(el) {
-            el.style.setProperty('height', '350px', 'important');
+            el.style.setProperty('height', '210px', 'important');
             el.style.setProperty('overflow', 'hidden', 'important');
         });
     }, 500);
