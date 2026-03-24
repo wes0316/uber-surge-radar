@@ -75,8 +75,6 @@ body {
 }
 
 .stApp {
-    height: 100vh !important;
-    overflow: hidden !important;
     background: linear-gradient(180deg, #111111 0%, #1a1a1a 100%) !important;
 }
 
@@ -85,7 +83,6 @@ body {
 }
 
 .stMain, [data-testid="stMainBlockContainer"] {
-    overflow: hidden !important;
     padding: 15px !important;
     max-width: none !important;
     background: transparent !important;
