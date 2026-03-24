@@ -282,80 +282,15 @@ body {
 # --- 3. iPad Mini 橫向版 JavaScript ---
 st.markdown("""
 <script>
-function fixiPadMiniStyles() {
-    console.log('修正 iPad Mini 橫向版樣式');
-    
-    // 確保地圖容器正確顯示
-    const mapContainers = document.querySelectorAll('.ipad-map-container');
-    mapContainers.forEach(elem => {
-        elem.style.height = '350px !important';
-        elem.style.borderRadius = '20px !important';
-        elem.style.overflow = 'hidden !important';
-    });
-    
-    // 確保指標容器正確顯示
-    const metricContainers = document.querySelectorAll('.ipad-metric-container');
-    metricContainers.forEach(elem => {
-        elem.style.display = 'flex !important';
-        elem.style.flexDirection = 'column !important';
-        elem.style.justifyContent = 'center !important';
-        elem.style.alignItems = 'center !important;
-    });
-    
-    // 基本的表格修正（作為備用）
-    const tables = document.querySelectorAll('table:not(.ipad-table)');
-    tables.forEach(table => {
-        table.style.whiteSpace = 'nowrap !important';
-        table.style.tableLayout = 'fixed !important';
-        
-        const cells = table.querySelectorAll('td, th');
-        cells.forEach(cell => {
-            cell.style.whiteSpace = 'nowrap !important';
-            cell.style.overflow = 'hidden !important';
-            cell.style.textOverflow = 'ellipsis !important';
+// 頁面載入後執行一次，確保地圖容器高度正確
+window.addEventListener('load', function() {
+    setTimeout(function() {
+        document.querySelectorAll('.ipad-map-container').forEach(function(el) {
+            el.style.setProperty('height', '350px', 'important');
+            el.style.setProperty('overflow', 'hidden', 'important');
         });
-    });
-    
-    // 添加懸停效果
-    const containers = document.querySelectorAll('.ipad-metric-container');
-    containers.forEach(elem => {
-        elem.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-5px) !important';
-        });
-        elem.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0) !important';
-        });
-    });
-}
-
-// 立即執行一次修正
-fixiPadMiniStyles();
-
-// 設定合理的定時器
-setInterval(fixiPadMiniStyles, 1000);
-
-// 監聽 DOM 變化
-const observer = new MutationObserver(function(mutations) {
-    mutations.forEach(function(mutation) {
-        if (mutation.type === 'childList') {
-            fixiPadMiniStyles();
-        }
-    });
+    }, 500);
 });
-
-observer.observe(document.body, {
-    childList: true,
-    subtree: true
-});
-
-// 頁面載入完成後再次執行修正
-document.addEventListener('DOMContentLoaded', fixiPadMiniStyles);
-window.addEventListener('load', fixiPadMiniStyles);
-
-// 延遲執行確保 DOM 完全載入
-setTimeout(fixiPadMiniStyles, 100);
-setTimeout(fixiPadMiniStyles, 500);
-setTimeout(fixiPadMiniStyles, 1000);
 </script>
 """, unsafe_allow_html=True)
 
