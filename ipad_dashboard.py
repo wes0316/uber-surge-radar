@@ -684,59 +684,6 @@ st.markdown("""
 function fixiPadMiniStyles() {
     console.log('修正 iPad Mini 橫向版樣式');
     
-    // 超級強制表格不斷行 - 直接設定屬性
-    const allElements = document.querySelectorAll('table, td, th, .ipad-table, [data-testid="stTable"], .stDataFrame');
-    allElements.forEach(element => {
-        // 直接設定 style 屬性字符串
-        element.setAttribute('style', 
-            'white-space: nowrap !important; ' +
-            'overflow: hidden !important; ' +
-            'text-overflow: ellipsis !important; ' +
-            'word-wrap: normal !important; ' +
-            'word-break: keep-all !important; ' +
-            'display: table-cell !important; ' +
-            'max-width: none !important; ' +
-            'min-width: 0 !important;'
-        );
-    });
-    
-    // 針對表格的特殊處理
-    const tables = document.querySelectorAll('table');
-    tables.forEach(table => {
-        table.setAttribute('style', 
-            'white-space: nowrap !important; ' +
-            'table-layout: fixed !important; ' +
-            'width: 100% !important; ' +
-            'overflow: hidden !important;'
-        );
-        
-        // 處理所有單元格
-        const cells = table.querySelectorAll('td, th');
-        cells.forEach((cell, index) => {
-            const baseStyle = 
-                'white-space: nowrap !important; ' +
-                'overflow: hidden !important; ' +
-                'text-overflow: ellipsis !important; ' +
-                'word-wrap: normal !important; ' +
-                'word-break: keep-all !important; ' +
-                'display: table-cell !important; ' +
-                'vertical-align: middle !important;';
-            
-            if (table.classList.contains('ipad-table')) {
-                // iPad 表格的列寬設定
-                if (cell.cellIndex === 0) {
-                    cell.setAttribute('style', baseStyle + ' width: 60% !important;');
-                } else if (cell.cellIndex === 1) {
-                    cell.setAttribute('style', baseStyle + ' width: 40% !important;');
-                } else {
-                    cell.setAttribute('style', baseStyle);
-                }
-            } else {
-                cell.setAttribute('style', baseStyle);
-            }
-        });
-    });
-    
     // 確保地圖容器正確顯示
     const mapContainers = document.querySelectorAll('.ipad-map-container');
     mapContainers.forEach(elem => {
@@ -751,73 +698,20 @@ function fixiPadMiniStyles() {
         elem.style.display = 'flex !important';
         elem.style.flexDirection = 'column !important';
         elem.style.justifyContent = 'center !important';
-        elem.style.alignItems = 'center !important';
+        elem.style.alignItems = 'center !important;
     });
     
-    // 確保所有表格都不斷行
-    const allTables = document.querySelectorAll('table, [data-testid="stTable"], .stDataFrame, .ipad-table');
-    allTables.forEach(table => {
-        // 強制設定表格樣式
-        table.style.setProperty('white-space', 'nowrap', 'important');
-        table.style.setProperty('table-layout', 'fixed', 'important');
-        table.style.setProperty('width', '100%', 'important');
+    // 基本的表格修正（作為備用）
+    const tables = document.querySelectorAll('table:not(.ipad-table)');
+    tables.forEach(table => {
+        table.style.whiteSpace = 'nowrap !important';
+        table.style.tableLayout = 'fixed !important';
         
-        // 處理所有單元格
-        const cells = table.querySelectorAll('td, th, *');
+        const cells = table.querySelectorAll('td, th');
         cells.forEach(cell => {
-            cell.style.setProperty('white-space', 'nowrap', 'important');
-            cell.style.setProperty('overflow', 'hidden', 'important');
-            cell.style.setProperty('text-overflow', 'ellipsis', 'important');
-            cell.style.setProperty('word-wrap', 'normal', 'important');
-            cell.style.setProperty('word-break', 'keep-all', 'important');
-        });
-    });
-    
-    // 特別處理 iPad 表格
-    const ipadTables = document.querySelectorAll('.ipad-table, table.ipad-table');
-    ipadTables.forEach(table => {
-        table.style.setProperty('white-space', 'nowrap', 'important');
-        table.style.setProperty('table-layout', 'fixed', 'important');
-        table.style.setProperty('width', '100%', 'important');
-        
-        const rows = table.querySelectorAll('tr');
-        rows.forEach(row => {
-            const cells = row.querySelectorAll('td, th');
-            cells.forEach((cell, index) => {
-                cell.style.setProperty('white-space', 'nowrap', 'important');
-                cell.style.setProperty('overflow', 'hidden', 'important');
-                cell.style.setProperty('text-overflow', 'ellipsis', 'important');
-                cell.style.setProperty('word-wrap', 'normal', 'important');
-                cell.style.setProperty('word-break', 'keep-all', 'important');
-                cell.style.setProperty('display', 'table-cell', 'important');
-                cell.style.setProperty('vertical-align', 'middle', 'important');
-                
-                // 設定列寬
-                if (cell.cellIndex === 0) {
-                    cell.style.setProperty('width', '60%', 'important');
-                } else if (cell.cellIndex === 1) {
-                    cell.style.setProperty('width', '40%', 'important');
-                }
-            });
-        });
-    });
-    
-    // 處理 Streamlit 特定的表格容器
-    const streamlitTables = document.querySelectorAll('[data-testid="stTable"]');
-    streamlitTables.forEach(container => {
-        const tables = container.querySelectorAll('table');
-        tables.forEach(table => {
-            table.style.setProperty('white-space', 'nowrap', 'important');
-            table.style.setProperty('table-layout', 'fixed', 'important');
-            
-            const allCells = table.querySelectorAll('td, th, *');
-            allCells.forEach(cell => {
-                cell.style.setProperty('white-space', 'nowrap', 'important');
-                cell.style.setProperty('overflow', 'hidden', 'important');
-                cell.style.setProperty('text-overflow', 'ellipsis', 'important');
-                cell.style.setProperty('word-wrap', 'normal', 'important');
-                cell.style.setProperty('word-break', 'keep-all', 'important');
-            });
+            cell.style.whiteSpace = 'nowrap !important';
+            cell.style.overflow = 'hidden !important';
+            cell.style.textOverflow = 'ellipsis !important';
         });
     });
     
@@ -1052,7 +946,7 @@ folium.Marker(
 
 # 顯示 iPad Mini 版地圖
 st.markdown('<div class="ipad-map-container">', unsafe_allow_html=True)
-st_folium(m, width="100%", height=500, use_container_width=True)
+st_folium(m, width="100%", height=350, use_container_width=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
 # --- 10. iPad Mini 橫向版排行榜 ---
