@@ -764,7 +764,9 @@ def fetch_analysis_data():
             t, a = float(r.get('totalcar', 0)), float(r.get('availablecar', 0))
             if t > 0 and (t-a)/t >= 0.9:
                 lat, lon = transformer.transform(float(r['tw97x']), float(r['tw97y']))
-                red_data.append({'lat': lat, 'lon': lon, 'area': r.get('area', '未知')})
+                # 過濾台灣範圍外的異常坐標
+                if 21.5 <= lat <= 25.5 and 119.0 <= lon <= 122.5:
+                    red_data.append({'lat': lat, 'lon': lon, 'area': r.get('area', '未知')})
         
         full_df = pd.DataFrame(red_data)
         if full_df.empty:
@@ -777,7 +779,7 @@ def fetch_analysis_data():
         top_3_centers = []
         for area in top_10_list['area'].head(3):
             subset = full_df[full_df['area'] == area]
-            top_3_centers.append({'area': area, 'lat': subset['lat'].mean(), 'lon': subset['lon'].mean(), 'count': len(subset)})
+            top_3_centers.append({'area': area, 'lat': float(subset['lat'].median()), 'lon': float(subset['lon'].median()), 'count': len(subset)})
         
         return top_3_centers, top_10_list, len(full_df)
     except:
@@ -822,10 +824,12 @@ with col_map:
         attributionControl=False
     )
 
-    # auto_zoom：用 fit_bounds 確保車輛 + 所有熱區圓都在視窗內
+    # auto_zoom：用 fit_bounds 確保車輛 + 所有熱區圓都在視窗內（只含驗證坐標）
     if auto_zoom and top_3_centers and len(top_3_centers) > 0:
-        all_points = [[center_lat, center_lon]] + [[c['lat'], c['lon']] for c in top_3_centers]
-        m.fit_bounds(all_points, padding=[30, 30])
+        valid = [c for c in top_3_centers if 21.5 <= c['lat'] <= 25.5 and 119.0 <= c['lon'] <= 122.5]
+        if valid:
+            all_points = [[center_lat, center_lon]] + [[c['lat'], c['lon']] for c in valid]
+            m.fit_bounds(all_points, padding=[30, 30])
 
     # 添加雷達回波圖層
     if show_rain:
