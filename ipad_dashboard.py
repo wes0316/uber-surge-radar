@@ -66,7 +66,7 @@ st.markdown("""
 
 /* === 基礎樣式 === */
 body {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%) !important;
+    background: linear-gradient(180deg, #111111 0%, #1a1a1a 100%) !important;
     color: white !important;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
     margin: 0 !important;
@@ -77,12 +77,18 @@ body {
 .stApp {
     height: 100vh !important;
     overflow: hidden !important;
+    background: linear-gradient(180deg, #111111 0%, #1a1a1a 100%) !important;
+}
+
+[data-testid="stAppViewContainer"] {
+    background: linear-gradient(180deg, #111111 0%, #1a1a1a 100%) !important;
 }
 
 .stMain, [data-testid="stMainBlockContainer"] {
     overflow: hidden !important;
     padding: 15px !important;
     max-width: none !important;
+    background: transparent !important;
 }
 
 #MainMenu, footer, header { visibility: hidden; }
