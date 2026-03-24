@@ -922,7 +922,7 @@ m1.markdown(f"""
 
 m2.markdown(f"""
 <div style="background:rgba(45,45,45,0.9); border-left:12px solid #00D4FF; border-radius:15px; padding:20px; text-align:center; display:flex; flex-direction:column; justify-content:center; align-items:center;">
-    <div style="color:#87CEEB; font-size:40px; font-weight:900; line-height:1.1; margin-bottom:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:100%;">📍 車輛所在區域</div>
+    <div style="color:#87CEEB; font-size:28px; font-weight:900; line-height:1.1; margin-bottom:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:100%;">📍 車輛所在區域</div>
     <div style="color:#FFFFFF; font-size:68px; font-weight:900; line-height:1.1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:100%;">{st.session_state.get('current_address', '定位中...')}</div>
 </div>
 """, unsafe_allow_html=True)
