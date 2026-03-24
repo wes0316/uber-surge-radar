@@ -575,78 +575,9 @@ st.markdown("""
             console.log("=== 調試完成 ===");
         }
 
-        function fixRankingStyles() {
-            console.log("修正排行榜字體大小 - iPad mini 80cm 觀看距離");
-            
-            // 超級強制修正所有 h2
-            const allH2 = document.querySelectorAll("h2");
-            allH2.forEach(elem => {
-                elem.style.fontSize = "28px !important";
-                elem.style.fontWeight = "900 !important";
-                elem.style.color = "#FFD700 !important";
-                elem.style.whiteSpace = "nowrap !important";
-                elem.style.overflow = "hidden !important";
-                elem.style.textOverflow = "ellipsis !important";
-                elem.setAttribute("style", elem.getAttribute("style") + "; font-size: 28px !important; font-weight: 900 !important; color: #FFD700 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important;");
-                console.log("H2 強制修正為 28px:", elem.textContent);
-            });
-            
-            // 超級強制修正所有 p
-            const allP = document.querySelectorAll("p");
-            allP.forEach(elem => {
-                elem.style.fontSize = "20px !important";
-                elem.style.color = "#FFFFFF !important";
-                elem.style.whiteSpace = "nowrap !important";
-                elem.style.overflow = "hidden !important";
-                elem.style.textOverflow = "ellipsis !important";
-                elem.setAttribute("style", elem.getAttribute("style") + "; font-size: 20px !important; color: #FFFFFF !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important;");
-                console.log("P 強制修正為 20px:", elem.textContent);
-            });
-            
-            // 超級強制修正所有排行榜項目
-            const allDivs = document.querySelectorAll("div");
-            allDivs.forEach(elem => {
-                const style = elem.getAttribute("style") || "";
-                
-                // 金色文字
-                if (style.includes("color:#FFD700")) {
-                    elem.style.fontSize = "18px !important";
-                    elem.style.fontWeight = "900 !important";
-                    elem.style.color = "#FFD700 !important";
-                    elem.style.whiteSpace = "nowrap !important";
-                    elem.style.overflow = "hidden !important";
-                    elem.style.textOverflow = "ellipsis !important";
-                    elem.setAttribute("style", elem.getAttribute("style") + "; font-size: 18px !important; font-weight: 900 !important; color: #FFD700 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important;");
-                    console.log("金色文字強制修正為 18px:", elem.textContent);
-                }
-                
-                // 白色文字
-                if (style.includes("color:#FFFFFF") && !style.includes("color:#FFD700")) {
-                    elem.style.fontSize = "16px !important";
-                    elem.style.fontWeight = "600 !important";
-                    elem.style.color = "#FFFFFF !important";
-                    elem.style.whiteSpace = "nowrap !important";
-                    elem.style.overflow = "hidden !important";
-                    elem.style.textOverflow = "ellipsis !important";
-                    elem.setAttribute("style", elem.getAttribute("style") + "; font-size: 16px !important; font-weight: 600 !important; color: #FFFFFF !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important;");
-                    console.log("白色文字強制修正為 16px:", elem.textContent);
-                }
-            });
-        }
-
         // 立即執行並監聽變化
         setTimeout(fixMetricLabels, 100);
         setTimeout(fixMetricLabels, 500);
-        setTimeout(fixMetricLabels, 1000);
-        setTimeout(fixMetricLabels, 2000);
-        
-        setTimeout(fixRankingStyles, 100);
-        setTimeout(fixRankingStyles, 500);
-        setTimeout(fixRankingStyles, 1000);
-        setTimeout(fixRankingStyles, 2000);
-        setTimeout(fixRankingStyles, 3000);
-        setTimeout(fixRankingStyles, 5000);
-        setTimeout(fixRankingStyles, 8000);
         
         // 調試字體樣式
         setTimeout(debugStyles, 2000);
