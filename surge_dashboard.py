@@ -456,6 +456,35 @@ st.markdown("""
             justify-content: center !important;
             align-items: center !important;
         }
+        /* 排行榜表格 - 防止斷行 */
+        .rank-table {
+            width: 100% !important;
+            border-collapse: separate !important;
+            border-spacing: 0 2px !important;
+            table-layout: auto !important;
+        }
+        .rank-table td {
+            white-space: nowrap !important;
+            word-break: keep-all !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            padding: 4px 6px !important;
+            font-size: 15px !important;
+            font-weight: 700 !important;
+            color: #FFFFFF !important;
+            max-width: 0 !important;
+        }
+        .rank-table td.rank-count {
+            color: #00D4FF !important;
+            text-align: right !important;
+            font-weight: 900 !important;
+            width: 52px !important;
+            min-width: 52px !important;
+            max-width: 52px !important;
+        }
+        .rank-table td.rank-area {
+            width: auto !important;
+        }
     </style>
 
     <script>
@@ -1072,11 +1101,11 @@ with col_list:
             medal = medals[i] if i < len(medals) else "🏅"
             rows_html += f"""
             <tr>
-                <td style='padding:3px 6px; color:#FFFFFF; white-space:nowrap; font-size:15px; font-weight:700;'>{medal} {row['area']}</td>
-                <td style='padding:3px 6px; color:#00D4FF; text-align:right; white-space:nowrap; font-size:15px; font-weight:900;'>{row['count']}處</td>
+                <td class='rank-area'>{medal} {row['area']}</td>
+                <td class='rank-count'>{row['count']}處</td>
             </tr>"""
         st.markdown(f"""
-        <table style='width:100%; border-collapse:separate; border-spacing:0 2px; table-layout:fixed;'>
+        <table class='rank-table'>
             {rows_html}
         </table>""", unsafe_allow_html=True)
 
