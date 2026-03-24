@@ -103,7 +103,6 @@ def display_logo():
 st.markdown("""
     <style>
         html, body, [data-testid="stAppViewContainer"], .stApp {
-            overflow: hidden !important; 
             background-color: #0E1117 !important;
             background: #0E1117 !important;
             color: #FFFFFF !important; 
