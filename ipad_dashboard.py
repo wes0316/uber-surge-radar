@@ -129,6 +129,7 @@ body {
     display: block !important;
     margin-bottom: 12px !important;
     text-shadow: 0 2px 4px rgba(135, 206, 235, 0.3) !important;
+    white-space: nowrap !important;
 }
 
 .ipad-metric-value {
@@ -139,19 +140,20 @@ body {
     line-height: 1.1 !important;
     display: block !important;
     text-shadow: 0 3px 6px rgba(255, 255, 255, 0.2) !important;
+    white-space: nowrap !important;
 }
 
 .ipad-metric-container {
     background: linear-gradient(135deg, rgba(45, 45, 45, 0.95) 0%, rgba(30, 30, 30, 0.95) 100%) !important;
     border-left: 12px solid #00D4FF !important;
     border-radius: 20px !important;
-    padding: 20px !important;
+    padding: 15px !important;
     text-align: center !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: center !important;
     align-items: center !important;
-    margin-bottom: 20px !important;
+    margin-bottom: 15px !important;
     box-shadow: 0 8px 32px rgba(0, 212, 255, 0.2) !important;
     backdrop-filter: blur(10px) !important;
     border: 1px solid rgba(0, 212, 255, 0.3) !important;
@@ -165,10 +167,10 @@ body {
 
 /* --- iPad Mini 橫向版地圖容器 --- */
 .ipad-map-container {
-    height: 500px !important;
+    height: 350px !important;
     border-radius: 20px !important;
     overflow: hidden !important;
-    margin-bottom: 20px !important;
+    margin-bottom: 15px !important;
     box-shadow: 0 8px 32px rgba(0, 212, 255, 0.2) !important;
     border: 2px solid #00D4FF !important;
     position: relative !important;
@@ -191,17 +193,18 @@ body {
     font-size: 24px !important;
     color: #00D4FF !important;
     font-weight: 800 !important;
-    margin-bottom: 15px !important;
+    margin-bottom: 10px !important;
     text-shadow: 0 2px 4px rgba(0, 212, 255, 0.3) !important;
     text-align: center !important;
+    white-space: nowrap !important;
 }
 
 .ipad-table {
     width: 100% !important;
     color: white !important;
-    font-size: 16px !important;
+    font-size: 14px !important;
     border-collapse: separate !important;
-    border-spacing: 0 8px !important;
+    border-spacing: 0 4px !important;
     font-weight: 600 !important;
     background: transparent !important;
 }
@@ -219,9 +222,10 @@ body {
 }
 
 .ipad-table td {
-    padding: 12px 16px !important;
+    padding: 8px 12px !important;
     color: #FFFFFF !important;
     border: none !important;
+    white-space: nowrap !important;
 }
 
 .ipad-table td:first-child {
@@ -233,8 +237,9 @@ body {
     border-radius: 0 12px 12px 0 !important;
     text-align: right !important;
     font-weight: 900 !important;
-    font-size: 18px !important;
+    font-size: 16px !important;
     color: #00D4FF !important;
+    white-space: nowrap !important;
 }
 
 /* --- iPad Mini 橫向版標題 --- */
@@ -243,9 +248,10 @@ body {
     color: #00D4FF !important;
     font-weight: 900 !important;
     text-align: center !important;
-    margin-bottom: 30px !important;
+    margin-bottom: 20px !important;
     text-shadow: 0 3px 6px rgba(0, 212, 255, 0.3) !important;
     letter-spacing: 1px !important;
+    white-space: nowrap !important;
 }
 
 /* --- iPad Mini 橫向版響應式設計 --- */
