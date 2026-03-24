@@ -1061,23 +1061,24 @@ with col_map:
 
 # --- 9.2 排行榜 ---
 with col_list:
-    # 使用 Streamlit 原生標題
-    st.markdown("## 🏆 紅區排行榜")
+    st.markdown("<div style='color:#FFD700; text-align:center; font-size:20px; font-weight:900; white-space:nowrap; margin-bottom:6px;'>🏆 紅區排行榜</div>", unsafe_allow_html=True)
     
     if top_10_list.empty:
-        st.write("### 📊 目前無紅區數據")
+        st.markdown("<p style='color:#FFFFFF; font-size:16px;'>📊 目前無紅區數據</p>", unsafe_allow_html=True)
     else:
+        medals = ["🥇","🥈","🥉","🏅","🏅","🏅","🏅","🏅","🏅","🏅"]
+        rows_html = ""
         for i, (_, row) in enumerate(top_10_list.iterrows()):
-            medal = "🥇" if i == 0 else "🥈" if i == 1 else "🥉" if i == 2 else "🏅"
-            
-            # 使用 Streamlit 原生組件
-            col1, col2 = st.columns([3, 1])
-            with col1:
-                st.write(f"### {medal} {row['area']}")
-            with col2:
-                st.markdown(f"<div style='text-align: left; font-size: 28px; font-weight: 900; color: white;'>{row['count']} 處</div>", unsafe_allow_html=True)
-            
-            st.write("---")
+            medal = medals[i] if i < len(medals) else "🏅"
+            rows_html += f"""
+            <tr>
+                <td style='padding:3px 6px; color:#FFFFFF; white-space:nowrap; font-size:15px; font-weight:700;'>{medal} {row['area']}</td>
+                <td style='padding:3px 6px; color:#00D4FF; text-align:right; white-space:nowrap; font-size:15px; font-weight:900;'>{row['count']}處</td>
+            </tr>"""
+        st.markdown(f"""
+        <table style='width:100%; border-collapse:separate; border-spacing:0 2px; table-layout:fixed;'>
+            {rows_html}
+        </table>""", unsafe_allow_html=True)
 
 # --- 10. GPS三分鐘自動定位與地圖更新 ---
 st.markdown(f"""
