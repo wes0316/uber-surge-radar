@@ -106,18 +106,11 @@ table, td, th {
 body {
     background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%) !important;
     color: white !important;
-    font-family: 'Arial', sans-serif !important;
-    overflow: hidden !important;
-}
-
-/* --- iPad Mini 橫向版全域樣式 --- */
-body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
-    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%) !important;
-    color: #FFFFFF !important;
     margin: 0 !important;
     padding: 0 !important;
     overflow-x: hidden !important;
+    overflow: hidden !important;
 }
 
 /* --- iPad Mini 橫向版側邊欄 --- */
@@ -139,6 +132,50 @@ body {
     font-weight: 700 !important;
     color: #00D4FF !important;
     line-height: 1.4 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+/* --- 超級強制所有元素不斷行 --- */
+html body table,
+html body td,
+html body th,
+html body .ipad-table,
+html body .ipad-table td,
+html body .ipad-table th,
+html body [data-testid="stTable"],
+html body [data-testid="stTable"] td,
+html body [data-testid="stTable"] th,
+html body .stDataFrame,
+html body .stDataFrame td,
+html body .stDataFrame th {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    word-wrap: normal !important;
+    word-break: keep-all !important;
+    display: table-cell !important;
+    max-width: none !important;
+    min-width: 0 !important;
+}
+
+/* --- 針對所有可能的表格容器 --- */
+div table,
+div td,
+div th,
+section table,
+section td,
+section th,
+main table,
+main td,
+main th {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    word-wrap: normal !important;
+    word-break: keep-all !important;
+}
     margin-left: 8px !important;
     margin-bottom: 8px !important;
     white-space: nowrap !important;
