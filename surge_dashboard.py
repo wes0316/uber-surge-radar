@@ -8,6 +8,7 @@ import urllib3
 import base64
 import os
 from pyproj import Transformer
+from streamlit_js_eval import get_geolocation
 
 # --- 隱藏 SSL 憑證警告 ---
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -649,40 +650,6 @@ def get_address_from_coords(lat, lon):
         print(f"地址獲取完全失敗: {e}")
         return f"定位中... ({lat:.2f}, {lon:.2f})"
 
-def get_geolocation():
-    """獲取當前 GPS 位置"""
-    import streamlit_js_eval
-    try:
-        location = streamlit_js_eval.js_eval("""
-        async function getLocation() {
-            return new Promise((resolve, reject) => {
-                if (!navigator.geolocation) {
-                    reject('Geolocation not supported');
-                    return;
-                }
-                navigator.geolocation.getCurrentPosition(
-                    position => {
-                        resolve({
-                            coords: {
-                                latitude: position.coords.latitude,
-                                longitude: position.coords.longitude,
-                                accuracy: position.coords.accuracy,
-                                speed: position.coords.speed
-                            },
-                            timestamp: position.timestamp
-                        });
-                    },
-                    error => reject(error.message),
-                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
-                );
-            });
-        }
-        return await getLocation();
-        """)
-        return location
-    except Exception as e:
-        print(f"GPS 定位錯誤: {e}")
-        return None
 
 # --- 4. 定位處理 ---
 if 'gps_pos' not in st.session_state: st.session_state['gps_pos'] = (24.9669, 121.5451)
