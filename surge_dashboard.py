@@ -768,7 +768,7 @@ with col_list:
     if not top_10_list.empty:
         for i, (_, row) in enumerate(top_10_list.iterrows()):
             medal = medals[i] if i < len(medals) else "🏅"
-            rows_html += f'<div style="display:flex;flex-direction:row;justify-content:space-between;align-items:center;padding:4px 6px;margin-bottom:3px;background:rgba(45,45,45,0.7);border-radius:6px;border-left:3px solid #00D4FF;"><span class="rank-text" style="white-space:nowrap;word-break:keep-all;color:#FFFFFF;font-weight:700;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1;">{medal} {row["area"]}</span><span class="rank-text" style="white-space:nowrap;color:#00D4FF;font-weight:900;margin-left:8px;flex-shrink:0;">{row["count"]}處</span></div>'
+            rows_html += f'<div class="rank-row"><span class="rank-area">{medal} {row["area"]}</span><span class="rank-count">{row["count"]}處</span></div>'
     else:
         rows_html = "<p style='color:#FFFFFF;font-size:16px;'>📊 目前無紅區數據</p>"
     rank_html = f"""<!DOCTYPE html><html><head><style>
