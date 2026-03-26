@@ -454,6 +454,25 @@ st.markdown("""
             font-size: 19px !important;
         }
 
+        /* 排行榜容器與地圖等高 */
+        .rank-container {
+            height: 520px !important;
+            min-height: 520px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            overflow: hidden !important;
+            box-sizing: border-box !important;
+        }
+        .rank-container .rank-scroll {
+            flex: 1 !important;
+            overflow-y: auto !important;
+            min-height: 0 !important;
+        }
+        /* 強制 Streamlit wrapper 不裁切高度 */
+        [data-testid="stMarkdownContainer"] {
+            height: 100% !important;
+        }
+
     </style>
 """, unsafe_allow_html=True)
 
