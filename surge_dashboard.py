@@ -539,6 +539,22 @@ def get_address_from_coords(lat, lon):
 # --- 4. 定位處理 ---
 if 'gps_pos' not in st.session_state: st.session_state['gps_pos'] = (24.9669, 121.5451)
 if 'current_address' not in st.session_state: st.session_state['current_address'] = "定位中..."
+if 'last_address_update' not in st.session_state: st.session_state['last_address_update'] = 0
+
+ADDRESS_INTERVAL = 180  # 每三分鐘查詢一次地址
+
+def should_update_address():
+    return (time.time() - st.session_state['last_address_update']) >= ADDRESS_INTERVAL
+
+def update_address(lat, lon):
+    if should_update_address():
+        try:
+            address = get_address_from_coords(lat, lon)
+            st.session_state['current_address'] = address
+            st.session_state['last_address_update'] = time.time()
+            print(f"地址已更新: {address}")
+        except Exception as e:
+            print(f"地址獲取失敗: {e}")
 
 print("開始獲取 GPS 位置...")
 curr = get_geolocation()
@@ -548,32 +564,12 @@ speed_kmh = 0
 if curr and 'coords' in curr:
     lat = curr['coords']['latitude']
     lon = curr['coords']['longitude']
-    print(f"成功獲取座標: lat={lat}, lon={lon}")
-    
     st.session_state['gps_pos'] = (lat, lon)
     speed_kmh = (curr['coords'].get('speed') or 0) * 3.6
-    print(f"速度: {speed_kmh} km/h")
-    
-    # 更新地址
-    print("開始獲取地址...")
-    try:
-        address = get_address_from_coords(lat, lon)
-        st.session_state['current_address'] = address
-        print(f"地址更新完成: {address}")
-    except Exception as e:
-        print(f"地址獲取失敗: {e}")
-        st.session_state['current_address'] = f"位置 ({lat:.2f}, {lon:.2f})"
+    update_address(lat, lon)
 else:
-    print("GPS 獲取失敗，使用預設位置")
-    # 使用預設位置獲取地址
     lat, lon = st.session_state['gps_pos']
-    try:
-        address = get_address_from_coords(lat, lon)
-        st.session_state['current_address'] = address
-        print(f"預設位置地址: {address}")
-    except Exception as e:
-        print(f"預設位置地址獲取失敗: {e}")
-        st.session_state['current_address'] = f"預設位置 ({lat:.2f}, {lon:.2f})"
+    update_address(lat, lon)
 
 print(f"最終地址: {st.session_state['current_address']}")
 
