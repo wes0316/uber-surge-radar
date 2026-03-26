@@ -686,15 +686,13 @@ with col_map:
     # 添加雷達回波圖層
     if show_rain:
         ts = int(time.time())
-        radar_overlay = folium.raster_layers.TileLayer(
-            tiles=f'https://www.cwa.gov.tw/Data/radar/CV1_3600_EL.png?v={ts}',
+        folium.raster_layers.ImageOverlay(
+            image=f'https://www.cwa.gov.tw/Data/radar/CV1_3600_EL.png?v={ts}',
+            bounds=[[20.5, 118.0], [26.5, 123.5]],
+            opacity=0.65,
             name='雷達回波',
-            overlay=True,
-            control=True,
-            show=True,
-            opacity=0.7
-        )
-        radar_overlay.add_to(m)
+            cross_origin=False
+        ).add_to(m)
 
     # 添加熱區圓圈
     if show_heatmap and top_3_centers:
