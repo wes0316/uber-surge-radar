@@ -460,14 +460,17 @@ def fetch_analysis_data():
         print(f"台北市資料錯誤: {e}")
     try:
         # 新北市
-        ntpc_d = requests.get("https://data.ntpc.gov.tw/api/datasets/b1464ef0-9c7c-4a6f-abf7-6bdf32847e68/json", params={'size': 2000}, timeout=8).json()
-        ntpc_a = requests.get("https://data.ntpc.gov.tw/api/datasets/e09b35a5-a738-48cc-b0f5-570b67ad9c78/json", params={'size': 2000}, timeout=8).json()
+        _hdrs = {'User-Agent': 'Mozilla/5.0 UberSurgeRadar/1.0'}
+        ntpc_d = requests.get("https://data.ntpc.gov.tw/api/datasets/b1464ef0-9c7c-4a6f-abf7-6bdf32847e68/json",
+                              params={'size': 2000}, headers=_hdrs, timeout=15, verify=False).json()
+        ntpc_a = requests.get("https://data.ntpc.gov.tw/api/datasets/e09b35a5-a738-48cc-b0f5-570b67ad9c78/json",
+                              params={'size': 2000}, headers=_hdrs, timeout=15, verify=False).json()
         df_nt = pd.merge(pd.DataFrame(ntpc_d), pd.DataFrame(ntpc_a), on='ID')
         red_nt = []
         for _, r in df_nt.iterrows():
-            t = float(r.get('TOTALCAR', 0) or 0)
-            a = float(r.get('AVAILABLECAR', -1) or -1)
-            if t > 0 and a >= 0 and (t-a)/t >= 0.9:
+            t_v = float(r.get('TOTALCAR', 0) or 0)
+            a_v = float(r.get('AVAILABLECAR', -1) or -1)
+            if t_v > 0 and a_v >= 0 and (t_v - a_v) / t_v >= 0.9:
                 lat, lon = transformer.transform(float(r['TW97X']), float(r['TW97Y']))
                 if 21.5 <= lat <= 25.5 and 119.0 <= lon <= 122.5:
                     red_nt.append({'lat': lat, 'lon': lon, 'area': r.get('AREA', '未知')})
@@ -475,6 +478,7 @@ def fetch_analysis_data():
         if not df_red_nt.empty:
             newtaipei_top3 = _top3_centers(df_red_nt)
             total += len(df_red_nt)
+        print(f"新北市: merged={len(df_nt)}, red={len(red_nt)}, top3={newtaipei_top3}")
     except Exception as e:
         print(f"新北市資料錯誤: {e}")
     return taipei_top3, newtaipei_top3, total
