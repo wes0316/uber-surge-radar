@@ -534,36 +534,21 @@ def get_address_from_coords(lat, lon):
                         return result
                     else:
                         print("未找到合適的地址欄位")
-                        return f"位置 ({lat:.2f}, {lon:.2f})"
+                        return "定位中..."
                 else:
                     print("API 回應中沒有 address 欄位")
-                    return f"位置 ({lat:.2f}, {lon:.2f})"
+                    return "定位中..."
             else:
                 print(f"API 請求失敗: {response.status_code}")
-                return f"位置 ({lat:.2f}, {lon:.2f})"
+                return "定位中..."
                 
         except Exception as e:
             print(f"Nominatim API 請求異常: {e}")
-            
-            # 備用方案：根據座標範圍判斷大概區域
-            try:
-                # 台北市的範圍大約是
-                if 24.9 <= lat <= 25.3 and 121.4 <= lon <= 121.7:
-                    return "台北市區"
-                elif 24.8 <= lat <= 25.1 and 121.3 <= lon <= 121.6:
-                    return "新北市區"
-                elif 25.0 <= lat <= 25.1 and 121.5 <= lon <= 121.6:
-                    return "信義區"
-                elif 24.9 <= lat <= 25.0 and 121.5 <= lon <= 121.6:
-                    return "大安區"
-                else:
-                    return f"台灣地區 ({lat:.2f}, {lon:.2f})"
-            except:
-                return f"位置 ({lat:.2f}, {lon:.2f})"
+            return "定位中..."
                 
     except Exception as e:
         print(f"地址獲取完全失敗: {e}")
-        return f"定位中... ({lat:.2f}, {lon:.2f})"
+        return "定位中..."
 
 
 # --- 4. 定位處理 ---
