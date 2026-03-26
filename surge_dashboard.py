@@ -742,7 +742,7 @@ with col_list:
         rows_html = ""
         for i, (_, row) in enumerate(top_10_list.iterrows()):
             medal = medals[i] if i < len(medals) else "🏅"
-            rows_html += f'<div style="display:flex;flex-direction:row;justify-content:space-between;align-items:center;padding:3px 6px;margin-bottom:2px;background:rgba(45,45,45,0.7);border-radius:6px;border-left:3px solid #00D4FF;"><span style="white-space:nowrap;word-break:keep-all;color:#FFFFFF;font-size:15px;font-weight:700;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1;">{medal} {row["area"]}</span><span style="white-space:nowrap;color:#00D4FF;font-size:15px;font-weight:900;margin-left:8px;flex-shrink:0;">{row["count"]}處</span></div>'
+            rows_html += f'<div style="display:flex;flex-direction:row;justify-content:space-between;align-items:center;padding:3px 6px;margin-bottom:2px;background:rgba(45,45,45,0.7);border-radius:6px;border-left:3px solid #00D4FF;"><span style="white-space:nowrap;word-break:keep-all;color:#FFFFFF;font-size:19px;font-weight:700;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1;">{medal} {row["area"]}</span><span style="white-space:nowrap;color:#00D4FF;font-size:19px;font-weight:900;margin-left:8px;flex-shrink:0;">{row["count"]}處</span></div>'
         st.markdown(f'<div style="width:100%;">{rows_html}</div>', unsafe_allow_html=True)
 
 # --- 10. GPS三分鐘自動定位與地圖更新 ---
