@@ -593,12 +593,14 @@ with col_list:
 """
     rank_html = f"""<!DOCTYPE html><html><head><style>
     body{{margin:0;padding:0;background:#0E1117;font-family:Inter,sans-serif;box-sizing:border-box;}}
-    .rank-title{{color:#FFD700;text-align:center;font-size:20px;font-weight:900;white-space:nowrap;margin-bottom:8px;}}
+    .rank-title{{color:#FFD700;text-align:center;font-size:20px;font-weight:900;white-space:nowrap;margin-bottom:10px;}}
+    .city-section{{margin-bottom:10px;}}
+    .city-title{{font-size:17px;font-weight:900;margin-bottom:4px;padding:2px 6px;}}
     .rank-row{{display:flex;flex-direction:row;justify-content:space-between;align-items:center;padding:4px 6px;margin-bottom:3px;background:rgba(45,45,45,0.7);border-radius:6px;border-left:3px solid #00D4FF;}}
     .rank-area{{white-space:nowrap;word-break:keep-all;color:#FFFFFF;font-size:19px;font-weight:700;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1;}}
-    .rank-count{{white-space:nowrap;color:#00D4FF;font-size:19px;font-weight:900;margin-left:8px;flex-shrink:0;}}
+    .rank-count{{white-space:nowrap;font-size:19px;font-weight:900;margin-left:8px;flex-shrink:0;}}
     </style></head><body>
-    <div class='rank-title'>🏆 紅區排行榜</div>
+    <div class='rank-title'>🏆 雙北需求熱區</div>
     {rows_html}
     </body></html>"""
     components.html(rank_html, height=520, scrolling=False)
