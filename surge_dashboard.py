@@ -199,26 +199,6 @@ st.markdown("""
             margin: 0 !important;
         }
 
-        /* --- 🎯 主畫面指標區域 --- */
-        [data-testid="stMetricValue"] { 
-            color: #FFFFFF !important; 
-            font-size: 68px !important; 
-            font-weight: 900 !important; 
-            text-align: center !important;
-            white-space: nowrap !important;
-            overflow: hidden !important;
-            text-overflow: ellipsis !important;
-        }
-        [data-testid="stMetricLabel"] { 
-            color: #87CEEB !important; 
-            font-size: 40px !important; 
-            font-weight: 900 !important; 
-            text-align: center !important;
-            white-space: nowrap !important;
-            overflow: hidden !important;
-            text-overflow: ellipsis !important;
-        }
-
         /* 🎯 側邊欄按鈕樣式 - 強制優先級 */
         [data-testid="stSidebar"] div.stButton > button,
         [data-testid="stSidebar"] button[kind="primary"],
@@ -300,143 +280,6 @@ st.markdown("""
             padding: 0 !important;
         }
 
-        /* 🎯 終極字體大小重置 - 最高優先級 */
-        html body h2,
-        body h2,
-        .stApp h2,
-        [data-testid="stVerticalBlock"] h2,
-        div[data-testid="stVerticalBlock"] h2,
-        h2 {
-            font-size: 28px !important;
-            font-weight: 900 !important;
-            color: #FFD700 !important;
-            white-space: nowrap !important;
-            overflow: hidden !important;
-            text-overflow: ellipsis !important;
-            line-height: 1.2 !important;
-            margin: 0 !important;
-            padding: 10px 0 !important;
-        }
-        
-        html body p,
-        body p,
-        .stApp p,
-        [data-testid="stVerticalBlock"] p,
-        div[data-testid="stVerticalBlock"] p,
-        p {
-            font-size: 20px !important;
-            font-weight: 400 !important;
-            color: #FFFFFF !important;
-            white-space: nowrap !important;
-            overflow: hidden !important;
-            text-overflow: ellipsis !important;
-            line-height: 1.4 !important;
-            margin: 10px 0 !important;
-            padding: 5px 0 !important;
-        }
-        
-        html body div[style*="color:#FFD700"],
-        body div[style*="color:#FFD700"],
-        .stApp div[style*="color:#FFD700"],
-        [data-testid="stVerticalBlock"] div[style*="color:#FFD700"],
-        div[data-testid="stVerticalBlock"] div[style*="color:#FFD700"],
-        div[style*="color:#FFD700"] {
-            font-size: 18px !important;
-            font-weight: 900 !important;
-            color: #FFD700 !important;
-            white-space: nowrap !important;
-            overflow: hidden !important;
-            text-overflow: ellipsis !important;
-            line-height: 1.2 !important;
-            margin-bottom: 4px !important;
-        }
-        
-        html body div[style*="color:#FFFFFF"],
-        body div[style*="color:#FFFFFF"],
-        .stApp div[style*="color:#FFFFFF"],
-        [data-testid="stVerticalBlock"] div[style*="color:#FFFFFF"],
-        div[data-testid="stVerticalBlock"] div[style*="color:#FFFFFF"],
-        div[style*="color:#FFFFFF"] {
-            font-size: 16px !important;
-            font-weight: 600 !important;
-            color: #FFFFFF !important;
-            white-space: nowrap !important;
-            overflow: hidden !important;
-            text-overflow: ellipsis !important;
-            line-height: 1.3 !important;
-        }
-
-        /* 🎯 排行榜字體大小 - 超級強制優先級 */
-        h2:not([data-testid]) {
-            font-size: 28px !important;
-            font-weight: 900 !important;
-            color: #FFD700 !important;
-            white-space: nowrap !important;
-            overflow: hidden !important;
-            text-overflow: ellipsis !important;
-        }
-        
-        /* 排行榜標題 - 終極強制 */
-        html body h2,
-        body h2,
-        .stApp h2,
-        [data-testid="stVerticalBlock"] h2,
-        div[data-testid="stVerticalBlock"] h2 {
-            font-size: 28px !important;
-            font-weight: 900 !important;
-            color: #FFD700 !important;
-            white-space: nowrap !important;
-            overflow: hidden !important;
-            text-overflow: ellipsis !important;
-        }
-        
-        /* 無數據提示 - 終極強制 */
-        html body p,
-        body p,
-        .stApp p,
-        [data-testid="stVerticalBlock"] p,
-        div[data-testid="stVerticalBlock"] p {
-            font-size: 20px !important;
-            color: #FFFFFF !important;
-            white-space: nowrap !important;
-            overflow: hidden !important;
-            text-overflow: ellipsis !important;
-        }
-        
-        /* 排行榜項目容器 - 終極強制 */
-        html body div[style*="background: rgba"],
-        body div[style*="background: rgba"],
-        .stApp div[style*="background: rgba"],
-        [data-testid="stVerticalBlock"] div[style*="background: rgba"] {
-            font-size: inherit !important;
-        }
-        
-        /* 地區名稱 - 終極強制 */
-        html body div[style*="color:#FFD700"],
-        body div[style*="color:#FFD700"],
-        .stApp div[style*="color:#FFD700"],
-        [data-testid="stVerticalBlock"] div[style*="color:#FFD700"] {
-            font-size: 18px !important;
-            font-weight: 900 !important;
-            color: #FFD700 !important;
-            white-space: nowrap !important;
-            overflow: hidden !important;
-            text-overflow: ellipsis !important;
-        }
-        
-        /* 數量顯示 - 終極強制 */
-        html body div[style*="color:#FFFFFF"],
-        body div[style*="color:#FFFFFF"],
-        .stApp div[style*="color:#FFFFFF"],
-        [data-testid="stVerticalBlock"] div[style*="color:#FFFFFF"] {
-            font-size: 16px !important;
-            font-weight: 600 !important;
-            color: #FFFFFF !important;
-            white-space: nowrap !important;
-            overflow: hidden !important;
-            text-overflow: ellipsis !important;
-        }
-
         /* 🎯 排行榜表格樣式 - 保留內聯樣式 */
         [data-testid="stVerticalBlock"] > div > div > div > div[data-testid="stVerticalBlock"] > div > div > div {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif !important;
@@ -451,28 +294,6 @@ st.markdown("""
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif !important;
         }
 
-        .rank-text {
-            font-size: 19px !important;
-        }
-
-        /* 排行榜容器與地圖等高 */
-        .rank-container {
-            height: 520px !important;
-            min-height: 520px !important;
-            display: flex !important;
-            flex-direction: column !important;
-            overflow: hidden !important;
-            box-sizing: border-box !important;
-        }
-        .rank-container .rank-scroll {
-            flex: 1 !important;
-            overflow-y: auto !important;
-            min-height: 0 !important;
-        }
-        /* 強制 Streamlit wrapper 不裁切高度 */
-        [data-testid="stMarkdownContainer"] {
-            height: 100% !important;
-        }
 
     </style>
 """, unsafe_allow_html=True)
