@@ -430,37 +430,57 @@ with st.sidebar:
     
 
 # --- 6. 數據獲取 ---
+def _top3_centers(df):
+    result = []
+    for area, count in df['area'].value_counts().head(3).items():
+        sub = df[df['area'] == area]
+        result.append({'area': area, 'lat': float(sub['lat'].median()), 'lon': float(sub['lon'].median()), 'count': int(count)})
+    return result
+
 @st.cache_data(ttl=60)
 def fetch_analysis_data():
+    taipei_top3, newtaipei_top3, total = [], [], 0
     try:
+        # 台北市
         res = requests.get("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_allavailable.json", timeout=5).json()
         desc = requests.get("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_alldesc.json", timeout=5).json()
-        df = pd.merge(pd.DataFrame(desc['data']['park']), pd.DataFrame(res['data']['park']), on='id')
-
-        red_data = []
-        for _, r in df.iterrows():
+        df_tp = pd.merge(pd.DataFrame(desc['data']['park']), pd.DataFrame(res['data']['park']), on='id')
+        red_tp = []
+        for _, r in df_tp.iterrows():
             t, a = float(r.get('totalcar', 0)), float(r.get('availablecar', 0))
             if t > 0 and (t-a)/t >= 0.9:
                 lat, lon = transformer.transform(float(r['tw97x']), float(r['tw97y']))
                 if 21.5 <= lat <= 25.5 and 119.0 <= lon <= 122.5:
-                    red_data.append({'lat': lat, 'lon': lon, 'area': r.get('area', '未知')})
-
-        full_df = pd.DataFrame(red_data)
-        if full_df.empty:
-            return [], 0
-
-        rank = full_df['area'].value_counts().head(3)
-        top_3_centers = []
-        for area, count in rank.items():
-            subset = full_df[full_df['area'] == area]
-            top_3_centers.append({'area': area, 'lat': float(subset['lat'].median()), 'lon': float(subset['lon'].median()), 'count': int(count)})
-
-        return top_3_centers, len(full_df)
-    except:
-        return [], 0
+                    red_tp.append({'lat': lat, 'lon': lon, 'area': r.get('area', '未知')})
+        df_red_tp = pd.DataFrame(red_tp)
+        if not df_red_tp.empty:
+            taipei_top3 = _top3_centers(df_red_tp)
+            total += len(df_red_tp)
+    except Exception as e:
+        print(f"台北市資料錯誤: {e}")
+    try:
+        # 新北市
+        ntpc_d = requests.get("https://data.ntpc.gov.tw/api/datasets/b1464ef0-9c7c-4a6f-abf7-6bdf32847e68/json", params={'size': 2000}, timeout=8).json()
+        ntpc_a = requests.get("https://data.ntpc.gov.tw/api/datasets/e09b35a5-a738-48cc-b0f5-570b67ad9c78/json", params={'size': 2000}, timeout=8).json()
+        df_nt = pd.merge(pd.DataFrame(ntpc_d), pd.DataFrame(ntpc_a), on='ID')
+        red_nt = []
+        for _, r in df_nt.iterrows():
+            t = float(r.get('TOTALCAR', 0) or 0)
+            a = float(r.get('AVAILABLECAR', -1) or -1)
+            if t > 0 and a >= 0 and (t-a)/t >= 0.9:
+                lat, lon = transformer.transform(float(r['TW97X']), float(r['TW97Y']))
+                if 21.5 <= lat <= 25.5 and 119.0 <= lon <= 122.5:
+                    red_nt.append({'lat': lat, 'lon': lon, 'area': r.get('AREA', '未知')})
+        df_red_nt = pd.DataFrame(red_nt)
+        if not df_red_nt.empty:
+            newtaipei_top3 = _top3_centers(df_red_nt)
+            total += len(df_red_nt)
+    except Exception as e:
+        print(f"新北市資料錯誤: {e}")
+    return taipei_top3, newtaipei_top3, total
 
 # --- 8. 主畫面指標 ---
-top_3_centers, total_count = fetch_analysis_data()
+taipei_top3, newtaipei_top3, total_count = fetch_analysis_data()
 
 m1, m2 = st.columns(2)
 
@@ -499,8 +519,9 @@ with col_map:
     )
 
     # auto_zoom：用 fit_bounds 確保車輛 + 所有熱區圓都在視窗內
-    if auto_zoom and top_3_centers:
-        valid = [c for c in top_3_centers if 21.5 <= c['lat'] <= 25.5 and 119.0 <= c['lon'] <= 122.5]
+    all_centers = taipei_top3 + newtaipei_top3
+    if auto_zoom and all_centers:
+        valid = [c for c in all_centers if 21.5 <= c['lat'] <= 25.5 and 119.0 <= c['lon'] <= 122.5]
         if valid:
             all_points = [[center_lat, center_lon]] + [[c['lat'], c['lon']] for c in valid]
             m.fit_bounds(all_points, padding=[30, 30])
@@ -515,26 +536,21 @@ with col_map:
             name='雷達回波'
         ).add_to(m)
 
-    # 添加熱區圓圈（台北市前三，紅色）
-    if show_heatmap and top_3_centers:
-        for dist in top_3_centers:
-            folium.Circle(
-                location=[dist['lat'], dist['lon']],
-                radius=1500,
-                color='#FF0000',
-                fill=True,
-                fill_opacity=0.45,
-                weight=4,
-                tooltip=f"<b style='font-size:20px;'>{dist['area']} ({dist['count']}處)</b>",
-                zindex=10
-            ).add_to(m)
-            folium.CircleMarker(
-                location=[dist['lat'], dist['lon']],
-                radius=6,
-                color='white',
-                fill=True,
-                fill_color='#FF0000'
-            ).add_to(m)
+    # 添加熱區圓圈（台北紅、新北藍，各前三）
+    if show_heatmap:
+        for centers, color in [(taipei_top3, '#FF0000'), (newtaipei_top3, '#0066FF')]:
+            for dist in centers:
+                folium.Circle(
+                    location=[dist['lat'], dist['lon']],
+                    radius=1500, color=color, fill=True,
+                    fill_opacity=0.45, weight=4,
+                    tooltip=f"<b style='font-size:20px;'>{dist['area']} ({dist['count']}處)</b>",
+                    zindex=10
+                ).add_to(m)
+                folium.CircleMarker(
+                    location=[dist['lat'], dist['lon']],
+                    radius=6, color='white', fill=True, fill_color=color
+                ).add_to(m)
 
     # 添加車輛位置
     folium.CircleMarker(
@@ -553,13 +569,19 @@ with col_map:
 # --- 9.2 排行榜 ---
 with col_list:
     medals = ["🥇","🥈","🥉"]
-    rows_html = ""
-    if top_3_centers:
-        for i, dist in enumerate(top_3_centers):
-            medal = medals[i] if i < len(medals) else "🏅"
-            rows_html += f'<div class="rank-row"><span class="rank-area">{medal} {dist["area"]}</span><span class="rank-count">{dist["count"]}處</span></div>'
-    else:
-        rows_html = "<p style='color:#FFFFFF;font-size:16px;'>📊 目前無紅區數據</p>"
+    def _city_rows(centers, color):
+        if not centers:
+            return f'<div style="color:#888;font-size:14px;padding:4px 6px;">無資料</div>'
+        return ''.join(f'<div class="rank-row"><span class="rank-area">{medals[i]} {d["area"]}</span><span class="rank-count" style="color:{color};">{d["count"]}處</span></div>' for i, d in enumerate(centers))
+    rows_html = f"""
+<div class="city-section">
+  <div class="city-title" style="color:#FF4444;">🔴 台北市</div>
+  {_city_rows(taipei_top3, '#FF4444')}
+</div>
+<div class="city-section">
+  <div class="city-title" style="color:#4488FF;">� 新北市</div>
+  {_city_rows(newtaipei_top3, '#4488FF')}
+</div>"""
     rank_html = f"""<!DOCTYPE html><html><head><style>
     body{{margin:0;padding:0;background:#0E1117;font-family:Inter,sans-serif;box-sizing:border-box;}}
     .rank-title{{color:#FFD700;text-align:center;font-size:20px;font-weight:900;white-space:nowrap;margin-bottom:10px;}}
