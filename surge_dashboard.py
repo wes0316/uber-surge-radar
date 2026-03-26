@@ -690,8 +690,7 @@ with col_map:
             image=f'https://www.cwa.gov.tw/Data/radar/CV1_3600_EL.png?v={ts}',
             bounds=[[20.5, 118.0], [26.5, 123.5]],
             opacity=0.65,
-            name='雷達回波',
-            cross_origin=False
+            name='雷達回波'
         ).add_to(m)
 
     # 添加熱區圓圈
