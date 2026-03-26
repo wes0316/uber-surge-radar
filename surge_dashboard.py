@@ -115,18 +115,24 @@ st.markdown("""
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif !important;
         }
         
-        /* 🎯 移除頂部白色橫幅 - 強制覆蓋 */
+        /* 🎯 完全隱藏頂部 header 橫條 */
         .stApp > header,
         .stApp header,
         header[data-testid="stHeader"],
         div[data-testid="stHeader"],
         .stApp .stHeader,
         .stHeader {
-            background-color: #0E1117 !important;
-            background: #0E1117 !important;
-            border-bottom: none !important;
-            box-shadow: none !important;
-            border: none !important;
+            display: none !important;
+            height: 0 !important;
+            min-height: 0 !important;
+            visibility: hidden !important;
+        }
+
+        /* 移除主內容區頂部空白，與 logo 齊高 */
+        .main .block-container,
+        [data-testid="stMainBlockContainer"] {
+            padding-top: 0.5rem !important;
+            margin-top: 0 !important;
         }
         
         /* 隱藏 Streamlit 預設標題和圖標 */
