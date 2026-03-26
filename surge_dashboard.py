@@ -430,9 +430,6 @@ with st.sidebar:
     
 
 # --- 6. 數據獲取 ---
-TAIPEI_DISTRICTS = {'松山區','信義區','大安區','中山區','中正區','大同區','萬華區','文山區','南港區','內湖區','士林區','北投區'}
-NEWTAIPEI_DISTRICTS = {'板橋區','三重區','中和區','永和區','新莊區','新店區','樹林區','鶯歌區','三峽區','淡水區','汐止區','瑞芳區','土城區','蘆洲區','五股區','泰山區','林口區','深坑區','石碇區','坪林區','三芝區','石門區','八里區','平溪區','雙溪區','貢寮區','金山區','萬里區','烏來區'}
-
 @st.cache_data(ttl=60)
 def fetch_analysis_data():
     try:
@@ -446,33 +443,24 @@ def fetch_analysis_data():
             if t > 0 and (t-a)/t >= 0.9:
                 lat, lon = transformer.transform(float(r['tw97x']), float(r['tw97y']))
                 if 21.5 <= lat <= 25.5 and 119.0 <= lon <= 122.5:
-                    area = r.get('area', '未知')
-                    red_data.append({'lat': lat, 'lon': lon, 'area': area})
+                    red_data.append({'lat': lat, 'lon': lon, 'area': r.get('area', '未知')})
 
         full_df = pd.DataFrame(red_data)
         if full_df.empty:
-            return [], [], 0
+            return [], 0
 
-        def top3_centers(df_city):
-            rank = df_city['area'].value_counts().head(3)
-            result = []
-            for area, count in rank.items():
-                subset = df_city[df_city['area'] == area]
-                result.append({'area': area, 'lat': float(subset['lat'].median()), 'lon': float(subset['lon'].median()), 'count': int(count)})
-            return result
+        rank = full_df['area'].value_counts().head(3)
+        top_3_centers = []
+        for area, count in rank.items():
+            subset = full_df[full_df['area'] == area]
+            top_3_centers.append({'area': area, 'lat': float(subset['lat'].median()), 'lon': float(subset['lon'].median()), 'count': int(count)})
 
-        taipei_df = full_df[full_df['area'].isin(TAIPEI_DISTRICTS)]
-        newtaipei_df = full_df[full_df['area'].isin(NEWTAIPEI_DISTRICTS)]
-
-        taipei_top3 = top3_centers(taipei_df) if not taipei_df.empty else []
-        newtaipei_top3 = top3_centers(newtaipei_df) if not newtaipei_df.empty else []
-
-        return taipei_top3, newtaipei_top3, len(full_df)
+        return top_3_centers, len(full_df)
     except:
-        return [], [], 0
+        return [], 0
 
 # --- 8. 主畫面指標 ---
-taipei_top3, newtaipei_top3, total_count = fetch_analysis_data()
+top_3_centers, total_count = fetch_analysis_data()
 
 m1, m2 = st.columns(2)
 
@@ -511,9 +499,8 @@ with col_map:
     )
 
     # auto_zoom：用 fit_bounds 確保車輛 + 所有熱區圓都在視窗內
-    all_centers = taipei_top3 + newtaipei_top3
-    if auto_zoom and all_centers:
-        valid = [c for c in all_centers if 21.5 <= c['lat'] <= 25.5 and 119.0 <= c['lon'] <= 122.5]
+    if auto_zoom and top_3_centers:
+        valid = [c for c in top_3_centers if 21.5 <= c['lat'] <= 25.5 and 119.0 <= c['lon'] <= 122.5]
         if valid:
             all_points = [[center_lat, center_lon]] + [[c['lat'], c['lon']] for c in valid]
             m.fit_bounds(all_points, padding=[30, 30])
@@ -528,31 +515,26 @@ with col_map:
             name='雷達回波'
         ).add_to(m)
 
-    # 添加熱區圓圈（台北市=紅、新北市=藍）
-    if show_heatmap:
-        city_layers = [
-            (taipei_top3, '#FF0000', '台北市'),
-            (newtaipei_top3, '#0066FF', '新北市'),
-        ]
-        for centers, color, city_name in city_layers:
-            for dist in centers:
-                folium.Circle(
-                    location=[dist['lat'], dist['lon']],
-                    radius=1500,
-                    color=color,
-                    fill=True,
-                    fill_opacity=0.45,
-                    weight=4,
-                    tooltip=f"<b style='font-size:20px;'>[{city_name}] {dist['area']} ({dist['count']}處)</b>",
-                    zindex=10
-                ).add_to(m)
-                folium.CircleMarker(
-                    location=[dist['lat'], dist['lon']],
-                    radius=6,
-                    color='white',
-                    fill=True,
-                    fill_color=color
-                ).add_to(m)
+    # 添加熱區圓圈（台北市前三，紅色）
+    if show_heatmap and top_3_centers:
+        for dist in top_3_centers:
+            folium.Circle(
+                location=[dist['lat'], dist['lon']],
+                radius=1500,
+                color='#FF0000',
+                fill=True,
+                fill_opacity=0.45,
+                weight=4,
+                tooltip=f"<b style='font-size:20px;'>{dist['area']} ({dist['count']}處)</b>",
+                zindex=10
+            ).add_to(m)
+            folium.CircleMarker(
+                location=[dist['lat'], dist['lon']],
+                radius=6,
+                color='white',
+                fill=True,
+                fill_color='#FF0000'
+            ).add_to(m)
 
     # 添加車輛位置
     folium.CircleMarker(
@@ -571,26 +553,13 @@ with col_map:
 # --- 9.2 排行榜 ---
 with col_list:
     medals = ["🥇","🥈","🥉"]
-
-    def build_city_rows(centers, city_color):
-        html = ""
-        for i, dist in enumerate(centers):
+    rows_html = ""
+    if top_3_centers:
+        for i, dist in enumerate(top_3_centers):
             medal = medals[i] if i < len(medals) else "🏅"
-            html += f'<div class="rank-row"><span class="rank-area">{medal} {dist["area"]}</span><span class="rank-count" style="color:{city_color};">{dist["count"]}處</span></div>'
-        if not html:
-            html = '<div style="color:#888;font-size:14px;padding:4px 6px;">無數據</div>'
-        return html
-
-    rows_html = f"""
-<div class="city-section">
-  <div class="city-title" style="color:#FF4444;">🔴 台北市</div>
-  {build_city_rows(taipei_top3, '#FF4444')}
-</div>
-<div class="city-section">
-  <div class="city-title" style="color:#4488FF;">� 新北市</div>
-  {build_city_rows(newtaipei_top3, '#4488FF')}
-</div>
-"""
+            rows_html += f'<div class="rank-row"><span class="rank-area">{medal} {dist["area"]}</span><span class="rank-count">{dist["count"]}處</span></div>'
+    else:
+        rows_html = "<p style='color:#FFFFFF;font-size:16px;'>📊 目前無紅區數據</p>"
     rank_html = f"""<!DOCTYPE html><html><head><style>
     body{{margin:0;padding:0;background:#0E1117;font-family:Inter,sans-serif;box-sizing:border-box;}}
     .rank-title{{color:#FFD700;text-align:center;font-size:20px;font-weight:900;white-space:nowrap;margin-bottom:10px;}}
