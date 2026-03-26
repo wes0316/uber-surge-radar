@@ -430,38 +430,46 @@ with st.sidebar:
     
 
 # --- 6. 數據獲取 ---
+TAIPEI_DISTRICTS = {'松山區','信義區','大安區','中山區','中正區','大同區','萬華區','文山區','南港區','內湖區','士林區','北投區'}
+NEWTAIPEI_DISTRICTS = {'板橋區','三重區','中和區','永和區','新莊區','新店區','樹林區','鶯歌區','三峽區','淡水區','汐止區','瑞芳區','土城區','蘆洲區','五股區','泰山區','林口區','深坑區','石碇區','坪林區','三芝區','石門區','八里區','平溪區','雙溪區','貢寮區','金山區','萬里區','烏來區'}
+
 @st.cache_data(ttl=60)
 def fetch_analysis_data():
     try:
         res = requests.get("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_allavailable.json", timeout=5).json()
         desc = requests.get("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_alldesc.json", timeout=5).json()
         df = pd.merge(pd.DataFrame(desc['data']['park']), pd.DataFrame(res['data']['park']), on='id')
-        
+
         red_data = []
         for _, r in df.iterrows():
             t, a = float(r.get('totalcar', 0)), float(r.get('availablecar', 0))
             if t > 0 and (t-a)/t >= 0.9:
                 lat, lon = transformer.transform(float(r['tw97x']), float(r['tw97y']))
-                # 過濾台灣範圍外的異常坐標
                 if 21.5 <= lat <= 25.5 and 119.0 <= lon <= 122.5:
-                    red_data.append({'lat': lat, 'lon': lon, 'area': r.get('area', '未知')})
-        
+                    area = r.get('area', '未知')
+                    red_data.append({'lat': lat, 'lon': lon, 'area': area})
+
         full_df = pd.DataFrame(red_data)
         if full_df.empty:
-            return [], pd.DataFrame(columns=['area', 'count']), 0
-        
-        full_rank = full_df['area'].value_counts().reset_index()
-        full_rank.columns = ['area', 'count']
-        top_10_list = full_rank.head(10)
-        
-        top_3_centers = []
-        for area in top_10_list['area'].head(3):
-            subset = full_df[full_df['area'] == area]
-            top_3_centers.append({'area': area, 'lat': float(subset['lat'].median()), 'lon': float(subset['lon'].median()), 'count': len(subset)})
-        
-        return top_3_centers, top_10_list, len(full_df)
+            return [], [], 0
+
+        def top3_centers(df_city):
+            rank = df_city['area'].value_counts().head(3)
+            result = []
+            for area, count in rank.items():
+                subset = df_city[df_city['area'] == area]
+                result.append({'area': area, 'lat': float(subset['lat'].median()), 'lon': float(subset['lon'].median()), 'count': int(count)})
+            return result
+
+        taipei_df = full_df[full_df['area'].isin(TAIPEI_DISTRICTS)]
+        newtaipei_df = full_df[full_df['area'].isin(NEWTAIPEI_DISTRICTS)]
+
+        taipei_top3 = top3_centers(taipei_df) if not taipei_df.empty else []
+        newtaipei_top3 = top3_centers(newtaipei_df) if not newtaipei_df.empty else []
+
+        return taipei_top3, newtaipei_top3, len(full_df)
     except:
-        return [], pd.DataFrame(columns=['area', 'count']), 0
+        return [], [], 0
 
 # --- 8. 主畫面指標 ---
 top_3_centers, top_10_list, total_count = fetch_analysis_data()
