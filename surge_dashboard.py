@@ -472,7 +472,7 @@ def fetch_analysis_data():
         return [], [], 0
 
 # --- 8. 主畫面指標 ---
-top_3_centers, top_10_list, total_count = fetch_analysis_data()
+taipei_top3, newtaipei_top3, total_count = fetch_analysis_data()
 
 m1, m2 = st.columns(2)
 
@@ -510,9 +510,10 @@ with col_map:
         attributionControl=False
     )
 
-    # auto_zoom：用 fit_bounds 確保車輛 + 所有熱區圓都在視窗內（只含驗證坐標）
-    if auto_zoom and top_3_centers and len(top_3_centers) > 0:
-        valid = [c for c in top_3_centers if 21.5 <= c['lat'] <= 25.5 and 119.0 <= c['lon'] <= 122.5]
+    # auto_zoom：用 fit_bounds 確保車輛 + 所有熱區圓都在視窗內
+    all_centers = taipei_top3 + newtaipei_top3
+    if auto_zoom and all_centers:
+        valid = [c for c in all_centers if 21.5 <= c['lat'] <= 25.5 and 119.0 <= c['lon'] <= 122.5]
         if valid:
             all_points = [[center_lat, center_lon]] + [[c['lat'], c['lon']] for c in valid]
             m.fit_bounds(all_points, padding=[30, 30])
@@ -527,39 +528,31 @@ with col_map:
             name='雷達回波'
         ).add_to(m)
 
-    # 添加熱區圓圈
-    if show_heatmap and top_3_centers:
-        for i, dist in enumerate(top_3_centers):
-            # 根據數量調整圓圈顏色和透明度
-            if dist['count'] > 0:
-                color = '#FF0000'
-                fill_opacity = 0.45
-                radius = 1500
-            else:
-                color = '#FFA500'  # 橙色表示預設位置
-                fill_opacity = 0.25
-                radius = 1000
-            
-            # 添加熱區圓圈
-            folium.Circle(
-                location=[dist['lat'], dist['lon']], 
-                radius=radius, 
-                color=color, 
-                fill=True, 
-                fill_opacity=fill_opacity, 
-                weight=4, 
-                tooltip=f"<b style='font-size:20px;'>{dist['area']} ({dist['count']}處)</b>", 
-                zindex=10
-            ).add_to(m)
-            
-            # 添加中心點標記
-            folium.CircleMarker(
-                location=[dist['lat'], dist['lon']], 
-                radius=6, 
-                color='white', 
-                fill=True, 
-                fill_color=color
-            ).add_to(m)
+    # 添加熱區圓圈（台北市=紅、新北市=藍）
+    if show_heatmap:
+        city_layers = [
+            (taipei_top3, '#FF0000', '台北市'),
+            (newtaipei_top3, '#0066FF', '新北市'),
+        ]
+        for centers, color, city_name in city_layers:
+            for dist in centers:
+                folium.Circle(
+                    location=[dist['lat'], dist['lon']],
+                    radius=1500,
+                    color=color,
+                    fill=True,
+                    fill_opacity=0.45,
+                    weight=4,
+                    tooltip=f"<b style='font-size:20px;'>[{city_name}] {dist['area']} ({dist['count']}處)</b>",
+                    zindex=10
+                ).add_to(m)
+                folium.CircleMarker(
+                    location=[dist['lat'], dist['lon']],
+                    radius=6,
+                    color='white',
+                    fill=True,
+                    fill_color=color
+                ).add_to(m)
 
     # 添加車輛位置
     folium.CircleMarker(
@@ -577,14 +570,27 @@ with col_map:
 
 # --- 9.2 排行榜 ---
 with col_list:
-    medals = ["🥇","🥈","🥉","🏅","🏅","🏅","🏅","🏅","🏅","🏅"]
-    rows_html = ""
-    if not top_10_list.empty:
-        for i, (_, row) in enumerate(top_10_list.iterrows()):
+    medals = ["🥇","🥈","🥉"]
+
+    def build_city_rows(centers, city_color):
+        html = ""
+        for i, dist in enumerate(centers):
             medal = medals[i] if i < len(medals) else "🏅"
-            rows_html += f'<div class="rank-row"><span class="rank-area">{medal} {row["area"]}</span><span class="rank-count">{row["count"]}處</span></div>'
-    else:
-        rows_html = "<p style='color:#FFFFFF;font-size:16px;'>📊 目前無紅區數據</p>"
+            html += f'<div class="rank-row"><span class="rank-area">{medal} {dist["area"]}</span><span class="rank-count" style="color:{city_color};">{dist["count"]}處</span></div>'
+        if not html:
+            html = '<div style="color:#888;font-size:14px;padding:4px 6px;">無數據</div>'
+        return html
+
+    rows_html = f"""
+<div class="city-section">
+  <div class="city-title" style="color:#FF4444;">🔴 台北市</div>
+  {build_city_rows(taipei_top3, '#FF4444')}
+</div>
+<div class="city-section">
+  <div class="city-title" style="color:#4488FF;">� 新北市</div>
+  {build_city_rows(newtaipei_top3, '#4488FF')}
+</div>
+"""
     rank_html = f"""<!DOCTYPE html><html><head><style>
     body{{margin:0;padding:0;background:#0E1117;font-family:Inter,sans-serif;box-sizing:border-box;}}
     .rank-title{{color:#FFD700;text-align:center;font-size:20px;font-weight:900;white-space:nowrap;margin-bottom:8px;}}
