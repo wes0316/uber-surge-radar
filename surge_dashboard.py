@@ -770,11 +770,7 @@ with col_list:
             rows_html += f'<div style="display:flex;flex-direction:row;justify-content:space-between;align-items:center;padding:4px 6px;margin-bottom:3px;background:rgba(45,45,45,0.7);border-radius:6px;border-left:3px solid #00D4FF;"><span class="rank-text" style="white-space:nowrap;word-break:keep-all;color:#FFFFFF;font-weight:700;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1;">{medal} {row["area"]}</span><span class="rank-text" style="white-space:nowrap;color:#00D4FF;font-weight:900;margin-left:8px;flex-shrink:0;">{row["count"]}處</span></div>'
     else:
         rows_html = "<p style='color:#FFFFFF;font-size:16px;'>📊 目前無紅區數據</p>"
-    st.markdown(f"""
-<div style="height:520px;display:flex;flex-direction:column;overflow:hidden;">
-  <div style="color:#FFD700;text-align:center;font-size:20px;font-weight:900;white-space:nowrap;margin-bottom:8px;flex-shrink:0;">🏆 紅區排行榜</div>
-  <div style="flex:1;overflow-y:auto;">{rows_html}</div>
-</div>""", unsafe_allow_html=True)
+    st.markdown(f'<div class="rank-container"><div style="color:#FFD700;text-align:center;font-size:20px;font-weight:900;white-space:nowrap;margin-bottom:8px;flex-shrink:0;">🏆 紅區排行榜</div><div class="rank-scroll">{rows_html}</div></div>', unsafe_allow_html=True)
 
 # --- 10. GPS三分鐘自動定位與地圖更新 ---
 st.markdown(f"""
