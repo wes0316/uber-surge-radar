@@ -560,12 +560,10 @@ print("開始獲取 GPS 位置...")
 curr = get_geolocation()
 print(f"GPS 結果: {curr}")
 
-speed_kmh = 0
 if curr and 'coords' in curr:
     lat = curr['coords']['latitude']
     lon = curr['coords']['longitude']
     st.session_state['gps_pos'] = (lat, lon)
-    speed_kmh = (curr['coords'].get('speed') or 0) * 3.6
     update_address(lat, lon)
 else:
     lat, lon = st.session_state['gps_pos']
@@ -594,10 +592,6 @@ with st.sidebar:
         st.cache_data.clear()
         st.rerun()
     
-    st.markdown("---")
-    st.markdown(f"<h3 style='color:#FFD700; text-align:center; font-size: 36px; font-weight: 900;'>🚗 車速</h3>", unsafe_allow_html=True)
-    st.markdown(f"<h2 style='color:#00FF88; text-align:center; font-size: 48px; font-weight: 900;'>{speed_kmh:.0f}</h2>", unsafe_allow_html=True)
-    st.markdown("<h3 style='color:#FFD700; text-align:center; font-size: 36px; font-weight: 900;'>km/h</h3>", unsafe_allow_html=True)
 
 # --- 6. 數據獲取 ---
 @st.cache_data(ttl=60)
@@ -730,7 +724,7 @@ with col_map:
         color='lime', 
         fill=True, 
         fill_color='green',
-        popup=f"🚗 車輛位置<br>速度: {speed_kmh:.0f} km/h",
+        popup="🚗 車輛位置",
         zindex=20
     ).add_to(m)
 
