@@ -444,6 +444,10 @@ st.markdown("""
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif !important;
         }
 
+        .rank-text {
+            font-size: 19px !important;
+        }
+
     </style>
 """, unsafe_allow_html=True)
 
