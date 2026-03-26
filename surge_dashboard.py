@@ -775,38 +775,5 @@ st.markdown(f"""
         setTimeout(updateGPSAndMap, 3000);
         setInterval(updateGPSAndMap, 180000);
         
-        // 每分鐘檢查GPS位置並更新地圖中心
-        function updateMapCenter() {{
-            try {{
-                // 獲取當前GPS位置
-                navigator.geolocation.getCurrentPosition(
-                    function(position) {{
-                        const lat = position.coords.latitude;
-                        const lon = position.coords.longitude;
-                        
-                        // 更新地圖中心點
-                        const mapElements = document.querySelectorAll('.leaflet-map');
-                        mapElements.forEach(map => {{
-                            if (map._map) {{
-                                map._map.setView([lat, lon], map._map.getZoom());
-                            }}
-                        }});
-                    }},
-                    function(error) {{
-                        console.log('GPS定位失敗:', error);
-                    }},
-                    {{
-                        enableHighAccuracy: true,
-                        timeout: 10000,
-                        maximumAge: 60000
-                    }}
-                );
-            }} catch (e) {{
-                console.log('GPS更新失敗:', e);
-            }}
-        }}
-        
-        // 每分鐘嘗試更新地圖中心
-        setInterval(updateMapCenter, 60000);
     </script>
 """, unsafe_allow_html=True)
