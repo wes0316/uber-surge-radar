@@ -9,6 +9,7 @@ import base64
 import os
 from pyproj import Transformer
 from streamlit_js_eval import get_geolocation
+import streamlit.components.v1 as components
 
 # --- 隱藏 SSL 憑證警告 ---
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -770,7 +771,17 @@ with col_list:
             rows_html += f'<div style="display:flex;flex-direction:row;justify-content:space-between;align-items:center;padding:4px 6px;margin-bottom:3px;background:rgba(45,45,45,0.7);border-radius:6px;border-left:3px solid #00D4FF;"><span class="rank-text" style="white-space:nowrap;word-break:keep-all;color:#FFFFFF;font-weight:700;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1;">{medal} {row["area"]}</span><span class="rank-text" style="white-space:nowrap;color:#00D4FF;font-weight:900;margin-left:8px;flex-shrink:0;">{row["count"]}處</span></div>'
     else:
         rows_html = "<p style='color:#FFFFFF;font-size:16px;'>📊 目前無紅區數據</p>"
-    st.markdown(f'<div class="rank-container"><div style="color:#FFD700;text-align:center;font-size:20px;font-weight:900;white-space:nowrap;margin-bottom:8px;flex-shrink:0;">🏆 紅區排行榜</div><div class="rank-scroll">{rows_html}</div></div>', unsafe_allow_html=True)
+    rank_html = f"""<!DOCTYPE html><html><head><style>
+    body{{margin:0;padding:0;background:#0E1117;font-family:Inter,sans-serif;box-sizing:border-box;}}
+    .rank-title{{color:#FFD700;text-align:center;font-size:20px;font-weight:900;white-space:nowrap;margin-bottom:8px;}}
+    .rank-row{{display:flex;flex-direction:row;justify-content:space-between;align-items:center;padding:4px 6px;margin-bottom:3px;background:rgba(45,45,45,0.7);border-radius:6px;border-left:3px solid #00D4FF;}}
+    .rank-area{{white-space:nowrap;word-break:keep-all;color:#FFFFFF;font-size:19px;font-weight:700;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1;}}
+    .rank-count{{white-space:nowrap;color:#00D4FF;font-size:19px;font-weight:900;margin-left:8px;flex-shrink:0;}}
+    </style></head><body>
+    <div class='rank-title'>🏆 紅區排行榜</div>
+    {rows_html}
+    </body></html>"""
+    components.html(rank_html, height=520, scrolling=False)
 
 # --- 10. GPS三分鐘自動定位與地圖更新 ---
 st.markdown(f"""
